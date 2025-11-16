@@ -1,8 +1,8 @@
 {
-    "name": "help-plugin/wordpress-plugin",
-    "description": "Plugin WordPress com página no painel de controle",
+    "name": "boopixel/boochat-connect",
+    "description": "AI Chatbot with n8n Automation - WordPress plugin",
     "type": "wordpress-plugin",
-    "license": "proprietary",
+    "license": "GPL-2.0-or-later",
     "require": {
         "php": ">=7.4"
     },

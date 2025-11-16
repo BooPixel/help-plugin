@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ZIP_NAME="help-plugin.zip"
+ZIP_NAME="boochat-connect.zip"
 
 [ -f "$ZIP_NAME" ] && rm "$ZIP_NAME"
 
