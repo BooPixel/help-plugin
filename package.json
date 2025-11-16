@@ -1,16 +1,29 @@
 {
-  "name": "help-plugin",
+  "name": "boochat-connect",
   "version": "1.0.0",
-  "description": "Plugin WordPress com página no painel de controle",
+  "description": "AI Chatbot with n8n Automation - Connect your WordPress site to n8n workflows for intelligent customer service chat automation.",
   "scripts": {
     "build": "./build.sh",
     "zip": "./build.sh"
   },
   "keywords": [
+    "chatbot",
+    "ai",
+    "n8n",
+    "automation",
+    "customer-service",
+    "chat",
+    "support",
+    "automation-workflow",
     "wordpress",
     "plugin"
   ],
-  "author": "",
-  "license": "GPL-2.0-or-later"
+  "author": "BooPixel",
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://boopixel.com",
+  "repository": {
+    "type": "git",
+    "url": "https://boopixel.com/boochat-connect"
+  }
 }
 
