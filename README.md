@@ -1,18 +1,25 @@
 # Help Plugin
 
-A WordPress plugin that adds a custom admin dashboard page to your WordPress site.
+A WordPress plugin that provides a customer service chat widget with API integration, customization options, and statistics tracking.
 
 ## Description
 
-Help Plugin is a WordPress plugin that extends the WordPress admin panel by adding a dedicated page in the sidebar menu. It provides an interface to view system information, perform custom actions, and manage plugin-specific settings.
+Help Plugin is a WordPress plugin that adds a customer service chat widget to your website. It features a customizable chat interface that connects to an external API for conversation handling, includes comprehensive statistics tracking, and offers extensive customization options for colors, typography, and messaging.
 
 ## Features
 
-- **Admin Dashboard Page**: Custom page in WordPress admin sidebar menu
-- **System Information**: Display WordPress version, PHP version, and plugin version
-- **Interactive Actions**: Built-in interactive buttons and functionality
-- **Clean UI**: Modern and clean admin interface matching WordPress design standards
-- **Fully Customizable**: Easy to extend with additional features
+- **Chat Widget**: Interactive chat popup and window on the frontend
+- **API Integration**: Connects to external API for conversation handling
+- **Customization Panel**: 
+  - Customizable chat name and welcome message
+  - Color customization (primary, secondary, background, text)
+  - Typography options (font family and size)
+- **Statistics Dashboard**: 
+  - Track interactions (1 day, 7 days, 30 days)
+  - Interactive charts with date range selection
+  - Message content logging
+- **Settings Management**: Configure API URL and chat settings
+- **Responsive Design**: Mobile-friendly chat interface
 - **Unit Tests**: Complete test coverage with PHPUnit
 
 ## Installation
@@ -42,33 +49,60 @@ Help Plugin is a WordPress plugin that extends the WordPress admin panel by addi
 wp plugin install help-plugin.zip --activate
 ```
 
+## Configuration
+
+### Setting Up the API
+
+1. Navigate to **Help Plugin > Configurações** in WordPress admin
+2. Enter your API webhook URL
+3. Click **Salvar Configurações**
+
+The API should accept POST requests with the following JSON format:
+```json
+{
+  "sessionId": "unique-session-id",
+  "action": "sendMessage",
+  "chatInput": "user message text"
+}
+```
+
+Expected response format:
+```json
+{
+  "output": "API response message"
+}
+```
+
+### Customizing the Chat
+
+1. Navigate to **Help Plugin > Painel Principal** in WordPress admin
+2. Customize the following options:
+   - **Nome do Chat**: Display name in chat header
+   - **Mensagem Inicial**: Welcome message shown when chat opens
+   - **Cor Primária**: Primary gradient color (header, buttons)
+   - **Cor Secundária**: Secondary gradient color
+   - **Cor de Fundo do Chat**: Chat window background color
+   - **Cor do Texto**: Text color for messages
+   - **Fonte**: Font family selection
+   - **Tamanho da Fonte**: Font size selection
+3. Click **Salvar Customizações**
+
 ## Usage
 
-Once activated, you will see a new menu item **Help Plugin** in your WordPress admin sidebar menu (usually near the bottom).
+### Frontend Chat
 
-### Accessing the Plugin Page
+Once activated, a chat popup will appear on the frontend of your website (bottom-right corner). Users can:
+- Click the popup to open the chat window
+- Send messages that are processed by your configured API
+- View responses from the API in real-time
 
-1. Log in to your WordPress admin panel
-2. Click on **Help Plugin** in the sidebar menu
-3. You will be redirected to the plugin's main page
+### Statistics
 
-### Available Features
-
-The plugin page includes:
-
-- **Welcome Section**: Overview and introduction to the plugin
-- **System Information Table**: 
-  - WordPress version
-  - PHP version
-  - Plugin version
-- **Action Buttons**: Interactive elements for custom functionality
-
-### Customization
-
-You can extend the plugin by modifying:
-- `help-plugin.php` - Main plugin logic
-- `assets/css/admin-style.css` - Admin page styling
-- `assets/js/admin-script.js` - Admin page JavaScript functionality
+View interaction statistics:
+1. Navigate to **Help Plugin > Estatísticas** in WordPress admin
+2. View quick summary (1 day, 7 days, 30 days)
+3. Select a date range using the calendar picker
+4. View interactive chart showing interactions over time
 
 ## Development
 
@@ -76,21 +110,23 @@ You can extend the plugin by modifying:
 
 ```
 help-plugin/
-├── help-plugin.php          # Main plugin file
-├── LICENSE                  # Proprietary license
+├── help-plugin.php              # Main plugin file
+├── LICENSE                      # Proprietary license
 ├── assets/
 │   ├── css/
-│   │   └── admin-style.css  # Admin page styles
+│   │   ├── admin-style.css      # Admin page styles
+│   │   └── chat-style.css       # Frontend chat styles
 │   └── js/
-│       └── admin-script.js  # Admin page scripts
-├── tests/                   # Unit tests
-│   ├── bootstrap.php        # Test bootstrap file
-│   └── test-help-plugin.php # Plugin tests
-├── build.sh                 # Build script to generate ZIP
-├── composer.json            # PHP dependencies
-├── package.json             # npm configuration
-├── phpunit.xml              # PHPUnit configuration
-└── README.md                # Documentation
+│       ├── admin-script.js      # Admin page scripts
+│       ├── chat-script.js       # Frontend chat functionality
+│       └── statistics-script.js # Statistics page scripts
+├── tests/                       # Unit tests
+│   └── test-help-plugin.php     # Plugin tests
+├── build.sh                     # Build script to generate ZIP
+├── composer.json                # PHP dependencies
+├── package.json                 # npm configuration
+├── phpunit.xml                  # PHPUnit configuration
+└── README.md                    # Documentation
 ```
 
 ### Building the Plugin
@@ -153,13 +189,26 @@ The plugin includes comprehensive unit tests covering:
 - Menu registration
 - Asset enqueueing
 - Page rendering
-- Constants definition
+- API integration
+- Statistics tracking
+- Customization settings
+- Database interactions
+
+## Database
+
+The plugin creates a custom table `wp_help_plugin_interactions` to store:
+- Session IDs
+- Message content
+- Interaction timestamps
+
+This table is automatically created on first use.
 
 ## Requirements
 
 - **WordPress**: 5.0 or higher
 - **PHP**: 7.4 or higher
 - **MySQL**: 5.6 or higher (or MariaDB 10.0 or higher)
+- **jQuery**: Included with WordPress
 
 ## Version
 
@@ -173,9 +222,12 @@ For support, feature requests, or bug reports, please contact the plugin author.
 
 ### 1.0.0 (Initial Release)
 - Initial plugin release
-- Admin dashboard page implementation
-- System information display
-- Interactive actions
+- Chat widget with popup and window
+- API integration for conversation handling
+- Customization panel (colors, typography, messages)
+- Statistics dashboard with charts
+- Interaction tracking and logging
+- Settings management
 - Unit test suite
 - Build automation
 
