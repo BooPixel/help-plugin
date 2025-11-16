@@ -107,7 +107,15 @@ composer test:coverage
 
 ## License
 
-GPL v2 or later
+**Proprietary - Commercial License**
+
+This plugin is proprietary software. All rights reserved.
+
+This software is licensed, not sold. You may not use, copy, modify, distribute, or create derivative works of this software without purchasing a valid license.
+
+For licensing information and pricing, please contact the author.
+
+**Unauthorized use, reproduction, or distribution of this software is strictly prohibited and may result in legal action.**
 
 ## Author
 

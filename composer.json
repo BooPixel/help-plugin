@@ -2,7 +2,7 @@
     "name": "help-plugin/wordpress-plugin",
     "description": "Plugin WordPress com página no painel de controle",
     "type": "wordpress-plugin",
-    "license": "GPL-2.0-or-later",
+    "license": "proprietary",
     "require": {
         "php": ">=7.4"
     },
