@@ -1,0 +1,30 @@
+{
+    "name": "help-plugin/wordpress-plugin",
+    "description": "Plugin WordPress com página no painel de controle",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "yoast/phpunit-polyfills": "^1.0",
+        "wp-phpunit/wp-phpunit": "^6.0",
+        "mockery/mockery": "^1.5"
+    },
+    "autoload": {
+        "classmap": [
+            "help-plugin.php"
+        ]
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/"
+        ]
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-html coverage"
+    }
+}
+

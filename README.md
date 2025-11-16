@@ -1,84 +1,114 @@
 # Help Plugin
 
-Plugin WordPress com página no painel de controle administrativo.
+WordPress plugin with admin dashboard page.
 
-## Descrição
+## Description
 
-Help Plugin é um plugin WordPress que adiciona uma página no menu do painel de controle, permitindo visualizar informações do sistema e realizar ações personalizadas.
+Help Plugin is a WordPress plugin that adds a page to the admin menu, allowing you to view system information and perform custom actions.
 
-## Instalação
+## Installation
 
-### Método 1: Via Upload
+### Method 1: Via Upload
 
-1. Faça o download do arquivo `help-plugin.zip`
-2. Acesse o painel do WordPress
-3. Vá em **Plugins > Adicionar novo**
-4. Clique em **Enviar plugin**
-5. Selecione o arquivo `help-plugin.zip`
-6. Clique em **Instalar agora**
-7. Após a instalação, clique em **Ativar plugin**
+1. Download the `help-plugin.zip` file
+2. Access WordPress admin panel
+3. Go to **Plugins > Add New**
+4. Click **Upload Plugin**
+5. Select the `help-plugin.zip` file
+6. Click **Install Now**
+7. After installation, click **Activate Plugin**
 
-### Método 2: Via FTP
+### Method 2: Via FTP
 
-1. Extraia o conteúdo do arquivo ZIP
-2. Envie a pasta `help-plugin` para `wp-content/plugins/`
-3. Acesse o painel do WordPress
-4. Vá em **Plugins**
-5. Ative o **Help Plugin**
+1. Extract the ZIP file contents
+2. Upload the `help-plugin` folder to `wp-content/plugins/`
+3. Access WordPress admin panel
+4. Go to **Plugins**
+5. Activate **Help Plugin**
 
-## Uso
+## Usage
 
-Após a ativação, você verá um novo item no menu lateral do WordPress chamado **Help Plugin**. Ao clicar, você terá acesso a:
+After activation, you will see a new item in the WordPress sidebar menu called **Help Plugin**. Clicking on it will give you access to:
 
-- Página principal do plugin
-- Informações do sistema (versão do WordPress, PHP e do plugin)
-- Ações interativas
+- Main plugin page
+- System information (WordPress version, PHP version, and plugin version)
+- Interactive actions
 
-## Desenvolvimento
+## Development
 
-### Estrutura do Plugin
+### Plugin Structure
 
 ```
 help-plugin/
-├── help-plugin.php      # Arquivo principal do plugin
+├── help-plugin.php      # Main plugin file
 ├── assets/
 │   ├── css/
 │   │   └── admin-style.css
 │   └── js/
 │       └── admin-script.js
-├── build.sh             # Script para gerar ZIP
-├── package.json         # Configurações npm
+├── tests/               # Unit tests
+│   ├── bootstrap.php
+│   └── test-help-plugin.php
+├── build.sh             # Build script to generate ZIP
+├── composer.json        # PHP dependencies
+├── package.json         # npm configuration
+├── phpunit.xml          # PHPUnit configuration
 └── README.md
 ```
 
 ### Build
 
-Para gerar o arquivo ZIP do plugin:
+To generate the plugin ZIP file:
 
 ```bash
 ./build.sh
 ```
 
-ou
+or
 
 ```bash
 npm run build
 ```
 
-## Requisitos
+### Testing
 
-- WordPress 5.0 ou superior
-- PHP 7.4 ou superior
+Install dependencies:
 
-## Versão
+```bash
+composer install
+```
+
+Run tests:
+
+```bash
+composer test
+```
+
+or
+
+```bash
+./vendor/bin/phpunit
+```
+
+Run tests with coverage:
+
+```bash
+composer test:coverage
+```
+
+## Requirements
+
+- WordPress 5.0 or higher
+- PHP 7.4 or higher
+
+## Version
 
 1.0.0
 
-## Licença
+## License
 
 GPL v2 or later
 
-## Autor
+## Author
 
-Seu Nome
-
+Your Name
