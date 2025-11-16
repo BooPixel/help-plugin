@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit tests for Help Plugin
+ * Unit tests for BooChat Connect Plugin
  */
 
 use PHPUnit\Framework\TestCase;
@@ -165,14 +165,106 @@ class Help_Plugin_Test extends TestCase {
         
         if (!function_exists('get_admin_page_title')) {
             function get_admin_page_title() {
-                return 'Help Plugin';
+                return 'BooChat Connect';
             }
         }
         
         if (!function_exists('submit_button')) {
             function submit_button($text = null, $type = 'primary', $name = 'submit', $wrap = true, $other_attributes = null) {
-                return '<button type="submit" class="button button-' . $type . '">' . ($text ?: 'Salvar') . '</button>';
+                return '<button type="submit" class="button button-' . $type . '">' . ($text ?: 'Save') . '</button>';
             }
+        }
+        
+        if (!function_exists('get_locale')) {
+            function get_locale() {
+                return 'en_US';
+            }
+        }
+        
+        if (!function_exists('check_ajax_referer')) {
+            function check_ajax_referer($action = -1, $query_arg = false, $die = true) {
+                return true;
+            }
+        }
+        
+        if (!function_exists('wp_send_json_success')) {
+            function wp_send_json_success($data = null) {
+                return array('success' => true, 'data' => $data);
+            }
+        }
+        
+        if (!function_exists('wp_send_json_error')) {
+            function wp_send_json_error($data = null) {
+                return array('success' => false, 'data' => $data);
+            }
+        }
+        
+        if (!function_exists('wp_die')) {
+            function wp_die($message = '', $title = '', $args = array()) {
+                return;
+            }
+        }
+        
+        if (!function_exists('wp_redirect')) {
+            function wp_redirect($location, $status = 302) {
+                return true;
+            }
+        }
+        
+        if (!function_exists('add_query_arg')) {
+            function add_query_arg($key, $value = null, $url = null) {
+                return $url ? $url . '?' . $key . '=' . $value : '?' . $key . '=' . $value;
+            }
+        }
+        
+        if (!function_exists('flush_rewrite_rules')) {
+            function flush_rewrite_rules($hard = true) {
+                return true;
+            }
+        }
+        
+        if (!function_exists('dbDelta')) {
+            function dbDelta($queries, $execute = true) {
+                return array();
+            }
+        }
+        
+        if (!function_exists('delete_option')) {
+            function delete_option($option) {
+                return true;
+            }
+        }
+        
+        // Mock wpdb
+        global $wpdb;
+        if (!isset($wpdb)) {
+            $wpdb = new class {
+                public $prefix = 'wp_';
+                
+                public function insert($table, $data, $format = null) {
+                    return true;
+                }
+                
+                public function get_var($query = null) {
+                    return 0;
+                }
+                
+                public function get_results($query = null) {
+                    return array();
+                }
+                
+                public function prepare($query, ...$args) {
+                    return $query;
+                }
+                
+                public function query($query) {
+                    return true;
+                }
+                
+                public function get_charset_collate() {
+                    return 'DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
+                }
+            };
         }
         
         if (!function_exists('selected')) {
@@ -189,6 +281,11 @@ class Help_Plugin_Test extends TestCase {
         
         if (!defined('DB_NAME')) {
             define('DB_NAME', 'test_db');
+        }
+        
+        // Load plugin file
+        if (!class_exists('Help_Plugin')) {
+            require_once dirname(__DIR__) . '/help-plugin.php';
         }
         
         // Reset singleton instance
@@ -407,6 +504,116 @@ class Help_Plugin_Test extends TestCase {
     }
     
     /**
+     * Test help_plugin_get_language_from_locale function exists
+     */
+    public function test_help_plugin_get_language_from_locale_function_exists() {
+        $this->assertTrue(function_exists('help_plugin_get_language_from_locale'));
+    }
+    
+    /**
+     * Test help_plugin_get_language_from_locale returns correct language codes
+     */
+    public function test_help_plugin_get_language_from_locale_returns_correct_codes() {
+        $this->assertEquals('pt', help_plugin_get_language_from_locale('pt_BR'));
+        $this->assertEquals('es', help_plugin_get_language_from_locale('es_ES'));
+        $this->assertEquals('en', help_plugin_get_language_from_locale('en_US'));
+        $this->assertEquals('en', help_plugin_get_language_from_locale('en_GB'));
+    }
+    
+    /**
+     * Test help_plugin_get_language_from_locale defaults to English
+     */
+    public function test_help_plugin_get_language_from_locale_defaults_to_english() {
+        $this->assertEquals('en', help_plugin_get_language_from_locale('fr_FR'));
+        $this->assertEquals('en', help_plugin_get_language_from_locale('de_DE'));
+    }
+    
+    /**
+     * Test help_plugin_translate function exists
+     */
+    public function test_help_plugin_translate_function_exists() {
+        $this->assertTrue(function_exists('help_plugin_translate'));
+    }
+    
+    /**
+     * Test help_plugin_translate returns English translation by default
+     */
+    public function test_help_plugin_translate_returns_english_by_default() {
+        $result = help_plugin_translate('chat_name_default');
+        $this->assertEquals('Support', $result);
+    }
+    
+    /**
+     * Test activate method exists
+     */
+    public function test_activate_method_exists() {
+        $this->assertTrue(method_exists('Help_Plugin', 'activate'));
+    }
+    
+    /**
+     * Test deactivate method exists
+     */
+    public function test_deactivate_method_exists() {
+        $this->assertTrue(method_exists('Help_Plugin', 'deactivate'));
+    }
+    
+    /**
+     * Test get_language method exists
+     */
+    public function test_get_language_method_exists() {
+        $reflection = new ReflectionClass('Help_Plugin');
+        $this->assertTrue($reflection->hasMethod('get_language'));
+    }
+    
+    /**
+     * Test get_effective_language method exists
+     */
+    public function test_get_effective_language_method_exists() {
+        $reflection = new ReflectionClass('Help_Plugin');
+        $this->assertTrue($reflection->hasMethod('get_effective_language'));
+    }
+    
+    /**
+     * Test log_interaction method exists
+     */
+    public function test_log_interaction_method_exists() {
+        $reflection = new ReflectionClass('Help_Plugin');
+        $this->assertTrue($reflection->hasMethod('log_interaction'));
+    }
+    
+    /**
+     * Test log_robot_response method exists
+     */
+    public function test_log_robot_response_method_exists() {
+        $reflection = new ReflectionClass('Help_Plugin');
+        $this->assertTrue($reflection->hasMethod('log_robot_response'));
+    }
+    
+    /**
+     * Test create_interactions_table method exists
+     */
+    public function test_create_interactions_table_method_exists() {
+        $reflection = new ReflectionClass('Help_Plugin');
+        $this->assertTrue($reflection->hasMethod('create_interactions_table'));
+    }
+    
+    /**
+     * Test get_interactions_count method exists
+     */
+    public function test_get_interactions_count_method_exists() {
+        $reflection = new ReflectionClass('Help_Plugin');
+        $this->assertTrue($reflection->hasMethod('get_interactions_count'));
+    }
+    
+    /**
+     * Test get_chart_data method exists
+     */
+    public function test_get_chart_data_method_exists() {
+        $reflection = new ReflectionClass('Help_Plugin');
+        $this->assertTrue($reflection->hasMethod('get_chart_data'));
+    }
+    
+    /**
      * Test render_admin_page outputs HTML
      */
     public function test_render_admin_page_outputs_html() {
@@ -415,7 +622,7 @@ class Help_Plugin_Test extends TestCase {
         $output = ob_get_clean();
         
         $this->assertStringContainsString('<div class="wrap help-plugin-wrap">', $output);
-        $this->assertStringContainsString('Help Plugin', $output);
+        $this->assertStringContainsString('BooChat Connect', $output);
     }
     
     /**
@@ -426,10 +633,10 @@ class Help_Plugin_Test extends TestCase {
         $this->plugin->render_admin_page();
         $output = ob_get_clean();
         
-        $this->assertStringContainsString('Customização do Chat', $output);
-        $this->assertStringContainsString('Nome do Chat', $output);
-        $this->assertStringContainsString('Mensagem Inicial', $output);
-        $this->assertStringContainsString('Cor Primária', $output);
+        $this->assertStringContainsString('chat_name', $output);
+        $this->assertStringContainsString('welcome_message', $output);
+        $this->assertStringContainsString('primary_color', $output);
+        $this->assertStringContainsString('form', $output);
     }
     
     /**
@@ -441,7 +648,7 @@ class Help_Plugin_Test extends TestCase {
         $output = ob_get_clean();
         
         $this->assertStringContainsString('<div class="wrap help-plugin-wrap">', $output);
-        $this->assertStringContainsString('Configurações', $output);
+        $this->assertStringContainsString('form', $output);
     }
     
     /**
@@ -452,8 +659,8 @@ class Help_Plugin_Test extends TestCase {
         $this->plugin->render_settings_page();
         $output = ob_get_clean();
         
-        $this->assertStringContainsString('URL da API', $output);
         $this->assertStringContainsString('api_url', $output);
+        $this->assertStringContainsString('language', $output);
     }
     
     /**
@@ -465,7 +672,7 @@ class Help_Plugin_Test extends TestCase {
         $output = ob_get_clean();
         
         $this->assertStringContainsString('<div class="wrap help-plugin-wrap">', $output);
-        $this->assertStringContainsString('Estatísticas', $output);
+        $this->assertStringContainsString('interactions-chart', $output);
     }
     
     /**
