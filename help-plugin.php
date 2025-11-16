@@ -1,28 +1,32 @@
 <?php
 /**
- * Plugin Name: Help Plugin
- * Plugin URI: https://example.com/help-plugin
- * Description: Plugin WordPress com página no painel de controle
+ * Plugin Name: BooChat Connect
+ * Plugin URI: https://boopixel.com/boochat-connect
+ * Description: AI Chatbot & n8n Automation - Modern, lightweight chatbot popup that integrates seamlessly with n8n. Automate workflows, respond in real-time, collect leads, and connect to any AI model or external service. Perfect for 24/7 AI support, sales automation, and smart customer interactions.
  * Version: 1.0.0
- * Author: Seu Nome
- * Author URI: https://example.com
- * License: Proprietary - Commercial License
- * License URI: https://example.com/license
- * Text Domain: help-plugin
+ * Author: BooPixel
+ * Author URI: https://boopixel.com
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: boochat-connect
+ * Domain Path: /languages
+ * Requires at least: 5.0
+ * Tested up to: 6.4
+ * Requires PHP: 7.2
+ * Network: false
  */
 
-// Prevenir acesso direto
+// Prevent direct access
 if (!defined('ABSPATH')) {
     exit;
 }
 
-// Definir constantes
+// Define constants
 define('HELP_PLUGIN_VERSION', '1.0.0');
 define('HELP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('HELP_PLUGIN_URL', plugin_dir_url(__FILE__));
-define('HELP_PLUGIN_API_URL', 'https://boopixel.app.n8n.cloud/webhook/974d9c0b-31f5-4f10-b8f7-ed2cbb9cde26/chat');
 
-// Versão dinâmica baseada em timestamp para quebrar cache
+// Dynamic version based on timestamp to break cache
 function help_plugin_get_version() {
     $version = get_option('help_plugin_cache_version');
     if (empty($version)) {
@@ -33,17 +37,301 @@ function help_plugin_get_version() {
 }
 
 /**
- * Classe principal do plugin
+ * Get language code from WordPress locale
+ * 
+ * @param string $locale WordPress locale (e.g., pt_BR, es_ES, en_US)
+ * @return string Language code (en, pt, es)
+ */
+function help_plugin_get_language_from_locale($locale) {
+    // Map WordPress locales to plugin codes
+    $locale_map = array(
+        'pt_BR' => 'pt',
+        'pt_PT' => 'pt',
+        'es_ES' => 'es',
+        'es_MX' => 'es',
+        'es_AR' => 'es',
+        'es_CO' => 'es',
+        'es_CL' => 'es',
+        'es_PE' => 'es',
+        'es_VE' => 'es',
+        'en_US' => 'en',
+        'en_GB' => 'en',
+        'en_CA' => 'en',
+        'en_AU' => 'en',
+    );
+    
+    // Check full mapping
+    if (isset($locale_map[$locale])) {
+        return $locale_map[$locale];
+    }
+    
+    // Check prefix only (pt, es, en)
+    $prefix = substr($locale, 0, 2);
+    if (in_array($prefix, array('pt', 'es', 'en'))) {
+        return $prefix;
+    }
+    
+    // Default: English
+    return 'en';
+}
+
+/**
+ * Get translation based on configured language
+ */
+function help_plugin_translate($key, $default = '') {
+    // Get configured language or use WordPress locale
+    $configured_language = get_option('help_plugin_language', '');
+    
+    if (empty($configured_language)) {
+        // If no configuration, use WordPress locale
+        $wp_locale = get_locale();
+        $language = help_plugin_get_language_from_locale($wp_locale);
+    } else {
+        $language = $configured_language;
+    }
+    
+    $translations = array(
+        'en' => array(
+            'chat_name_default' => 'Support',
+            'welcome_message_default' => 'Hello! How can we help you today?',
+            'need_help' => 'Need help?',
+            'close' => 'Close',
+            'close_chat' => 'Close chat',
+            'type_message' => 'Type your message...',
+            'send' => 'Send',
+            'waiting_response' => 'Waiting for response...',
+            'error_send_message' => 'Error sending message. Please try again.',
+            'customization_saved' => 'Customizations saved successfully!',
+            'chat_customization' => 'Chat Customization',
+            'customize_colors_typography' => 'Customize colors and typography of the support chat.',
+            'save_customizations' => 'Save Customizations',
+            'name_displayed_header' => 'Name displayed in chat header.',
+            'welcome_message_displayed' => 'Welcome message displayed when chat is opened.',
+            'primary_gradient_color' => 'Primary gradient color (header and buttons).',
+            'secondary_gradient_color' => 'Secondary gradient color.',
+            'chat_window_background' => 'Chat window background color.',
+            'message_text_color' => 'Message text color.',
+            'font_family_chat' => 'Font family for the chat.',
+            'font_size_messages' => 'Font size for messages.',
+            'settings_saved' => 'Settings saved successfully!',
+            'api_settings' => 'API Settings',
+            'configure_api_url' => 'Configure the customer service API URL.',
+            'save_settings' => 'Save Settings',
+            'api_webhook_url' => 'Complete webhook URL for customer service API.',
+            'api_configured' => 'Configured',
+            'api_not_configured' => 'Not configured',
+            'api_will_process' => 'The API URL will be used to process all support chat messages.',
+            'statistics_interactions' => 'Interaction Statistics',
+            'view_interactions_period' => 'View chat interactions by period.',
+            'quick_summary' => 'Quick Summary',
+            'last_24_hours' => 'Last 24 hours',
+            'last_7_days' => 'Last 7 days',
+            'last_month' => 'Last month',
+            'select_period' => 'Select Period',
+            'start_date' => 'Start Date:',
+            'end_date' => 'End Date:',
+            'load_statistics' => 'Load Statistics',
+            'interactions_chart' => 'Interactions Chart',
+            'main_panel' => 'Main Panel',
+            'settings' => 'Settings',
+            'statistics' => 'Statistics',
+            'api_not_configured_error' => 'API URL not configured. Configure in Help Plugin > Settings.',
+            'http_error_message' => 'HTTP %d: %s',
+            'empty_message' => 'Empty message.',
+            'api_connection_error' => 'Error connecting to the service. Please try again.',
+            'server_response_error' => 'Error processing server response.',
+            'no_permission' => 'No permission.',
+            'security_error' => 'Security error. Please reload the page.',
+            'language' => 'Language',
+            'language_description' => 'Select the plugin language. If not set, it will use the WordPress site language.',
+            'language_auto' => 'Auto (WordPress Language)',
+            'api_url' => 'API URL',
+            'information' => 'Information',
+            'status' => 'Status',
+            'chat_name' => 'Chat Name',
+            'welcome_message' => 'Welcome Message',
+            'primary_color' => 'Primary Color',
+            'secondary_color' => 'Secondary Color',
+            'chat_bg_color' => 'Chat Background Color',
+            'text_color' => 'Text Color',
+            'font_family' => 'Font',
+            'font_size' => 'Font Size',
+            'small' => 'Small',
+            'normal' => 'Normal',
+            'medium' => 'Medium',
+            'large' => 'Large',
+            'extra_large' => 'Extra Large',
+        ),
+        'pt' => array(
+            'chat_name_default' => 'Atendimento',
+            'welcome_message_default' => 'Olá! Como podemos ajudar você hoje?',
+            'need_help' => 'Precisa de ajuda?',
+            'close' => 'Fechar',
+            'close_chat' => 'Fechar chat',
+            'type_message' => 'Digite sua mensagem...',
+            'send' => 'Enviar',
+            'waiting_response' => 'Aguardando resposta...',
+            'error_send_message' => 'Erro ao enviar mensagem. Tente novamente.',
+            'customization_saved' => 'Customizações salvas com sucesso!',
+            'chat_customization' => 'Customização do Chat',
+            'customize_colors_typography' => 'Personalize as cores e tipografia do chat de atendimento.',
+            'save_customizations' => 'Salvar Customizações',
+            'name_displayed_header' => 'Nome exibido no header do chat.',
+            'welcome_message_displayed' => 'Mensagem de boas-vindas exibida quando o chat é aberto.',
+            'primary_gradient_color' => 'Cor principal do gradiente (header e botões).',
+            'secondary_gradient_color' => 'Cor secundária do gradiente.',
+            'chat_window_background' => 'Cor de fundo da janela do chat.',
+            'message_text_color' => 'Cor do texto das mensagens.',
+            'font_family_chat' => 'Família de fonte para o chat.',
+            'font_size_messages' => 'Tamanho da fonte das mensagens.',
+            'settings_saved' => 'Configurações salvas com sucesso!',
+            'api_settings' => 'Configurações da API',
+            'configure_api_url' => 'Configure a URL da API de atendimento ao cliente.',
+            'save_settings' => 'Salvar Configurações',
+            'api_webhook_url' => 'URL completa do webhook da API de atendimento.',
+            'api_configured' => 'Configurada',
+            'api_not_configured' => 'Não configurada',
+            'api_will_process' => 'A URL da API será usada para processar todas as mensagens do chat de atendimento.',
+            'statistics_interactions' => 'Estatísticas de Interações',
+            'view_interactions_period' => 'Visualize as interações do chat por período.',
+            'quick_summary' => 'Resumo Rápido',
+            'last_24_hours' => 'Últimas 24 horas',
+            'last_7_days' => 'Últimos 7 dias',
+            'last_month' => 'Último mês',
+            'select_period' => 'Selecionar Período',
+            'start_date' => 'Data Inicial:',
+            'end_date' => 'Data Final:',
+            'load_statistics' => 'Carregar Estatísticas',
+            'interactions_chart' => 'Gráfico de Interações',
+            'main_panel' => 'Painel Principal',
+            'settings' => 'Configurações',
+            'statistics' => 'Estatísticas',
+            'api_not_configured_error' => 'URL da API não configurada. Configure em Help Plugin > Configurações.',
+            'http_error_message' => 'HTTP %d: %s',
+            'empty_message' => 'Mensagem vazia.',
+            'api_connection_error' => 'Erro ao conectar com o serviço de atendimento. Tente novamente.',
+            'server_response_error' => 'Erro ao processar resposta do servidor.',
+            'no_permission' => 'Sem permissão.',
+            'security_error' => 'Erro de segurança. Recarregue a página.',
+            'language' => 'Idioma',
+            'language_description' => 'Selecione o idioma do plugin. Se não definido, usará o idioma do WordPress.',
+            'language_auto' => 'Automático (Idioma do WordPress)',
+            'api_url' => 'URL da API',
+            'information' => 'Informações',
+            'status' => 'Status',
+            'chat_name' => 'Nome do Chat',
+            'welcome_message' => 'Mensagem Inicial',
+            'primary_color' => 'Cor Primária',
+            'secondary_color' => 'Cor Secundária',
+            'chat_bg_color' => 'Cor de Fundo do Chat',
+            'text_color' => 'Cor do Texto',
+            'font_family' => 'Fonte',
+            'font_size' => 'Tamanho da Fonte',
+            'small' => 'Pequeno',
+            'normal' => 'Normal',
+            'medium' => 'Médio',
+            'large' => 'Grande',
+            'extra_large' => 'Extra Grande',
+        ),
+        'es' => array(
+            'chat_name_default' => 'Atención',
+            'welcome_message_default' => '¡Hola! ¿Cómo podemos ayudarte hoy?',
+            'need_help' => '¿Necesitas ayuda?',
+            'close' => 'Cerrar',
+            'close_chat' => 'Cerrar chat',
+            'type_message' => 'Escribe tu mensaje...',
+            'send' => 'Enviar',
+            'waiting_response' => 'Esperando respuesta...',
+            'error_send_message' => 'Error al enviar mensaje. Inténtalo de nuevo.',
+            'customization_saved' => '¡Personalizaciones guardadas con éxito!',
+            'chat_customization' => 'Personalización del Chat',
+            'customize_colors_typography' => 'Personaliza los colores y tipografía del chat de atención.',
+            'save_customizations' => 'Guardar Personalizaciones',
+            'name_displayed_header' => 'Nombre mostrado en el encabezado del chat.',
+            'welcome_message_displayed' => 'Mensaje de bienvenida mostrado cuando se abre el chat.',
+            'primary_gradient_color' => 'Color principal del degradado (encabezado y botones).',
+            'secondary_gradient_color' => 'Color secundario del degradado.',
+            'chat_window_background' => 'Color de fondo de la ventana del chat.',
+            'message_text_color' => 'Color del texto de los mensajes.',
+            'font_family_chat' => 'Familia de fuente para el chat.',
+            'font_size_messages' => 'Tamaño de fuente de los mensajes.',
+            'settings_saved' => '¡Configuración guardada con éxito!',
+            'api_settings' => 'Configuración de la API',
+            'configure_api_url' => 'Configura la URL de la API de atención al cliente.',
+            'save_settings' => 'Guardar Configuración',
+            'api_webhook_url' => 'URL completa del webhook de la API de atención.',
+            'api_configured' => 'Configurada',
+            'api_not_configured' => 'No configurada',
+            'api_will_process' => 'La URL de la API se usará para procesar todos los mensajes del chat de atención.',
+            'statistics_interactions' => 'Estadísticas de Interacciones',
+            'view_interactions_period' => 'Visualiza las interacciones del chat por período.',
+            'quick_summary' => 'Resumen Rápido',
+            'last_24_hours' => 'Últimas 24 horas',
+            'last_7_days' => 'Últimos 7 días',
+            'last_month' => 'Último mes',
+            'select_period' => 'Seleccionar Período',
+            'start_date' => 'Fecha Inicial:',
+            'end_date' => 'Fecha Final:',
+            'load_statistics' => 'Cargar Estadísticas',
+            'interactions_chart' => 'Gráfico de Interacciones',
+            'main_panel' => 'Panel Principal',
+            'settings' => 'Configuración',
+            'statistics' => 'Estadísticas',
+            'api_not_configured_error' => 'URL de la API no configurada. Configura en Help Plugin > Configuración.',
+            'http_error_message' => 'HTTP %d: %s',
+            'empty_message' => 'Mensaje vacío.',
+            'api_connection_error' => 'Error al conectar con el servicio. Inténtalo de nuevo.',
+            'server_response_error' => 'Error al procesar la respuesta del servidor.',
+            'no_permission' => 'Sin permiso.',
+            'security_error' => 'Error de seguridad. Recarga la página.',
+            'language' => 'Idioma',
+            'language_description' => 'Selecciona el idioma del plugin. Si no está definido, usará el idioma de WordPress.',
+            'language_auto' => 'Automático (Idioma de WordPress)',
+            'api_url' => 'URL de la API',
+            'information' => 'Información',
+            'status' => 'Estado',
+            'chat_name' => 'Nombre del Chat',
+            'welcome_message' => 'Mensaje Inicial',
+            'primary_color' => 'Color Primario',
+            'secondary_color' => 'Color Secundario',
+            'chat_bg_color' => 'Color de Fondo del Chat',
+            'text_color' => 'Color del Texto',
+            'font_family' => 'Fuente',
+            'font_size' => 'Tamaño de la Fuente',
+            'small' => 'Pequeño',
+            'normal' => 'Normal',
+            'medium' => 'Mediano',
+            'large' => 'Grande',
+            'extra_large' => 'Extra Grande',
+        ),
+    );
+    
+    if (isset($translations[$language][$key])) {
+        return $translations[$language][$key];
+    }
+    
+    // Fallback to English if key doesn't exist
+    if (isset($translations['en'][$key])) {
+        return $translations['en'][$key];
+    }
+    
+    return $default ? $default : $key;
+}
+
+/**
+ * Main plugin class
  */
 class Help_Plugin {
     
     /**
-     * Instância única do plugin
+     * Single instance of the plugin
      */
     private static $instance = null;
     
     /**
-     * Obter instância única
+     * Get single instance
+     * 
+     * @return Help_Plugin Single instance of the plugin
      */
     public static function get_instance() {
         if (self::$instance === null) {
@@ -53,7 +341,23 @@ class Help_Plugin {
     }
     
     /**
-     * Construtor
+     * Plugin activation hook
+     */
+    public static function activate() {
+        $instance = self::get_instance();
+        $instance->create_interactions_table();
+        flush_rewrite_rules();
+    }
+    
+    /**
+     * Plugin deactivation hook
+     */
+    public static function deactivate() {
+        flush_rewrite_rules();
+    }
+    
+    /**
+     * Constructor
      */
     private function __construct() {
         add_action('admin_menu', array($this, 'add_admin_menu'));
@@ -68,47 +372,76 @@ class Help_Plugin {
         add_action('wp_ajax_nopriv_help_plugin_send_message', array($this, 'ajax_send_message'));
         add_action('wp_ajax_help_plugin_get_statistics', array($this, 'ajax_get_statistics'));
         
-        // Processar formulário de configurações
+        // Process settings form
         add_action('admin_post_help_plugin_save_settings', array($this, 'save_settings'));
         add_action('admin_post_help_plugin_save_customization', array($this, 'save_customization'));
         
-        // Adicionar CSS customizado no frontend
+        // Add custom CSS on frontend
         add_action('wp_head', array($this, 'output_custom_css'));
     }
     
     /**
-     * Obter configurações de customização
+     * Get currently configured language (returns empty if using WordPress)
+     * 
+     * @return string Language code (en, pt, es) or empty string to use WordPress
+     */
+    private function get_language() {
+        return get_option('help_plugin_language', '');
+    }
+    
+    /**
+     * Get effective language (configured or from WordPress)
+     * 
+     * @return string Language code (en, pt, es)
+     */
+    private function get_effective_language() {
+        $configured_language = get_option('help_plugin_language', '');
+        
+        if (empty($configured_language)) {
+            // If no configuration, use WordPress locale
+            $wp_locale = get_locale();
+            return help_plugin_get_language_from_locale($wp_locale);
+        }
+        
+        return $configured_language;
+    }
+    
+    /**
+     * Get customization settings
      */
     private function get_customization_settings() {
+        $language = $this->get_effective_language();
         return array(
-            'chat_name' => get_option('help_plugin_chat_name', 'Atendimento'),
-            'welcome_message' => get_option('help_plugin_welcome_message', 'Olá! Como podemos ajudar você hoje?'),
+            'chat_name' => get_option('help_plugin_chat_name', help_plugin_translate('chat_name_default')),
+            'welcome_message' => get_option('help_plugin_welcome_message', help_plugin_translate('welcome_message_default')),
             'primary_color' => get_option('help_plugin_primary_color', '#667eea'),
             'secondary_color' => get_option('help_plugin_secondary_color', '#764ba2'),
             'chat_bg_color' => get_option('help_plugin_chat_bg_color', '#ffffff'),
             'text_color' => get_option('help_plugin_text_color', '#333333'),
             'font_family' => get_option('help_plugin_font_family', 'Arial, sans-serif'),
             'font_size' => get_option('help_plugin_font_size', '14px'),
+            'language' => $language,
         );
     }
     
     /**
-     * Salvar customizações
+     * Save customizations
      */
     public function save_customization() {
-        // Verificar permissões
+        // Check permissions
         if (!current_user_can('manage_options')) {
-            wp_die(__('Você não tem permissão para acessar esta página.', 'help-plugin'));
+            wp_die(__('You do not have permission to access this page.', 'help-plugin'));
         }
         
-        // Verificar nonce
+        // Verify nonce
         if (!isset($_POST['help_plugin_customization_nonce']) || !wp_verify_nonce($_POST['help_plugin_customization_nonce'], 'help_plugin_save_customization')) {
-            wp_die(__('Erro de segurança. Tente novamente.', 'help-plugin'));
+            wp_die(__('Security error. Please try again.', 'help-plugin'));
         }
         
-        // Salvar configurações de customização
-        update_option('help_plugin_chat_name', sanitize_text_field($_POST['chat_name'] ?? 'Atendimento'));
-        update_option('help_plugin_welcome_message', sanitize_textarea_field($_POST['welcome_message'] ?? 'Olá! Como podemos ajudar você hoje?'));
+        // Save customization settings
+        $language = $this->get_language();
+        update_option('help_plugin_chat_name', sanitize_text_field($_POST['chat_name'] ?? help_plugin_translate('chat_name_default')));
+        update_option('help_plugin_welcome_message', sanitize_textarea_field($_POST['welcome_message'] ?? help_plugin_translate('welcome_message_default')));
         update_option('help_plugin_primary_color', sanitize_hex_color($_POST['primary_color'] ?? '#667eea'));
         update_option('help_plugin_secondary_color', sanitize_hex_color($_POST['secondary_color'] ?? '#764ba2'));
         update_option('help_plugin_chat_bg_color', sanitize_hex_color($_POST['chat_bg_color'] ?? '#ffffff'));
@@ -116,7 +449,7 @@ class Help_Plugin {
         update_option('help_plugin_font_family', sanitize_text_field($_POST['font_family'] ?? 'Arial, sans-serif'));
         update_option('help_plugin_font_size', sanitize_text_field($_POST['font_size'] ?? '14px'));
         
-        // Atualizar versão do cache para forçar reload dos assets
+        // Update cache version to force asset reload
         $new_version = time();
         update_option('help_plugin_cache_version', $new_version);
         
@@ -149,7 +482,7 @@ class Help_Plugin {
     }
     
     /**
-     * Output CSS customizado no frontend
+     * Output custom CSS on frontend
      */
     public function output_custom_css() {
         if (is_admin()) {
@@ -218,35 +551,41 @@ class Help_Plugin {
     
     /**
      * Obter URL da API do banco de dados
+     * 
+     * @return string URL da API ou string vazia se não configurada
      */
     private function get_api_url() {
-        $api_url = get_option('help_plugin_api_url', '');
-        // Se não houver URL salva, usar a constante padrão
-        if (empty($api_url)) {
-            return defined('HELP_PLUGIN_API_URL') ? HELP_PLUGIN_API_URL : '';
-        }
-        return $api_url;
+        return get_option('help_plugin_api_url', '');
     }
     
     /**
-     * Salvar configurações
+     * Save settings
      */
     public function save_settings() {
-        // Verificar permissões
+        // Check permissions
         if (!current_user_can('manage_options')) {
-            wp_die(__('Você não tem permissão para acessar esta página.', 'help-plugin'));
+            wp_die(__('You do not have permission to access this page.', 'help-plugin'));
         }
         
-        // Verificar nonce
+        // Verify nonce
         if (!isset($_POST['help_plugin_settings_nonce']) || !wp_verify_nonce($_POST['help_plugin_settings_nonce'], 'help_plugin_save_settings')) {
-            wp_die(__('Erro de segurança. Tente novamente.', 'help-plugin'));
+            wp_die(__('Security error. Please try again.', 'help-plugin'));
         }
         
-        // Salvar URL da API
+        // Save API URL
         $api_url = isset($_POST['api_url']) ? esc_url_raw($_POST['api_url']) : '';
         update_option('help_plugin_api_url', $api_url);
         
-        // Redirecionar com mensagem de sucesso
+        // Save language
+        $language = isset($_POST['language']) ? sanitize_text_field($_POST['language']) : '';
+        if (empty($language)) {
+            // If empty, remove option to use WordPress language
+            delete_option('help_plugin_language');
+        } elseif (in_array($language, array('en', 'pt', 'es'))) {
+            update_option('help_plugin_language', $language);
+        }
+        
+        // Redirect with success message
         wp_redirect(add_query_arg(array(
             'page' => 'help-plugin-settings',
             'settings-updated' => 'true'
@@ -255,27 +594,28 @@ class Help_Plugin {
     }
     
     /**
-     * Renderizar página de configurações
+     * Render settings page
      */
     public function render_settings_page() {
-        // Processar mensagem de sucesso
+        // Process success message
         $settings_updated = isset($_GET['settings-updated']) && $_GET['settings-updated'] === 'true';
         
         $api_url = $this->get_api_url();
+        $current_language = $this->get_language();
         ?>
         <div class="wrap help-plugin-wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
             
             <?php if ($settings_updated): ?>
                 <div class="notice notice-success is-dismissible">
-                    <p><?php esc_html_e('Configurações salvas com sucesso!', 'help-plugin'); ?></p>
+                    <p><?php echo esc_html(help_plugin_translate('settings_saved')); ?></p>
                 </div>
             <?php endif; ?>
             
             <div class="help-plugin-content">
                 <div class="help-plugin-card">
-                    <h2><?php esc_html_e('Configurações da API', 'help-plugin'); ?></h2>
-                    <p><?php esc_html_e('Configure a URL da API de atendimento ao cliente.', 'help-plugin'); ?></p>
+                    <h2><?php echo esc_html(help_plugin_translate('api_settings')); ?></h2>
+                    <p><?php echo esc_html(help_plugin_translate('configure_api_url')); ?></p>
                     
                     <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                         <?php wp_nonce_field('help_plugin_save_settings', 'help_plugin_settings_nonce'); ?>
@@ -285,7 +625,43 @@ class Help_Plugin {
                             <tbody>
                                 <tr>
                                     <th scope="row">
-                                        <label for="api_url"><?php esc_html_e('URL da API', 'help-plugin'); ?></label>
+                                        <label for="language"><?php echo esc_html(help_plugin_translate('language', 'Language')); ?></label>
+                                    </th>
+                                    <td>
+                                        <?php
+                                        $wp_locale = get_locale();
+                                        $wp_language = help_plugin_get_language_from_locale($wp_locale);
+                                        $wp_language_name = '';
+                                        switch ($wp_language) {
+                                            case 'pt':
+                                                $wp_language_name = 'Português';
+                                                break;
+                                            case 'es':
+                                                $wp_language_name = 'Español';
+                                                break;
+                                            default:
+                                                $wp_language_name = 'English';
+                                        }
+                                        ?>
+                                        <select id="language" name="language" class="regular-text">
+                                            <option value="" <?php selected($current_language, '', true); ?>><?php echo esc_html(help_plugin_translate('language_auto', 'Auto (WordPress Language)')); ?> (<?php echo esc_html($wp_language_name); ?>)</option>
+                                            <option value="en" <?php selected($current_language, 'en'); ?>>English</option>
+                                            <option value="pt" <?php selected($current_language, 'pt'); ?>>Português</option>
+                                            <option value="es" <?php selected($current_language, 'es'); ?>>Español</option>
+                                        </select>
+                                        <p class="description">
+                                            <?php echo esc_html(help_plugin_translate('language_description')); ?>
+                                            <?php if (empty($current_language)): ?>
+                                                <br><strong><?php printf(esc_html__('Currently using: %s (from WordPress)', 'help-plugin'), esc_html($wp_language_name)); ?></strong>
+                                            <?php else: ?>
+                                                <br><strong><?php printf(esc_html__('Currently using: %s (custom)', 'help-plugin'), esc_html($current_language === 'pt' ? 'Português' : ($current_language === 'es' ? 'Español' : 'English'))); ?></strong>
+                                            <?php endif; ?>
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="api_url"><?php echo esc_html(help_plugin_translate('api_url', 'API URL')); ?></label>
                                     </th>
                                     <td>
                                         <input 
@@ -294,29 +670,29 @@ class Help_Plugin {
                                             name="api_url" 
                                             value="<?php echo esc_attr($api_url); ?>" 
                                             class="regular-text"
-                                            placeholder="https://exemplo.com/webhook/chat"
+                                            placeholder="https://example.com/webhook/chat"
                                             required
                                         >
                                         <p class="description">
-                                            <?php esc_html_e('URL completa do webhook da API de atendimento.', 'help-plugin'); ?>
+                                            <?php echo esc_html(help_plugin_translate('api_webhook_url')); ?>
                                         </p>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                         
-                        <?php submit_button(__('Salvar Configurações', 'help-plugin')); ?>
+                        <?php submit_button(help_plugin_translate('save_settings')); ?>
                     </form>
                 </div>
                 
                 <div class="help-plugin-card">
-                    <h3><?php esc_html_e('Informações', 'help-plugin'); ?></h3>
-                    <p><?php esc_html_e('A URL da API será usada para processar todas as mensagens do chat de atendimento.', 'help-plugin'); ?></p>
-                    <p><strong><?php esc_html_e('Status:', 'help-plugin'); ?></strong> 
+                    <h3><?php echo esc_html(help_plugin_translate('information', 'Information')); ?></h3>
+                    <p><?php echo esc_html(help_plugin_translate('api_will_process')); ?></p>
+                    <p><strong><?php echo esc_html(help_plugin_translate('status', 'Status')); ?>:</strong> 
                         <?php if (!empty($api_url)): ?>
-                            <span style="color: green;"><?php esc_html_e('Configurada', 'help-plugin'); ?></span>
+                            <span style="color: green;"><?php echo esc_html(help_plugin_translate('api_configured')); ?></span>
                         <?php else: ?>
-                            <span style="color: red;"><?php esc_html_e('Não configurada', 'help-plugin'); ?></span>
+                            <span style="color: red;"><?php echo esc_html(help_plugin_translate('api_not_configured')); ?></span>
                         <?php endif; ?>
                     </p>
                 </div>
@@ -326,44 +702,44 @@ class Help_Plugin {
     }
     
     /**
-     * Adicionar menu no admin
+     * Add admin menu
      */
     public function add_admin_menu() {
         add_menu_page(
-            __('Help Plugin', 'help-plugin'),           // Título da página
-            __('Help Plugin', 'help-plugin'),           // Título do menu
+            __('BooChat Connect', 'boochat-connect'),           // Page title
+            __('BooChat Connect', 'boochat-connect'),           // Menu title
             'manage_options',                            // Capability
-            'help-plugin',                               // Slug do menu
+            'help-plugin',                               // Menu slug
             array($this, 'render_admin_page'),          // Callback
-            'dashicons-sos',                             // Ícone (opcional)
-            30                                           // Posição no menu
+            'dashicons-sos',                             // Icon (optional)
+            30                                           // Position in menu
         );
         
-        // Submenu principal (opcional - mostra a mesma página)
+        // Main submenu (optional - shows the same page)
         add_submenu_page(
             'help-plugin',
-            __('Painel Principal', 'help-plugin'),
-            __('Painel Principal', 'help-plugin'),
+            help_plugin_translate('main_panel'),
+            help_plugin_translate('main_panel'),
             'manage_options',
             'help-plugin',
             array($this, 'render_admin_page')
         );
         
-        // Submenu de Configurações
+        // Settings submenu
         add_submenu_page(
             'help-plugin',
-            __('Configurações', 'help-plugin'),
-            __('Configurações', 'help-plugin'),
+            help_plugin_translate('settings'),
+            help_plugin_translate('settings'),
             'manage_options',
             'help-plugin-settings',
             array($this, 'render_settings_page')
         );
         
-        // Submenu de Estatísticas
+        // Statistics submenu
         add_submenu_page(
             'help-plugin',
-            __('Estatísticas', 'help-plugin'),
-            __('Estatísticas', 'help-plugin'),
+            help_plugin_translate('statistics'),
+            help_plugin_translate('statistics'),
             'manage_options',
             'help-plugin-statistics',
             array($this, 'render_statistics_page')
@@ -371,10 +747,10 @@ class Help_Plugin {
     }
     
     /**
-     * Carregar assets do admin
+     * Enqueue admin assets
      */
     public function enqueue_admin_assets($hook) {
-        // Carregar nas páginas do plugin
+        // Load on plugin pages only
         if ($hook !== 'toplevel_page_help-plugin' && $hook !== 'help-plugin_page_help-plugin-settings' && $hook !== 'help-plugin_page_help-plugin-statistics') {
             return;
         }
@@ -394,7 +770,7 @@ class Help_Plugin {
             true
         );
         
-        // Carregar Chart.js e scripts de estatísticas apenas na página de estatísticas
+        // Load Chart.js and statistics scripts only on statistics page
         if ($hook === 'help-plugin_page_help-plugin-statistics') {
             wp_enqueue_script(
                 'chart-js',
@@ -420,10 +796,10 @@ class Help_Plugin {
     }
     
     /**
-     * Carregar assets do frontend
+     * Enqueue frontend assets
      */
     public function enqueue_frontend_assets() {
-        // Só carregar no frontend, não no admin
+        // Only load on frontend, not in admin
         if (is_admin()) {
             return;
         }
@@ -445,20 +821,20 @@ class Help_Plugin {
             true
         );
         
-        // Localizar script com dados AJAX - IMPORTANTE: deve ser chamado DEPOIS do wp_enqueue_script
+        // Localize script with AJAX data - IMPORTANT: must be called AFTER wp_enqueue_script
         wp_localize_script('help-plugin-chat-script', 'helpPluginAjax', array(
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('help-plugin-chat'),
-            'loadingText' => __('Aguardando resposta...', 'help-plugin'),
-            'errorText' => __('Erro ao enviar mensagem. Tente novamente.', 'help-plugin')
+            'loadingText' => help_plugin_translate('waiting_response'),
+            'errorText' => help_plugin_translate('error_send_message')
         ));
     }
     
     /**
-     * Renderizar widget de chat no footer
+     * Render chat widget in footer
      */
     public function render_chat_widget() {
-        // Só renderizar no frontend, não no admin
+        // Only render on frontend, not in admin
         if (is_admin()) {
             return;
         }
@@ -467,9 +843,9 @@ class Help_Plugin {
             <div class="help-plugin-popup-content">
                 <div class="help-plugin-popup-header">
                     <span class="help-plugin-popup-icon">💬</span>
-                    <span class="help-plugin-popup-text"><?php esc_html_e('Precisa de ajuda?', 'help-plugin'); ?></span>
+                    <span class="help-plugin-popup-text"><?php echo esc_html(help_plugin_translate('need_help')); ?></span>
                 </div>
-                <button class="help-plugin-popup-close" aria-label="<?php esc_attr_e('Fechar', 'help-plugin'); ?>">&times;</button>
+                <button class="help-plugin-popup-close" aria-label="<?php echo esc_attr(help_plugin_translate('close')); ?>">&times;</button>
             </div>
         </div>
 
@@ -479,7 +855,7 @@ class Help_Plugin {
                     <span class="help-plugin-chat-icon">💬</span>
                     <span><?php echo esc_html($this->get_customization_settings()['chat_name']); ?></span>
                 </div>
-                <button class="help-plugin-chat-close" aria-label="<?php esc_attr_e('Fechar chat', 'help-plugin'); ?>">&times;</button>
+                <button class="help-plugin-chat-close" aria-label="<?php echo esc_attr(help_plugin_translate('close_chat')); ?>">&times;</button>
             </div>
             <div class="help-plugin-chat-body">
                 <div class="help-plugin-chat-messages" id="help-plugin-chat-messages">
@@ -494,11 +870,11 @@ class Help_Plugin {
                         type="text" 
                         id="help-plugin-chat-input" 
                         class="help-plugin-chat-input" 
-                        placeholder="<?php esc_attr_e('Digite sua mensagem...', 'help-plugin'); ?>"
+                        placeholder="<?php echo esc_attr(help_plugin_translate('type_message')); ?>"
                         autocomplete="off"
                     >
                     <button type="submit" class="help-plugin-chat-send">
-                        <span><?php esc_html_e('Enviar', 'help-plugin'); ?></span>
+                        <span><?php echo esc_html(help_plugin_translate('send')); ?></span>
                     </button>
                 </form>
             </div>
@@ -507,50 +883,46 @@ class Help_Plugin {
     }
     
     /**
-     * AJAX handler para enviar mensagem
+     * AJAX handler to send message
      */
     public function ajax_send_message() {
-        // Verificar nonce para segurança
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'help-plugin-chat')) {
-            wp_send_json_error(array('message' => 'Erro de segurança. Recarregue a página.'));
-            return;
-        }
+        // Verify nonce for security
+        check_ajax_referer('help-plugin-chat', 'nonce');
         
         $session_id = isset($_POST['sessionId']) ? sanitize_text_field($_POST['sessionId']) : '';
         $chat_input = isset($_POST['chatInput']) ? sanitize_text_field($_POST['chatInput']) : '';
         
         if (empty($chat_input)) {
-            wp_send_json_error(array('message' => 'Mensagem vazia'));
+            wp_send_json_error(array('message' => help_plugin_translate('empty_message', 'Empty message.')));
             return;
         }
         
-        // Se não tem sessionId, gerar um novo
+        // If no sessionId, generate a new one
         if (empty($session_id)) {
             $session_id = $this->generate_session_id();
         }
         
-        // Registrar interação para estatísticas (com conteúdo da mensagem)
+        // Log interaction for statistics (with message content)
         $this->log_interaction($session_id, $chat_input);
         
-        // Fazer requisição à API externa
+        // Make request to external API
         $response = $this->send_to_api($session_id, $chat_input);
         
         if (is_wp_error($response)) {
-            $error_message = $response->get_error_message();
             wp_send_json_error(array(
-                'message' => 'Erro ao conectar com o serviço de atendimento. Tente novamente.',
+                'message' => help_plugin_translate('api_connection_error', 'Error connecting to the service. Please try again.'),
                 'sessionId' => $session_id
             ));
             return;
         }
         
-        // Extrair body da resposta
+        // Extract response body
         $body = isset($response['body']) ? $response['body'] : '';
         $response_code = isset($response['response']['code']) ? $response['response']['code'] : 0;
         
         if ($response_code !== 200) {
             wp_send_json_error(array(
-                'message' => 'Erro ao conectar com o serviço de atendimento. Tente novamente.',
+                'message' => help_plugin_translate('api_connection_error', 'Error connecting to the service. Please try again.'),
                 'sessionId' => $session_id
             ));
             return;
@@ -560,7 +932,7 @@ class Help_Plugin {
         
         if (json_last_error() !== JSON_ERROR_NONE) {
             wp_send_json_error(array(
-                'message' => 'Erro ao processar resposta do servidor.',
+                'message' => help_plugin_translate('server_response_error', 'Error processing server response.'),
                 'sessionId' => $session_id
             ));
             return;
@@ -568,11 +940,14 @@ class Help_Plugin {
         
         if (!isset($data['output'])) {
             wp_send_json_error(array(
-                'message' => 'Erro ao processar resposta do servidor.',
+                'message' => help_plugin_translate('server_response_error', 'Error processing server response.'),
                 'sessionId' => $session_id
             ));
             return;
         }
+        
+        // Log robot response to database
+        $this->log_robot_response($session_id, $data['output']);
         
         wp_send_json_success(array(
             'message' => $data['output'],
@@ -581,76 +956,65 @@ class Help_Plugin {
     }
     
     /**
-     * Gerar session ID único
+     * Generate unique session ID
      */
     private function generate_session_id() {
         return bin2hex(random_bytes(16));
     }
     
     /**
-     * Enviar mensagem para a API externa
+     * Send message to external API
+     * 
+     * @param string $session_id Unique session ID
+     * @param string $chat_input User message
+     * @return array|WP_Error API response or error
      */
     private function send_to_api($session_id, $chat_input) {
         $url = $this->get_api_url();
         
-        // Verificar se a URL está configurada
+        // Check if URL is configured
         if (empty($url)) {
-            return new WP_Error('no_api_url', 'URL da API não configurada. Configure em Help Plugin > Configurações.');
+            return new WP_Error('no_api_url', help_plugin_translate('api_not_configured_error', 'API URL not configured. Configure in Help Plugin > Settings.'));
         }
         
-        $post_data = json_encode(array(
-            'sessionId' => $session_id,
-            'action' => 'sendMessage',
-            'chatInput' => $chat_input
-        ));
-        
-        $curl = curl_init();
-        
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => $post_data,
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json'
+        $response = wp_remote_post($url, array(
+            'body' => json_encode(array(
+                'sessionId' => $session_id,
+                'action' => 'sendMessage',
+                'chatInput' => $chat_input
+            )),
+            'headers' => array(
+                'Content-Type' => 'application/json',
             ),
+            'timeout' => 30,
+            'sslverify' => true,
         ));
         
-        $response = curl_exec($curl);
-        $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        $curl_error = curl_error($curl);
-        
-        curl_close($curl);
-        
-        // Se houver erro no cURL
-        if ($response === false || !empty($curl_error)) {
-            return new WP_Error('curl_error', $curl_error ? $curl_error : 'Erro na requisição cURL');
+        if (is_wp_error($response)) {
+            return $response;
         }
         
-        // Se o código HTTP não for 200
-        if ($http_code !== 200) {
-            return new WP_Error('http_error', 'HTTP ' . $http_code . ': ' . $response);
+        $response_code = wp_remote_retrieve_response_code($response);
+        $body = wp_remote_retrieve_body($response);
+        
+        if ($response_code !== 200) {
+            return new WP_Error('http_error', sprintf(help_plugin_translate('http_error_message', 'HTTP %d: %s'), $response_code, $body));
         }
         
-        // Retornar resposta como array compatível com wp_remote_retrieve_body
+        // Return response as array compatible with existing code
         return array(
-            'body' => $response,
+            'body' => $body,
             'response' => array(
-                'code' => $http_code
+                'code' => $response_code
             )
         );
     }
     
     /**
-     * Renderizar página do admin
+     * Render admin page
      */
     public function render_admin_page() {
-        // Processar mensagem de sucesso
+        // Process success message
         $customization_updated = isset($_GET['customization-updated']) && $_GET['customization-updated'] === 'true';
         
         $settings = $this->get_customization_settings();
@@ -660,14 +1024,14 @@ class Help_Plugin {
             
             <?php if ($customization_updated): ?>
                 <div class="notice notice-success is-dismissible">
-                    <p><?php esc_html_e('Customizações salvas com sucesso!', 'help-plugin'); ?></p>
+                    <p><?php echo esc_html(help_plugin_translate('customization_saved')); ?></p>
                 </div>
             <?php endif; ?>
             
             <div class="help-plugin-content">
                 <div class="help-plugin-card">
-                    <h2><?php esc_html_e('Customização do Chat', 'help-plugin'); ?></h2>
-                    <p><?php esc_html_e('Personalize as cores e tipografia do chat de atendimento.', 'help-plugin'); ?></p>
+                    <h2><?php echo esc_html(help_plugin_translate('chat_customization')); ?></h2>
+                    <p><?php echo esc_html(help_plugin_translate('customize_colors_typography')); ?></p>
                     
                     <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                         <?php wp_nonce_field('help_plugin_save_customization', 'help_plugin_customization_nonce'); ?>
@@ -677,7 +1041,7 @@ class Help_Plugin {
                             <tbody>
                                 <tr>
                                     <th scope="row">
-                                        <label for="chat_name"><?php esc_html_e('Nome do Chat', 'help-plugin'); ?></label>
+                                        <label for="chat_name"><?php echo esc_html(help_plugin_translate('chat_name')); ?></label>
                                     </th>
                                     <td>
                                         <input 
@@ -686,17 +1050,17 @@ class Help_Plugin {
                                             name="chat_name" 
                                             value="<?php echo esc_attr($settings['chat_name']); ?>" 
                                             class="regular-text"
-                                            placeholder="Atendimento"
+                                            placeholder="<?php echo esc_attr(help_plugin_translate('chat_name_default')); ?>"
                                         >
                                         <p class="description">
-                                            <?php esc_html_e('Nome exibido no header do chat.', 'help-plugin'); ?>
+                                            <?php echo esc_html(help_plugin_translate('name_displayed_header')); ?>
                                         </p>
                                     </td>
                                 </tr>
                                 
                                 <tr>
                                     <th scope="row">
-                                        <label for="welcome_message"><?php esc_html_e('Mensagem Inicial', 'help-plugin'); ?></label>
+                                        <label for="welcome_message"><?php echo esc_html(help_plugin_translate('welcome_message')); ?></label>
                                     </th>
                                     <td>
                                         <textarea 
@@ -704,17 +1068,17 @@ class Help_Plugin {
                                             name="welcome_message" 
                                             rows="3"
                                             class="large-text"
-                                            placeholder="Olá! Como podemos ajudar você hoje?"
+                                            placeholder="<?php echo esc_attr(help_plugin_translate('welcome_message_default')); ?>"
                                         ><?php echo esc_textarea($settings['welcome_message']); ?></textarea>
                                         <p class="description">
-                                            <?php esc_html_e('Mensagem de boas-vindas exibida quando o chat é aberto.', 'help-plugin'); ?>
+                                            <?php echo esc_html(help_plugin_translate('welcome_message_displayed')); ?>
                                         </p>
                                     </td>
                                 </tr>
                                 
                                 <tr>
                                     <th scope="row">
-                                        <label for="primary_color"><?php esc_html_e('Cor Primária', 'help-plugin'); ?></label>
+                                        <label for="primary_color"><?php echo esc_html(help_plugin_translate('primary_color')); ?></label>
                                     </th>
                                     <td>
                                         <input 
@@ -724,14 +1088,14 @@ class Help_Plugin {
                                             value="<?php echo esc_attr($settings['primary_color']); ?>"
                                         >
                                         <p class="description">
-                                            <?php esc_html_e('Cor principal do gradiente (header e botões).', 'help-plugin'); ?>
+                                            <?php echo esc_html(help_plugin_translate('primary_gradient_color')); ?>
                                         </p>
                                     </td>
                                 </tr>
                                 
                                 <tr>
                                     <th scope="row">
-                                        <label for="secondary_color"><?php esc_html_e('Cor Secundária', 'help-plugin'); ?></label>
+                                        <label for="secondary_color"><?php echo esc_html(help_plugin_translate('secondary_color')); ?></label>
                                     </th>
                                     <td>
                                         <input 
@@ -741,14 +1105,14 @@ class Help_Plugin {
                                             value="<?php echo esc_attr($settings['secondary_color']); ?>"
                                         >
                                         <p class="description">
-                                            <?php esc_html_e('Cor secundária do gradiente.', 'help-plugin'); ?>
+                                            <?php echo esc_html(help_plugin_translate('secondary_gradient_color')); ?>
                                         </p>
                                     </td>
                                 </tr>
                                 
                                 <tr>
                                     <th scope="row">
-                                        <label for="chat_bg_color"><?php esc_html_e('Cor de Fundo do Chat', 'help-plugin'); ?></label>
+                                        <label for="chat_bg_color"><?php echo esc_html(help_plugin_translate('chat_bg_color')); ?></label>
                                     </th>
                                     <td>
                                         <input 
@@ -758,14 +1122,14 @@ class Help_Plugin {
                                             value="<?php echo esc_attr($settings['chat_bg_color']); ?>"
                                         >
                                         <p class="description">
-                                            <?php esc_html_e('Cor de fundo da janela do chat.', 'help-plugin'); ?>
+                                            <?php echo esc_html(help_plugin_translate('chat_window_background')); ?>
                                         </p>
                                     </td>
                                 </tr>
                                 
                                 <tr>
                                     <th scope="row">
-                                        <label for="text_color"><?php esc_html_e('Cor do Texto', 'help-plugin'); ?></label>
+                                        <label for="text_color"><?php echo esc_html(help_plugin_translate('text_color')); ?></label>
                                     </th>
                                     <td>
                                         <input 
@@ -775,14 +1139,14 @@ class Help_Plugin {
                                             value="<?php echo esc_attr($settings['text_color']); ?>"
                                         >
                                         <p class="description">
-                                            <?php esc_html_e('Cor do texto das mensagens.', 'help-plugin'); ?>
+                                            <?php echo esc_html(help_plugin_translate('message_text_color')); ?>
                                         </p>
                                     </td>
                                 </tr>
                                 
                                 <tr>
                                     <th scope="row">
-                                        <label for="font_family"><?php esc_html_e('Fonte', 'help-plugin'); ?></label>
+                                        <label for="font_family"><?php echo esc_html(help_plugin_translate('font_family')); ?></label>
                                     </th>
                                     <td>
                                         <select id="font_family" name="font_family" class="regular-text">
@@ -797,32 +1161,32 @@ class Help_Plugin {
                                             <option value="'Roboto', sans-serif" <?php selected($settings['font_family'], "'Roboto', sans-serif"); ?>>Roboto</option>
                                         </select>
                                         <p class="description">
-                                            <?php esc_html_e('Família de fonte para o chat.', 'help-plugin'); ?>
+                                            <?php echo esc_html(help_plugin_translate('font_family_chat')); ?>
                                         </p>
                                     </td>
                                 </tr>
                                 
                                 <tr>
                                     <th scope="row">
-                                        <label for="font_size"><?php esc_html_e('Tamanho da Fonte', 'help-plugin'); ?></label>
+                                        <label for="font_size"><?php echo esc_html(help_plugin_translate('font_size')); ?></label>
                                     </th>
                                     <td>
                                         <select id="font_size" name="font_size" class="regular-text">
-                                            <option value="12px" <?php selected($settings['font_size'], '12px'); ?>>12px - Pequeno</option>
-                                            <option value="14px" <?php selected($settings['font_size'], '14px'); ?>>14px - Normal</option>
-                                            <option value="16px" <?php selected($settings['font_size'], '16px'); ?>>16px - Médio</option>
-                                            <option value="18px" <?php selected($settings['font_size'], '18px'); ?>>18px - Grande</option>
-                                            <option value="20px" <?php selected($settings['font_size'], '20px'); ?>>20px - Extra Grande</option>
+                                            <option value="12px" <?php selected($settings['font_size'], '12px'); ?>>12px - <?php echo esc_html(help_plugin_translate('small', 'Small')); ?></option>
+                                            <option value="14px" <?php selected($settings['font_size'], '14px'); ?>>14px - <?php echo esc_html(help_plugin_translate('normal', 'Normal')); ?></option>
+                                            <option value="16px" <?php selected($settings['font_size'], '16px'); ?>>16px - <?php echo esc_html(help_plugin_translate('medium', 'Medium')); ?></option>
+                                            <option value="18px" <?php selected($settings['font_size'], '18px'); ?>>18px - <?php echo esc_html(help_plugin_translate('large', 'Large')); ?></option>
+                                            <option value="20px" <?php selected($settings['font_size'], '20px'); ?>>20px - <?php echo esc_html(help_plugin_translate('extra_large', 'Extra Large')); ?></option>
                                         </select>
                                         <p class="description">
-                                            <?php esc_html_e('Tamanho da fonte das mensagens.', 'help-plugin'); ?>
+                                            <?php echo esc_html(help_plugin_translate('font_size_messages')); ?>
                                         </p>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                         
-                        <?php submit_button(__('Salvar Customizações', 'help-plugin')); ?>
+                        <?php submit_button(help_plugin_translate('save_customizations')); ?>
                     </form>
                 </div>
             </div>
@@ -831,14 +1195,14 @@ class Help_Plugin {
     }
     
     /**
-     * Registrar interação para estatísticas
+     * Log interaction for statistics
      */
     private function log_interaction($session_id, $message = '') {
         global $wpdb;
         
         $table_name = $wpdb->prefix . 'help_plugin_interactions';
         
-        // Criar tabela se não existir
+        // Create table if it doesn't exist
         $this->create_interactions_table();
         
         $wpdb->insert(
@@ -846,15 +1210,40 @@ class Help_Plugin {
             array(
                 'session_id' => $session_id,
                 'message' => sanitize_textarea_field($message),
+                'message_type' => 'user',
                 'interaction_date' => current_time('mysql'),
                 'created_at' => current_time('mysql')
             ),
-            array('%s', '%s', '%s', '%s')
+            array('%s', '%s', '%s', '%s', '%s')
         );
     }
     
     /**
-     * Criar tabela de interações
+     * Log robot response for statistics
+     */
+    private function log_robot_response($session_id, $response = '') {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'help_plugin_interactions';
+        
+        // Create table if it doesn't exist
+        $this->create_interactions_table();
+        
+        $wpdb->insert(
+            $table_name,
+            array(
+                'session_id' => $session_id,
+                'message' => sanitize_textarea_field($response),
+                'message_type' => 'robot',
+                'interaction_date' => current_time('mysql'),
+                'created_at' => current_time('mysql')
+            ),
+            array('%s', '%s', '%s', '%s', '%s')
+        );
+    }
+    
+    /**
+     * Create interactions table
      */
     private function create_interactions_table() {
         global $wpdb;
@@ -867,23 +1256,34 @@ class Help_Plugin {
             id bigint(20) NOT NULL AUTO_INCREMENT,
             session_id varchar(255) NOT NULL,
             message text,
+            message_type varchar(20) DEFAULT 'user',
             interaction_date datetime NOT NULL,
             created_at datetime NOT NULL,
             PRIMARY KEY  (id),
             KEY session_id (session_id),
-            KEY interaction_date (interaction_date)
+            KEY interaction_date (interaction_date),
+            KEY message_type (message_type)
         ) $charset_collate;";
         
-        // Se a tabela já existe, adicionar coluna message se não existir
-        $column_exists = $wpdb->get_results($wpdb->prepare(
-            "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
-            WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = 'message'",
-            DB_NAME,
-            $table_name
-        ));
+        // If table already exists, add columns if they don't exist
+        $columns_to_check = array('message', 'message_type');
         
-        if (empty($column_exists)) {
-            $wpdb->query("ALTER TABLE $table_name ADD COLUMN message text AFTER session_id");
+        foreach ($columns_to_check as $column) {
+            $column_exists = $wpdb->get_results($wpdb->prepare(
+                "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s",
+                DB_NAME,
+                $table_name,
+                $column
+            ));
+            
+            if (empty($column_exists)) {
+                if ($column === 'message') {
+                    $wpdb->query("ALTER TABLE $table_name ADD COLUMN message text AFTER session_id");
+                } elseif ($column === 'message_type') {
+                    $wpdb->query("ALTER TABLE $table_name ADD COLUMN message_type varchar(20) DEFAULT 'user' AFTER message");
+                }
+            }
         }
         
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -891,7 +1291,7 @@ class Help_Plugin {
     }
     
     /**
-     * Renderizar página de estatísticas
+     * Render statistics page
      */
     public function render_statistics_page() {
         ?>
@@ -900,48 +1300,48 @@ class Help_Plugin {
             
             <div class="help-plugin-content">
                 <div class="help-plugin-card">
-                    <h2><?php esc_html_e('Estatísticas de Interações', 'help-plugin'); ?></h2>
-                    <p><?php esc_html_e('Visualize as interações do chat por período.', 'help-plugin'); ?></p>
+                    <h2><?php echo esc_html(help_plugin_translate('statistics_interactions')); ?></h2>
+                    <p><?php echo esc_html(help_plugin_translate('view_interactions_period')); ?></p>
                     
                     <div style="margin: 20px 0;">
-                        <h3><?php esc_html_e('Resumo Rápido', 'help-plugin'); ?></h3>
+                        <h3><?php echo esc_html(help_plugin_translate('quick_summary')); ?></h3>
                         <div style="display: flex; gap: 20px; flex-wrap: wrap; margin: 15px 0;">
                             <div style="background: #f0f0f1; padding: 15px; border-radius: 5px; min-width: 150px;">
-                                <strong><?php esc_html_e('Últimas 24 horas', 'help-plugin'); ?></strong>
+                                <strong><?php echo esc_html(help_plugin_translate('last_24_hours')); ?></strong>
                                 <div id="stats-1day" style="font-size: 24px; font-weight: bold; color: #667eea;">-</div>
                             </div>
                             <div style="background: #f0f0f1; padding: 15px; border-radius: 5px; min-width: 150px;">
-                                <strong><?php esc_html_e('Últimos 7 dias', 'help-plugin'); ?></strong>
+                                <strong><?php echo esc_html(help_plugin_translate('last_7_days')); ?></strong>
                                 <div id="stats-7days" style="font-size: 24px; font-weight: bold; color: #667eea;">-</div>
                             </div>
                             <div style="background: #f0f0f1; padding: 15px; border-radius: 5px; min-width: 150px;">
-                                <strong><?php esc_html_e('Último mês', 'help-plugin'); ?></strong>
+                                <strong><?php echo esc_html(help_plugin_translate('last_month')); ?></strong>
                                 <div id="stats-30days" style="font-size: 24px; font-weight: bold; color: #667eea;">-</div>
                             </div>
                         </div>
                     </div>
                     
                     <div style="margin: 30px 0;">
-                        <h3><?php esc_html_e('Selecionar Período', 'help-plugin'); ?></h3>
+                        <h3><?php echo esc_html(help_plugin_translate('select_period')); ?></h3>
                         <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin: 15px 0;">
                             <div>
-                                <label for="date-from" style="display: block; margin-bottom: 5px; font-weight: bold;"><?php esc_html_e('Data Inicial:', 'help-plugin'); ?></label>
+                                <label for="date-from" style="display: block; margin-bottom: 5px; font-weight: bold;"><?php echo esc_html(help_plugin_translate('start_date')); ?></label>
                                 <input type="date" id="date-from" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                             </div>
                             <div>
-                                <label for="date-to" style="display: block; margin-bottom: 5px; font-weight: bold;"><?php esc_html_e('Data Final:', 'help-plugin'); ?></label>
+                                <label for="date-to" style="display: block; margin-bottom: 5px; font-weight: bold;"><?php echo esc_html(help_plugin_translate('end_date')); ?></label>
                                 <input type="date" id="date-to" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                             </div>
                             <div style="align-self: flex-end;">
                                 <button type="button" id="load-statistics" class="button button-primary" style="padding: 8px 20px;">
-                                    <?php esc_html_e('Carregar Estatísticas', 'help-plugin'); ?>
+                                    <?php echo esc_html(help_plugin_translate('load_statistics')); ?>
                                 </button>
                             </div>
                         </div>
                     </div>
                     
                     <div style="margin: 30px 0;">
-                        <h3><?php esc_html_e('Gráfico de Interações', 'help-plugin'); ?></h3>
+                        <h3><?php echo esc_html(help_plugin_translate('interactions_chart')); ?></h3>
                         <div style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
                             <canvas id="interactions-chart" style="max-height: 400px;"></canvas>
                         </div>
@@ -953,42 +1353,39 @@ class Help_Plugin {
     }
     
     /**
-     * AJAX handler para obter estatísticas
+     * AJAX handler to get statistics
      */
     public function ajax_get_statistics() {
-        // Verificar permissões
+        // Check permissions
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => 'Sem permissão'));
+            wp_send_json_error(array('message' => help_plugin_translate('no_permission', 'No permission.')));
             return;
         }
         
-        // Verificar nonce
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'help-plugin-statistics')) {
-            wp_send_json_error(array('message' => 'Erro de segurança'));
-            return;
-        }
+        // Verify nonce
+        check_ajax_referer('help-plugin-statistics', 'nonce');
         
         global $wpdb;
         $table_name = $wpdb->prefix . 'help_plugin_interactions';
         
-        // Garantir que a tabela existe
+        // Ensure table exists
         $this->create_interactions_table();
         
         $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : '';
         $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : '';
         
-        // Se não houver datas, usar período padrão
+        // If no dates, use default period
         if (empty($date_from) || empty($date_to)) {
             $date_to = current_time('Y-m-d');
             $date_from = date('Y-m-d', strtotime('-30 days'));
         }
         
-        // Buscar estatísticas por período
+        // Get statistics by period
         $stats_1day = $this->get_interactions_count(1);
         $stats_7days = $this->get_interactions_count(7);
         $stats_30days = $this->get_interactions_count(30);
         
-        // Buscar dados detalhados para o gráfico
+        // Get detailed data for chart
         $chart_data = $this->get_chart_data($date_from, $date_to);
         
         wp_send_json_success(array(
@@ -1002,7 +1399,7 @@ class Help_Plugin {
     }
     
     /**
-     * Obter contagem de interações por dias
+     * Get interaction count by days
      */
     private function get_interactions_count($days) {
         global $wpdb;
@@ -1019,7 +1416,7 @@ class Help_Plugin {
     }
     
     /**
-     * Obter dados para o gráfico
+     * Get data for chart
      */
     private function get_chart_data($date_from, $date_to) {
         global $wpdb;
@@ -1038,19 +1435,19 @@ class Help_Plugin {
         $labels = array();
         $data = array();
         
-        // Criar array completo de datas no período
+        // Create complete array of dates in period
         $start = new DateTime($date_from);
         $end = new DateTime($date_to);
         $interval = new DateInterval('P1D');
         $period = new DatePeriod($start, $interval, $end->modify('+1 day'));
         
-        // Criar mapa de resultados
+        // Create results map
         $results_map = array();
         foreach ($results as $result) {
             $results_map[$result->date] = intval($result->count);
         }
         
-        // Preencher labels e dados
+        // Fill labels and data
         foreach ($period as $date) {
             $date_str = $date->format('Y-m-d');
             $labels[] = $date->format('d/m');
@@ -1065,12 +1462,16 @@ class Help_Plugin {
 }
 
 /**
- * Inicializar o plugin
+ * Initialize the plugin
  */
 function help_plugin_init() {
     return Help_Plugin::get_instance();
 }
 
-// Iniciar o plugin
+// Register activation and deactivation hooks
+register_activation_hook(__FILE__, array('Help_Plugin', 'activate'));
+register_deactivation_hook(__FILE__, array('Help_Plugin', 'deactivate'));
+
+// Initialize the plugin
 help_plugin_init();
 
