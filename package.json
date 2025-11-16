@@ -1,0 +1,16 @@
+{
+  "name": "help-plugin",
+  "version": "1.0.0",
+  "description": "Plugin WordPress com página no painel de controle",
+  "scripts": {
+    "build": "./build.sh",
+    "zip": "./build.sh"
+  },
+  "keywords": [
+    "wordpress",
+    "plugin"
+  ],
+  "author": "",
+  "license": "GPL-2.0-or-later"
+}
+
