@@ -4,7 +4,7 @@
     let chart = null;
     
     $(document).ready(function() {
-        // Definir datas padrão (últimos 30 dias)
+        // Set default dates (last 30 days)
         const today = new Date();
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(today.getDate() - 30);
@@ -12,10 +12,10 @@
         $('#date-from').val(thirtyDaysAgo.toISOString().split('T')[0]);
         $('#date-to').val(today.toISOString().split('T')[0]);
         
-        // Carregar estatísticas ao carregar a página
+        // Load statistics on page load
         loadStatistics();
         
-        // Carregar estatísticas ao clicar no botão
+        // Load statistics on button click
         $('#load-statistics').on('click', function() {
             loadStatistics();
         });
@@ -26,17 +26,17 @@
         const dateTo = $('#date-to').val();
         
         if (!dateFrom || !dateTo) {
-            alert('Por favor, selecione as datas inicial e final.');
+            alert('Please select start and end dates.');
             return;
         }
         
         if (new Date(dateFrom) > new Date(dateTo)) {
-            alert('A data inicial deve ser anterior à data final.');
+            alert('Start date must be before end date.');
             return;
         }
         
-        // Mostrar loading
-        $('#load-statistics').prop('disabled', true).text('Carregando...');
+        // Show loading
+        $('#load-statistics').prop('disabled', true).text('Loading...');
         
         $.ajax({
             url: helpPluginStats.ajaxUrl,
@@ -49,22 +49,22 @@
             },
             success: function(response) {
                 if (response.success) {
-                    // Atualizar resumo rápido
+                    // Update quick summary
                     $('#stats-1day').text(response.data.summary['1day'] || 0);
                     $('#stats-7days').text(response.data.summary['7days'] || 0);
                     $('#stats-30days').text(response.data.summary['30days'] || 0);
                     
-                    // Atualizar gráfico
+                    // Update chart
                     updateChart(response.data.chart);
                 } else {
-                    alert('Erro ao carregar estatísticas: ' + (response.data.message || 'Erro desconhecido'));
+                    alert('Error loading statistics: ' + (response.data.message || 'Unknown error'));
                 }
             },
             error: function() {
-                alert('Erro ao conectar com o servidor. Tente novamente.');
+                alert('Error connecting to server. Please try again.');
             },
             complete: function() {
-                $('#load-statistics').prop('disabled', false).text('Carregar Estatísticas');
+                $('#load-statistics').prop('disabled', false).text('Load Statistics');
             }
         });
     }
@@ -76,18 +76,18 @@
             return;
         }
         
-        // Destruir gráfico anterior se existir
+        // Destroy previous chart if exists
         if (chart) {
             chart.destroy();
         }
         
-        // Criar novo gráfico
+        // Create new chart
         chart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: chartData.labels,
                 datasets: [{
-                    label: 'Interações',
+                    label: 'Interactions',
                     data: chartData.data,
                     borderColor: '#667eea',
                     backgroundColor: 'rgba(102, 126, 234, 0.1)',

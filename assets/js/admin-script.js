@@ -1,5 +1,5 @@
 /**
- * Scripts para a página do admin do Help Plugin
+ * Scripts for Help Plugin admin page
  */
 
 (function($) {
@@ -7,16 +7,16 @@
     
     $(document).ready(function() {
         
-        // Botão de ação
+        // Action button
         $('#help-plugin-action-btn').on('click', function(e) {
             e.preventDefault();
             
             var $message = $('#help-plugin-message');
             
-            // Alternar visibilidade da mensagem
+            // Toggle message visibility
             $message.fadeIn();
             
-            // Ocultar após 5 segundos
+            // Hide after 5 seconds
             setTimeout(function() {
                 $message.fadeOut();
             }, 5000);
