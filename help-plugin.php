@@ -3,7 +3,7 @@
  * Plugin Name: BooChat Connect
  * Plugin URI: https://boopixel.com/boochat-connect
  * Description: AI Chatbot & n8n Automation - Modern, lightweight chatbot popup that integrates seamlessly with n8n. Automate workflows, respond in real-time, collect leads, and connect to any AI model or external service. Perfect for 24/7 AI support, sales automation, and smart customer interactions.
- * Version: 1.0.63
+ * Version: 1.0.82
  * Author: BooPixel
  * Author URI: https://boopixel.com
  * License: GPLv2 or later
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define constants
-define('BOOCHAT_CONNECT_VERSION', '1.0.50');
+define('BOOCHAT_CONNECT_VERSION', '1.0.82');
 define('BOOCHAT_CONNECT_DIR', plugin_dir_path(__FILE__));
 define('BOOCHAT_CONNECT_URL', plugin_dir_url(__FILE__));
 
@@ -32,6 +32,7 @@ require_once BOOCHAT_CONNECT_DIR . 'includes/class-boochat-connect-database.php'
 require_once BOOCHAT_CONNECT_DIR . 'includes/class-boochat-connect-api.php';
 require_once BOOCHAT_CONNECT_DIR . 'includes/class-boochat-connect-settings.php';
 require_once BOOCHAT_CONNECT_DIR . 'includes/class-boochat-connect-statistics.php';
+require_once BOOCHAT_CONNECT_DIR . 'includes/class-boochat-connect-license.php';
 require_once BOOCHAT_CONNECT_DIR . 'includes/class-boochat-connect-ajax.php';
 require_once BOOCHAT_CONNECT_DIR . 'includes/class-boochat-connect-admin.php';
 require_once BOOCHAT_CONNECT_DIR . 'includes/class-boochat-connect-frontend.php';
@@ -126,6 +127,20 @@ class BooChat_Connect {
     }
     
     /**
+     * Verify license periodically
+     */
+    public function verify_license_periodically() {
+        $license = new BooChat_Connect_License();
+        
+        // Verify license every 24 hours
+        $last_check = get_option('boochat_connect_license_last_check', 0);
+        if (time() - $last_check > 86400) {
+            $license->verify_license();
+            update_option('boochat_connect_license_last_check', time());
+        }
+    }
+    
+    /**
      * Plugin uninstall hook - Remove all plugin data
      */
     public static function uninstall() {
@@ -146,7 +161,15 @@ class BooChat_Connect {
             'boochat_connect_text_color',
             'boochat_connect_font_family',
             'boochat_connect_font_size',
-            'boochat_connect_api_url'
+            'boochat_connect_api_url',
+            'boochat_connect_license_key',
+            'boochat_connect_license_status',
+            'boochat_connect_license_expires',
+            'boochat_connect_license_last_check',
+            'boochat_connect_stripe_secret_key',
+            'boochat_connect_stripe_test_mode',
+            'boochat_connect_pro_price',
+            'boochat_connect_pro_currency'
         );
         
         foreach ($options as $option) {
@@ -167,6 +190,9 @@ class BooChat_Connect {
      * Constructor
      */
     private function __construct() {
+        // Schedule license verification
+        add_action('wp_loaded', array($this, 'verify_license_periodically'));
+        
         // Initialize core components
         $this->database = new BooChat_Connect_Database();
         $this->api = new BooChat_Connect_API();

@@ -27,7 +27,7 @@ echo "Updating version from $CURRENT_VERSION to $NEW_VERSION"
 
 # Update version in help-plugin.php (header and constant)
 sed -i.bak "s/Version: $CURRENT_VERSION/Version: $NEW_VERSION/g" help-plugin.php
-sed -i.bak "s/define('HELP_PLUGIN_VERSION', '$CURRENT_VERSION');/define('HELP_PLUGIN_VERSION', '$NEW_VERSION');/g" help-plugin.php
+sed -i.bak "s/define('BOOCHAT_CONNECT_VERSION', '$CURRENT_VERSION');/define('BOOCHAT_CONNECT_VERSION', '$NEW_VERSION');/g" help-plugin.php
 
 # Update version in package.json
 sed -i.bak "s/\"version\": \"$CURRENT_VERSION\"/\"version\": \"$NEW_VERSION\"/g" package.json
