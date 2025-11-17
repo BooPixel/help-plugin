@@ -37,6 +37,13 @@ class BooChat_Connect_Admin {
     private $statistics;
     
     /**
+     * License instance
+     *
+     * @var BooChat_Connect_License
+     */
+    private $license;
+    
+    /**
      * Constructor
      *
      * @param BooChat_Connect_Settings  $settings Settings instance.
@@ -47,11 +54,17 @@ class BooChat_Connect_Admin {
         $this->settings = $settings;
         $this->api = $api;
         $this->statistics = $statistics;
+        $this->license = new BooChat_Connect_License();
         
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
         add_action('admin_post_boochat_connect_save_settings', array($this, 'save_settings'));
         add_action('admin_post_boochat_connect_save_customization', array($this, 'save_customization'));
+        add_action('admin_post_boochat_connect_activate_license', array($this, 'handle_activate_license'));
+        add_action('admin_post_boochat_connect_deactivate_license', array($this, 'handle_deactivate_license'));
+        add_action('admin_post_boochat_connect_stripe_checkout', array($this, 'handle_stripe_checkout'));
+        add_action('admin_init', array($this, 'handle_stripe_return'));
+        add_action('wp_ajax_boochat_connect_create_stripe_session', array($this, 'ajax_create_stripe_session'));
     }
     
     /**
@@ -103,6 +116,18 @@ class BooChat_Connect_Admin {
             'boochat-connect-statistics',
             array($this, 'render_statistics_page')
         );
+        
+        // Add PRO upgrade page (temporarily hidden)
+        /*
+        add_submenu_page(
+            'boochat-connect',
+            esc_html__('Upgrade to PRO', 'boochat-connect'),
+            esc_html__('Upgrade to PRO', 'boochat-connect'),
+            'manage_options',
+            'boochat-connect-pro',
+            array($this, 'render_pro_upgrade_page')
+        );
+        */
     }
     
     /**
@@ -118,6 +143,7 @@ class BooChat_Connect_Admin {
             $current_page === 'boochat-connect-customization' ||
             $current_page === 'boochat-connect-settings' ||
             $current_page === 'boochat-connect-statistics' ||
+            // $current_page === 'boochat-connect-pro' || // PRO page temporarily hidden
             strpos($hook, 'boochat-connect') !== false
         );
         
@@ -150,6 +176,31 @@ class BooChat_Connect_Admin {
                 array('boochat-connect-admin-style'),
                 BOOCHAT_CONNECT_VERSION
             );
+        }
+        
+        // PRO page temporarily hidden
+        if (false && $current_page === 'boochat-connect-pro') {
+            wp_enqueue_style(
+                'boochat-connect-admin-main',
+                BOOCHAT_CONNECT_URL . 'assets/css/admin-main.css',
+                array('boochat-connect-admin-style'),
+                BOOCHAT_CONNECT_VERSION
+            );
+            
+            // Enqueue Stripe checkout script
+            wp_enqueue_script(
+                'boochat-connect-stripe-checkout',
+                BOOCHAT_CONNECT_URL . 'assets/js/stripe-checkout.js',
+                array('jquery'),
+                BOOCHAT_CONNECT_VERSION,
+                true
+            );
+            
+            wp_localize_script('boochat-connect-stripe-checkout', 'boochatConnectStripe', array(
+                'ajaxUrl' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('boochat-connect-stripe'),
+                'proPageUrl' => admin_url('admin.php?page=boochat-connect-pro'),
+            ));
         }
         
         wp_enqueue_script(
@@ -189,6 +240,7 @@ class BooChat_Connect_Admin {
                 'invalidDateRangeText' => boochat_connect_translate('invalid_date_range', 'Start date must be before end date.'),
                 'errorLoadingText' => boochat_connect_translate('error_loading_statistics', 'Error loading statistics: '),
                 'errorConnectingText' => boochat_connect_translate('error_connecting_server', 'Error connecting to server. Please try again.'),
+                'proUpgradeUrl' => admin_url('admin.php?page=boochat-connect-pro'),
             );
             
             wp_localize_script('boochat-connect-statistics-script', 'boochatConnectStats', $localize_data);
@@ -342,6 +394,162 @@ class BooChat_Connect_Admin {
      */
     public function render_statistics_page() {
         $this->statistics->render_page();
+    }
+    
+    /**
+     * Render PRO upgrade page
+     */
+    public function render_pro_upgrade_page() {
+        $is_pro = $this->license->is_pro();
+        $license_key = $this->license->get_license_key();
+        $license_status = $this->license->get_license_status();
+        
+        // Mask license key for display
+        if (!empty($license_key) && strlen($license_key) > 8) {
+            $masked_key = substr($license_key, 0, 4) . str_repeat('*', strlen($license_key) - 8) . substr($license_key, -4);
+        } else {
+            $masked_key = $license_key;
+        }
+        
+        $this->load_view('admin-pro-upgrade', array(
+            'is_pro' => $is_pro,
+            'license_status' => $license_status,
+            'license_key' => $masked_key,
+        ));
+    }
+    
+    /**
+     * Handle license activation
+     */
+    public function handle_activate_license() {
+        if (!$this->verify_request('boochat_connect_activate_license', 'license_nonce')) {
+            return;
+        }
+        
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
+        $license_key = isset($_POST['license_key']) ? sanitize_text_field(wp_unslash($_POST['license_key'])) : '';
+        
+        $result = $this->license->activate_license($license_key);
+        
+        if ($result['success']) {
+            wp_safe_redirect(add_query_arg(array(
+                'page' => 'boochat-connect-pro',
+                'activation' => 'success'
+            ), admin_url('admin.php')));
+        } else {
+            wp_safe_redirect(add_query_arg(array(
+                'page' => 'boochat-connect-pro',
+                'activation' => 'error',
+                'message' => urlencode($result['message'])
+            ), admin_url('admin.php')));
+        }
+        exit;
+    }
+    
+    /**
+     * Handle license deactivation
+     */
+    public function handle_deactivate_license() {
+        if (!$this->verify_request('boochat_connect_deactivate_license', 'deactivate_nonce')) {
+            return;
+        }
+        
+        $result = $this->license->deactivate_license();
+        
+        wp_safe_redirect(add_query_arg(array(
+            'page' => 'boochat-connect-pro',
+            'deactivation' => $result['success'] ? 'success' : 'error'
+        ), admin_url('admin.php')));
+        exit;
+    }
+    
+    /**
+     * AJAX handler to create Stripe checkout session
+     */
+    public function ajax_create_stripe_session() {
+        check_ajax_referer('boochat-connect-stripe', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => esc_html__('No permission.', 'boochat-connect')));
+            return;
+        }
+        
+        $result = $this->license->request_checkout_url();
+        
+        if ($result['success'] && isset($result['checkout_url'])) {
+            wp_send_json_success(array(
+                'checkout_url' => $result['checkout_url'],
+                'session_id' => isset($result['session_id']) ? $result['session_id'] : ''
+            ));
+        } else {
+            wp_send_json_error(array(
+                'message' => isset($result['message']) ? $result['message'] : esc_html__('Failed to create checkout session.', 'boochat-connect')
+            ));
+        }
+    }
+    
+    /**
+     * Handle checkout request (legacy POST form)
+     */
+    public function handle_stripe_checkout() {
+        if (!$this->verify_request('boochat_connect_stripe_checkout', 'stripe_nonce')) {
+            return;
+        }
+        
+        $result = $this->license->request_checkout_url();
+        
+        if ($result['success'] && isset($result['checkout_url'])) {
+            // Redirect to checkout
+            wp_safe_redirect($result['checkout_url']);
+            exit;
+        } else {
+            wp_safe_redirect(add_query_arg(array(
+                'page' => 'boochat-connect-pro',
+                'payment' => 'error',
+                'message' => isset($result['message']) ? urlencode($result['message']) : ''
+            ), admin_url('admin.php')));
+            exit;
+        }
+    }
+    
+    /**
+     * Handle payment return callback
+     */
+    public function handle_stripe_return() {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Payment callback verification
+        if (!isset($_GET['page']) || sanitize_text_field(wp_unslash($_GET['page'])) !== 'boochat-connect-pro') {
+            return;
+        }
+        
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Payment callback verification
+        if (!isset($_GET['payment']) || sanitize_text_field(wp_unslash($_GET['payment'])) !== 'success') {
+            return;
+        }
+        
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Payment callback verification
+        $session_id = isset($_GET['session_id']) ? sanitize_text_field(wp_unslash($_GET['session_id'])) : '';
+        
+        if (empty($session_id)) {
+            return;
+        }
+        
+        // Verify the payment and activate license
+        $result = $this->license->verify_payment_and_activate($session_id);
+        
+        if ($result['success']) {
+            wp_safe_redirect(add_query_arg(array(
+                'page' => 'boochat-connect-pro',
+                'payment' => 'success',
+                'license_activated' => '1'
+            ), admin_url('admin.php')));
+        } else {
+            wp_safe_redirect(add_query_arg(array(
+                'page' => 'boochat-connect-pro',
+                'payment' => 'error',
+                'message' => isset($result['message']) ? urlencode($result['message']) : ''
+            ), admin_url('admin.php')));
+        }
+        exit;
     }
 }
 
