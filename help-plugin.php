@@ -3,7 +3,7 @@
  * Plugin Name: BooChat Connect
  * Plugin URI: https://boopixel.com/boochat-connect
  * Description: AI Chatbot & n8n Automation - Modern, lightweight chatbot popup that integrates seamlessly with n8n. Automate workflows, respond in real-time, collect leads, and connect to any AI model or external service. Perfect for 24/7 AI support, sales automation, and smart customer interactions.
- * Version: 1.0.10
+ * Version: 1.0.11
  * Author: BooPixel
  * Author URI: https://boopixel.com
  * License: GPLv2 or later
@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define constants
-define('HELP_PLUGIN_VERSION', '1.0.10');
+define('HELP_PLUGIN_VERSION', '1.0.11');
 define('HELP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('HELP_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -497,12 +497,12 @@ class Help_Plugin {
     public function save_customization() {
         // Check permissions
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have permission to access this page.', 'help-plugin'));
+            wp_die(__('You do not have permission to access this page.', 'boochat-connect'));
         }
         
         // Verify nonce
         if (!isset($_POST['help_plugin_customization_nonce']) || !wp_verify_nonce($_POST['help_plugin_customization_nonce'], 'help_plugin_save_customization')) {
-            wp_die(__('Security error. Please try again.', 'help-plugin'));
+            wp_die(__('Security error. Please try again.', 'boochat-connect'));
         }
         
         // Save customization settings
@@ -631,12 +631,12 @@ class Help_Plugin {
     public function save_settings() {
         // Check permissions
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have permission to access this page.', 'help-plugin'));
+            wp_die(__('You do not have permission to access this page.', 'boochat-connect'));
         }
         
         // Verify nonce
         if (!isset($_POST['help_plugin_settings_nonce']) || !wp_verify_nonce($_POST['help_plugin_settings_nonce'], 'help_plugin_save_settings')) {
-            wp_die(__('Security error. Please try again.', 'help-plugin'));
+            wp_die(__('Security error. Please try again.', 'boochat-connect'));
         }
         
         // Save API URL
@@ -719,9 +719,15 @@ class Help_Plugin {
                                         <p class="description">
                                             <?php echo esc_html(help_plugin_translate('language_description')); ?>
                                             <?php if (empty($current_language)): ?>
-                                                <br><strong><?php printf(esc_html__('Currently using: %s (from WordPress)', 'help-plugin'), esc_html($wp_language_name)); ?></strong>
+                                                <br><strong><?php
+                                                    /* translators: %s: WordPress language name */
+                                                    printf(esc_html__('Currently using: %s (from WordPress)', 'boochat-connect'), esc_html($wp_language_name));
+                                                ?></strong>
                                             <?php else: ?>
-                                                <br><strong><?php printf(esc_html__('Currently using: %s (custom)', 'help-plugin'), esc_html($current_language === 'pt' ? 'Português' : ($current_language === 'es' ? 'Español' : 'English'))); ?></strong>
+                                                <br><strong><?php
+                                                    /* translators: %s: Custom language name */
+                                                    printf(esc_html__('Currently using: %s (custom)', 'boochat-connect'), esc_html($current_language === 'pt' ? 'Português' : ($current_language === 'es' ? 'Español' : 'English')));
+                                                ?></strong>
                                             <?php endif; ?>
                                         </p>
                                     </td>
