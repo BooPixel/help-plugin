@@ -244,7 +244,7 @@ The plugin includes comprehensive unit tests covering:
 
 ## Database
 
-The plugin creates a custom table `wp_help_plugin_interactions` to store:
+The plugin creates a custom table `wp_boochat_connect_interactions` to store:
 - Session IDs
 - Message content
 - Interaction timestamps
@@ -270,7 +270,7 @@ This table is automatically created on first use.
 
 ## Version
 
-Current version: **1.0.26**
+Current version: **1.0.38**
 
 ## Support
 
