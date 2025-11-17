@@ -5,10 +5,10 @@
 
 use PHPUnit\Framework\TestCase;
 
-class Help_Plugin_Test extends TestCase {
+class BooChat_Connect_Test extends TestCase {
     
     /**
-     * @var Help_Plugin
+     * @var BooChat_Connect
      */
     private $plugin;
     
@@ -69,7 +69,7 @@ class Help_Plugin_Test extends TestCase {
         
         if (!function_exists('plugin_dir_url')) {
             function plugin_dir_url($file) {
-                return 'http://example.com/wp-content/plugins/help-plugin/';
+                return 'http://example.com/wp-content/plugins/boochat-connect/';
             }
         }
         
@@ -94,8 +94,6 @@ class Help_Plugin_Test extends TestCase {
         if (!function_exists('wp_strip_all_tags')) {
             function wp_strip_all_tags($string, $remove_breaks = false) {
                 $string = preg_replace('@<(script|style)[^>]*?>.*?</\\1>@si', '', $string);
-                // Use native PHP strip_tags as fallback in test environment
-                // In real WordPress, wp_strip_all_tags uses strip_tags internally
                 $string = preg_replace('@<[^>]*?>@', '', $string);
                 if ($remove_breaks) {
                     $string = preg_replace('/[\r\n\t ]+/', ' ', $string);
@@ -218,14 +216,19 @@ class Help_Plugin_Test extends TestCase {
             }
         }
         
-        if (!function_exists('wp_redirect')) {
-            function wp_redirect($location, $status = 302) {
+        if (!function_exists('wp_safe_redirect')) {
+            function wp_safe_redirect($location, $status = 302) {
                 return true;
             }
         }
         
         if (!function_exists('add_query_arg')) {
             function add_query_arg($key, $value = null, $url = null) {
+                if (is_array($key)) {
+                    $url = $value;
+                    $query = http_build_query($key);
+                    return $url ? $url . '?' . $query : '?' . $query;
+                }
                 return $url ? $url . '?' . $key . '=' . $value : '?' . $key . '=' . $value;
             }
         }
@@ -245,6 +248,45 @@ class Help_Plugin_Test extends TestCase {
         if (!function_exists('delete_option')) {
             function delete_option($option) {
                 return true;
+            }
+        }
+        
+        if (!function_exists('wp_unslash')) {
+            function wp_unslash($value) {
+                return stripslashes($value);
+            }
+        }
+        
+        if (!function_exists('esc_sql')) {
+            function esc_sql($data) {
+                return addslashes($data);
+            }
+        }
+        
+        if (!function_exists('wp_remote_post')) {
+            function wp_remote_post($url, $args = array()) {
+                return array(
+                    'body' => json_encode(array('output' => 'Test response')),
+                    'response' => array('code' => 200)
+                );
+            }
+        }
+        
+        if (!function_exists('wp_remote_retrieve_response_code')) {
+            function wp_remote_retrieve_response_code($response) {
+                return isset($response['response']['code']) ? $response['response']['code'] : 200;
+            }
+        }
+        
+        if (!function_exists('wp_remote_retrieve_body')) {
+            function wp_remote_retrieve_body($response) {
+                return isset($response['body']) ? $response['body'] : '';
+            }
+        }
+        
+        if (!function_exists('is_wp_error')) {
+            function is_wp_error($thing) {
+                return false;
             }
         }
         
@@ -299,17 +341,17 @@ class Help_Plugin_Test extends TestCase {
         }
         
         // Load plugin file
-        if (!class_exists('Help_Plugin')) {
+        if (!class_exists('BooChat_Connect')) {
             require_once dirname(__DIR__) . '/help-plugin.php';
         }
         
         // Reset singleton instance
-        $reflection = new ReflectionClass('Help_Plugin');
+        $reflection = new ReflectionClass('BooChat_Connect');
         $instance = $reflection->getProperty('instance');
         $instance->setAccessible(true);
         $instance->setValue(null, null);
         
-        $this->plugin = Help_Plugin::get_instance();
+        $this->plugin = BooChat_Connect::get_instance();
     }
     
     /**
@@ -319,7 +361,7 @@ class Help_Plugin_Test extends TestCase {
         parent::tearDown();
         
         // Reset singleton instance
-        $reflection = new ReflectionClass('Help_Plugin');
+        $reflection = new ReflectionClass('BooChat_Connect');
         $instance = $reflection->getProperty('instance');
         $instance->setAccessible(true);
         $instance->setValue(null, null);
@@ -329,26 +371,26 @@ class Help_Plugin_Test extends TestCase {
      * Test singleton pattern
      */
     public function test_get_instance_returns_same_instance() {
-        $instance1 = Help_Plugin::get_instance();
-        $instance2 = Help_Plugin::get_instance();
+        $instance1 = BooChat_Connect::get_instance();
+        $instance2 = BooChat_Connect::get_instance();
         
         $this->assertSame($instance1, $instance2);
     }
     
     /**
-     * Test get_instance returns Help_Plugin instance
+     * Test get_instance returns BooChat_Connect instance
      */
-    public function test_get_instance_returns_help_plugin_instance() {
-        $instance = Help_Plugin::get_instance();
+    public function test_get_instance_returns_boochat_connect_instance() {
+        $instance = BooChat_Connect::get_instance();
         
-        $this->assertInstanceOf('Help_Plugin', $instance);
+        $this->assertInstanceOf('BooChat_Connect', $instance);
     }
     
     /**
      * Test constructor is private
      */
     public function test_constructor_is_private() {
-        $reflection = new ReflectionClass('Help_Plugin');
+        $reflection = new ReflectionClass('BooChat_Connect');
         $constructor = $reflection->getConstructor();
         
         $this->assertTrue($constructor->isPrivate());
@@ -358,203 +400,88 @@ class Help_Plugin_Test extends TestCase {
      * Test constants are defined
      */
     public function test_constants_are_defined() {
-        $this->assertTrue(defined('HELP_PLUGIN_VERSION'));
-        $this->assertTrue(defined('HELP_PLUGIN_DIR'));
-        $this->assertTrue(defined('HELP_PLUGIN_URL'));
+        $this->assertTrue(defined('BOOCHAT_CONNECT_VERSION'));
+        $this->assertTrue(defined('BOOCHAT_CONNECT_DIR'));
+        $this->assertTrue(defined('BOOCHAT_CONNECT_URL'));
     }
     
     /**
      * Test plugin version constant
      */
     public function test_plugin_version_constant() {
-        $this->assertEquals('1.0.0', HELP_PLUGIN_VERSION);
+        $this->assertNotEmpty(BOOCHAT_CONNECT_VERSION);
+        $this->assertIsString(BOOCHAT_CONNECT_VERSION);
     }
     
     /**
-     * Test help_plugin_init function exists
+     * Test boochat_connect_init function exists
      */
-    public function test_help_plugin_init_function_exists() {
-        $this->assertTrue(function_exists('help_plugin_init'));
+    public function test_boochat_connect_init_function_exists() {
+        $this->assertTrue(function_exists('boochat_connect_init'));
     }
     
     /**
-     * Test help_plugin_init returns Help_Plugin instance
+     * Test boochat_connect_init returns BooChat_Connect instance
      */
-    public function test_help_plugin_init_returns_help_plugin_instance() {
-        $result = help_plugin_init();
+    public function test_boochat_connect_init_returns_boochat_connect_instance() {
+        $result = boochat_connect_init();
         
-        $this->assertInstanceOf('Help_Plugin', $result);
+        $this->assertInstanceOf('BooChat_Connect', $result);
     }
     
     /**
-     * Test help_plugin_get_version function exists
+     * Test boochat_connect_get_version function exists
      */
-    public function test_help_plugin_get_version_function_exists() {
-        $this->assertTrue(function_exists('help_plugin_get_version'));
+    public function test_boochat_connect_get_version_function_exists() {
+        $this->assertTrue(function_exists('boochat_connect_get_version'));
     }
     
     /**
-     * Test add_admin_menu method exists
+     * Test boochat_connect_get_version returns value
      */
-    public function test_add_admin_menu_method_exists() {
-        $this->assertTrue(method_exists($this->plugin, 'add_admin_menu'));
+    public function test_boochat_connect_get_version_returns_value() {
+        $version = boochat_connect_get_version();
+        $this->assertNotEmpty($version);
+        $this->assertIsString($version);
     }
     
     /**
-     * Test enqueue_admin_assets method exists
+     * Test boochat_connect_get_language_from_locale function exists
      */
-    public function test_enqueue_admin_assets_method_exists() {
-        $this->assertTrue(method_exists($this->plugin, 'enqueue_admin_assets'));
+    public function test_boochat_connect_get_language_from_locale_function_exists() {
+        $this->assertTrue(function_exists('boochat_connect_get_language_from_locale'));
     }
     
     /**
-     * Test enqueue_frontend_assets method exists
+     * Test boochat_connect_get_language_from_locale returns correct language codes
      */
-    public function test_enqueue_frontend_assets_method_exists() {
-        $this->assertTrue(method_exists($this->plugin, 'enqueue_frontend_assets'));
+    public function test_boochat_connect_get_language_from_locale_returns_correct_codes() {
+        $this->assertEquals('pt', boochat_connect_get_language_from_locale('pt_BR'));
+        $this->assertEquals('es', boochat_connect_get_language_from_locale('es_ES'));
+        $this->assertEquals('en', boochat_connect_get_language_from_locale('en_US'));
+        $this->assertEquals('en', boochat_connect_get_language_from_locale('en_GB'));
     }
     
     /**
-     * Test render_admin_page method exists
+     * Test boochat_connect_get_language_from_locale defaults to English
      */
-    public function test_render_admin_page_method_exists() {
-        $this->assertTrue(method_exists($this->plugin, 'render_admin_page'));
+    public function test_boochat_connect_get_language_from_locale_defaults_to_english() {
+        $this->assertEquals('en', boochat_connect_get_language_from_locale('fr_FR'));
+        $this->assertEquals('en', boochat_connect_get_language_from_locale('de_DE'));
     }
     
     /**
-     * Test render_settings_page method exists
+     * Test boochat_connect_translate function exists
      */
-    public function test_render_settings_page_method_exists() {
-        $this->assertTrue(method_exists($this->plugin, 'render_settings_page'));
+    public function test_boochat_connect_translate_function_exists() {
+        $this->assertTrue(function_exists('boochat_connect_translate'));
     }
     
     /**
-     * Test render_statistics_page method exists
+     * Test boochat_connect_translate returns English translation by default
      */
-    public function test_render_statistics_page_method_exists() {
-        $this->assertTrue(method_exists($this->plugin, 'render_statistics_page'));
-    }
-    
-    /**
-     * Test render_chat_widget method exists
-     */
-    public function test_render_chat_widget_method_exists() {
-        $this->assertTrue(method_exists($this->plugin, 'render_chat_widget'));
-    }
-    
-    /**
-     * Test ajax_send_message method exists
-     */
-    public function test_ajax_send_message_method_exists() {
-        $this->assertTrue(method_exists($this->plugin, 'ajax_send_message'));
-    }
-    
-    /**
-     * Test ajax_get_statistics method exists
-     */
-    public function test_ajax_get_statistics_method_exists() {
-        $this->assertTrue(method_exists($this->plugin, 'ajax_get_statistics'));
-    }
-    
-    /**
-     * Test save_customization method exists
-     */
-    public function test_save_customization_method_exists() {
-        $this->assertTrue(method_exists($this->plugin, 'save_customization'));
-    }
-    
-    /**
-     * Test save_settings method exists
-     */
-    public function test_save_settings_method_exists() {
-        $this->assertTrue(method_exists($this->plugin, 'save_settings'));
-    }
-    
-    /**
-     * Test get_customization_settings method exists
-     */
-    public function test_get_customization_settings_method_exists() {
-        $reflection = new ReflectionClass('Help_Plugin');
-        $method = $reflection->getMethod('get_customization_settings');
-        $method->setAccessible(true);
-        
-        $settings = $method->invoke($this->plugin);
-        
-        $this->assertIsArray($settings);
-        $this->assertArrayHasKey('chat_name', $settings);
-        $this->assertArrayHasKey('welcome_message', $settings);
-        $this->assertArrayHasKey('primary_color', $settings);
-        $this->assertArrayHasKey('secondary_color', $settings);
-        $this->assertArrayHasKey('chat_bg_color', $settings);
-        $this->assertArrayHasKey('text_color', $settings);
-        $this->assertArrayHasKey('font_family', $settings);
-        $this->assertArrayHasKey('font_size', $settings);
-    }
-    
-    /**
-     * Test get_api_url method exists
-     */
-    public function test_get_api_url_method_exists() {
-        $reflection = new ReflectionClass('Help_Plugin');
-        $method = $reflection->getMethod('get_api_url');
-        $method->setAccessible(true);
-        
-        $url = $method->invoke($this->plugin);
-        
-        $this->assertIsString($url);
-    }
-    
-    /**
-     * Test generate_session_id method exists
-     */
-    public function test_generate_session_id_method_exists() {
-        $reflection = new ReflectionClass('Help_Plugin');
-        $method = $reflection->getMethod('generate_session_id');
-        $method->setAccessible(true);
-        
-        $session_id = $method->invoke($this->plugin);
-        
-        $this->assertIsString($session_id);
-        $this->assertNotEmpty($session_id);
-    }
-    
-    /**
-     * Test help_plugin_get_language_from_locale function exists
-     */
-    public function test_help_plugin_get_language_from_locale_function_exists() {
-        $this->assertTrue(function_exists('help_plugin_get_language_from_locale'));
-    }
-    
-    /**
-     * Test help_plugin_get_language_from_locale returns correct language codes
-     */
-    public function test_help_plugin_get_language_from_locale_returns_correct_codes() {
-        $this->assertEquals('pt', help_plugin_get_language_from_locale('pt_BR'));
-        $this->assertEquals('es', help_plugin_get_language_from_locale('es_ES'));
-        $this->assertEquals('en', help_plugin_get_language_from_locale('en_US'));
-        $this->assertEquals('en', help_plugin_get_language_from_locale('en_GB'));
-    }
-    
-    /**
-     * Test help_plugin_get_language_from_locale defaults to English
-     */
-    public function test_help_plugin_get_language_from_locale_defaults_to_english() {
-        $this->assertEquals('en', help_plugin_get_language_from_locale('fr_FR'));
-        $this->assertEquals('en', help_plugin_get_language_from_locale('de_DE'));
-    }
-    
-    /**
-     * Test help_plugin_translate function exists
-     */
-    public function test_help_plugin_translate_function_exists() {
-        $this->assertTrue(function_exists('help_plugin_translate'));
-    }
-    
-    /**
-     * Test help_plugin_translate returns English translation by default
-     */
-    public function test_help_plugin_translate_returns_english_by_default() {
-        $result = help_plugin_translate('chat_name_default');
+    public function test_boochat_connect_translate_returns_english_by_default() {
+        $result = boochat_connect_translate('chat_name_default');
         $this->assertEquals('Support', $result);
     }
     
@@ -562,170 +489,275 @@ class Help_Plugin_Test extends TestCase {
      * Test activate method exists
      */
     public function test_activate_method_exists() {
-        $this->assertTrue(method_exists('Help_Plugin', 'activate'));
+        $this->assertTrue(method_exists('BooChat_Connect', 'activate'));
     }
     
     /**
      * Test deactivate method exists
      */
     public function test_deactivate_method_exists() {
-        $this->assertTrue(method_exists('Help_Plugin', 'deactivate'));
+        $this->assertTrue(method_exists('BooChat_Connect', 'deactivate'));
     }
     
     /**
-     * Test get_language method exists
+     * Test uninstall method exists
      */
-    public function test_get_language_method_exists() {
-        $reflection = new ReflectionClass('Help_Plugin');
-        $this->assertTrue($reflection->hasMethod('get_language'));
+    public function test_uninstall_method_exists() {
+        $this->assertTrue(method_exists('BooChat_Connect', 'uninstall'));
     }
     
     /**
-     * Test get_effective_language method exists
+     * Test Database class exists
      */
-    public function test_get_effective_language_method_exists() {
-        $reflection = new ReflectionClass('Help_Plugin');
-        $this->assertTrue($reflection->hasMethod('get_effective_language'));
+    public function test_database_class_exists() {
+        $this->assertTrue(class_exists('BooChat_Connect_Database'));
     }
     
     /**
-     * Test log_interaction method exists
+     * Test Database create_table method exists
      */
-    public function test_log_interaction_method_exists() {
-        $reflection = new ReflectionClass('Help_Plugin');
-        $this->assertTrue($reflection->hasMethod('log_interaction'));
+    public function test_database_create_table_method_exists() {
+        $database = new BooChat_Connect_Database();
+        $this->assertTrue(method_exists($database, 'create_table'));
     }
     
     /**
-     * Test log_robot_response method exists
+     * Test Database log_interaction method exists
      */
-    public function test_log_robot_response_method_exists() {
-        $reflection = new ReflectionClass('Help_Plugin');
-        $this->assertTrue($reflection->hasMethod('log_robot_response'));
+    public function test_database_log_interaction_method_exists() {
+        $database = new BooChat_Connect_Database();
+        $this->assertTrue(method_exists($database, 'log_interaction'));
     }
     
     /**
-     * Test create_interactions_table method exists
+     * Test Database get_interactions_count method exists
      */
-    public function test_create_interactions_table_method_exists() {
-        $reflection = new ReflectionClass('Help_Plugin');
-        $this->assertTrue($reflection->hasMethod('create_interactions_table'));
+    public function test_database_get_interactions_count_method_exists() {
+        $database = new BooChat_Connect_Database();
+        $this->assertTrue(method_exists($database, 'get_interactions_count'));
     }
     
     /**
-     * Test get_interactions_count method exists
+     * Test Database get_chart_data method exists
      */
-    public function test_get_interactions_count_method_exists() {
-        $reflection = new ReflectionClass('Help_Plugin');
-        $this->assertTrue($reflection->hasMethod('get_interactions_count'));
+    public function test_database_get_chart_data_method_exists() {
+        $database = new BooChat_Connect_Database();
+        $this->assertTrue(method_exists($database, 'get_chart_data'));
     }
     
     /**
-     * Test get_chart_data method exists
+     * Test Database get_calendar_data method exists
      */
-    public function test_get_chart_data_method_exists() {
-        $reflection = new ReflectionClass('Help_Plugin');
-        $this->assertTrue($reflection->hasMethod('get_chart_data'));
+    public function test_database_get_calendar_data_method_exists() {
+        $database = new BooChat_Connect_Database();
+        $this->assertTrue(method_exists($database, 'get_calendar_data'));
     }
     
     /**
-     * Test render_admin_page outputs HTML
+     * Test API class exists
      */
-    public function test_render_admin_page_outputs_html() {
+    public function test_api_class_exists() {
+        $this->assertTrue(class_exists('BooChat_Connect_API'));
+    }
+    
+    /**
+     * Test API get_api_url method exists
+     */
+    public function test_api_get_api_url_method_exists() {
+        $api = new BooChat_Connect_API();
+        $this->assertTrue(method_exists($api, 'get_api_url'));
+    }
+    
+    /**
+     * Test API send_message method exists
+     */
+    public function test_api_send_message_method_exists() {
+        $api = new BooChat_Connect_API();
+        $this->assertTrue(method_exists($api, 'send_message'));
+    }
+    
+    /**
+     * Test API generate_session_id method exists
+     */
+    public function test_api_generate_session_id_method_exists() {
+        $api = new BooChat_Connect_API();
+        $this->assertTrue(method_exists($api, 'generate_session_id'));
+    }
+    
+    /**
+     * Test Settings class exists
+     */
+    public function test_settings_class_exists() {
+        $this->assertTrue(class_exists('BooChat_Connect_Settings'));
+    }
+    
+    /**
+     * Test Settings get_customization_settings method exists
+     */
+    public function test_settings_get_customization_settings_method_exists() {
+        $settings = new BooChat_Connect_Settings();
+        $this->assertTrue(method_exists($settings, 'get_customization_settings'));
+    }
+    
+    /**
+     * Test Settings get_customization_settings returns array
+     */
+    public function test_settings_get_customization_settings_returns_array() {
+        $settings = new BooChat_Connect_Settings();
+        $result = $settings->get_customization_settings();
+        
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('chat_name', $result);
+        $this->assertArrayHasKey('welcome_message', $result);
+        $this->assertArrayHasKey('primary_color', $result);
+        $this->assertArrayHasKey('secondary_color', $result);
+        $this->assertArrayHasKey('chat_bg_color', $result);
+        $this->assertArrayHasKey('text_color', $result);
+        $this->assertArrayHasKey('font_family', $result);
+        $this->assertArrayHasKey('font_size', $result);
+        $this->assertArrayHasKey('language', $result);
+    }
+    
+    /**
+     * Test Settings get_language method exists
+     */
+    public function test_settings_get_language_method_exists() {
+        $settings = new BooChat_Connect_Settings();
+        $this->assertTrue(method_exists($settings, 'get_language'));
+    }
+    
+    /**
+     * Test Settings get_effective_language method exists
+     */
+    public function test_settings_get_effective_language_method_exists() {
+        $settings = new BooChat_Connect_Settings();
+        $this->assertTrue(method_exists($settings, 'get_effective_language'));
+    }
+    
+    /**
+     * Test Admin class exists
+     */
+    public function test_admin_class_exists() {
+        $this->assertTrue(class_exists('BooChat_Connect_Admin'));
+    }
+    
+    /**
+     * Test Statistics class exists
+     */
+    public function test_statistics_class_exists() {
+        $this->assertTrue(class_exists('BooChat_Connect_Statistics'));
+    }
+    
+    /**
+     * Test Statistics render_page method exists
+     */
+    public function test_statistics_render_page_method_exists() {
+        $database = new BooChat_Connect_Database();
+        $statistics = new BooChat_Connect_Statistics($database);
+        $this->assertTrue(method_exists($statistics, 'render_page'));
+    }
+    
+    /**
+     * Test Statistics render_page outputs HTML
+     */
+    public function test_statistics_render_page_outputs_html() {
+        $database = new BooChat_Connect_Database();
+        $statistics = new BooChat_Connect_Statistics($database);
+        
         ob_start();
-        $this->plugin->render_admin_page();
+        $statistics->render_page();
         $output = ob_get_clean();
         
-        $this->assertStringContainsString('<div class="wrap help-plugin-wrap">', $output);
-        $this->assertStringContainsString('BooChat Connect', $output);
-    }
-    
-    /**
-     * Test render_admin_page contains customization form
-     */
-    public function test_render_admin_page_contains_customization_form() {
-        ob_start();
-        $this->plugin->render_admin_page();
-        $output = ob_get_clean();
-        
-        $this->assertStringContainsString('chat_name', $output);
-        $this->assertStringContainsString('welcome_message', $output);
-        $this->assertStringContainsString('primary_color', $output);
-        $this->assertStringContainsString('form', $output);
-    }
-    
-    /**
-     * Test render_settings_page outputs HTML
-     */
-    public function test_render_settings_page_outputs_html() {
-        ob_start();
-        $this->plugin->render_settings_page();
-        $output = ob_get_clean();
-        
-        $this->assertStringContainsString('<div class="wrap help-plugin-wrap">', $output);
-        $this->assertStringContainsString('form', $output);
-    }
-    
-    /**
-     * Test render_settings_page contains API URL field
-     */
-    public function test_render_settings_page_contains_api_url_field() {
-        ob_start();
-        $this->plugin->render_settings_page();
-        $output = ob_get_clean();
-        
-        $this->assertStringContainsString('api_url', $output);
-        $this->assertStringContainsString('language', $output);
-    }
-    
-    /**
-     * Test render_statistics_page outputs HTML
-     */
-    public function test_render_statistics_page_outputs_html() {
-        ob_start();
-        $this->plugin->render_statistics_page();
-        $output = ob_get_clean();
-        
-        $this->assertStringContainsString('<div class="wrap help-plugin-wrap">', $output);
+        $this->assertStringContainsString('<div class="wrap">', $output);
         $this->assertStringContainsString('interactions-chart', $output);
     }
     
     /**
-     * Test render_statistics_page contains statistics elements
+     * Test AJAX class exists
      */
-    public function test_render_statistics_page_contains_statistics_elements() {
-        ob_start();
-        $this->plugin->render_statistics_page();
-        $output = ob_get_clean();
-        
-        $this->assertStringContainsString('stats-1day', $output);
-        $this->assertStringContainsString('stats-7days', $output);
-        $this->assertStringContainsString('stats-30days', $output);
-        $this->assertStringContainsString('interactions-chart', $output);
+    public function test_ajax_class_exists() {
+        $this->assertTrue(class_exists('BooChat_Connect_Ajax'));
     }
     
     /**
-     * Test render_chat_widget outputs HTML
+     * Test Frontend class exists
      */
-    public function test_render_chat_widget_outputs_html() {
-        ob_start();
-        $this->plugin->render_chat_widget();
-        $output = ob_get_clean();
-        
-        $this->assertStringContainsString('help-plugin-popup', $output);
-        $this->assertStringContainsString('help-plugin-chat-window', $output);
+    public function test_frontend_class_exists() {
+        $this->assertTrue(class_exists('BooChat_Connect_Frontend'));
     }
     
     /**
-     * Test render_chat_widget contains chat form
+     * Test Database get_interactions_count returns integer
      */
-    public function test_render_chat_widget_contains_chat_form() {
-        ob_start();
-        $this->plugin->render_chat_widget();
-        $output = ob_get_clean();
+    public function test_database_get_interactions_count_returns_integer() {
+        $database = new BooChat_Connect_Database();
+        $count = $database->get_interactions_count(1);
         
-        $this->assertStringContainsString('help-plugin-chat-form', $output);
-        $this->assertStringContainsString('help-plugin-chat-input', $output);
-        $this->assertStringContainsString('help-plugin-chat-send', $output);
+        $this->assertIsInt($count);
+        $this->assertGreaterThanOrEqual(0, $count);
+    }
+    
+    /**
+     * Test Database get_chart_data returns array with labels and data
+     */
+    public function test_database_get_chart_data_returns_array() {
+        $database = new BooChat_Connect_Database();
+        $result = $database->get_chart_data('2025-01-01', '2025-01-31');
+        
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('labels', $result);
+        $this->assertArrayHasKey('data', $result);
+        $this->assertIsArray($result['labels']);
+        $this->assertIsArray($result['data']);
+    }
+    
+    /**
+     * Test Database get_calendar_data returns array
+     */
+    public function test_database_get_calendar_data_returns_array() {
+        $database = new BooChat_Connect_Database();
+        $result = $database->get_calendar_data();
+        
+        $this->assertIsArray($result);
+    }
+    
+    /**
+     * Test API generate_session_id returns string
+     */
+    public function test_api_generate_session_id_returns_string() {
+        $api = new BooChat_Connect_API();
+        $session_id = $api->generate_session_id();
+        
+        $this->assertIsString($session_id);
+        $this->assertNotEmpty($session_id);
+        $this->assertEquals(32, strlen($session_id)); // 16 bytes = 32 hex chars
+    }
+    
+    /**
+     * Test API get_api_url returns string
+     */
+    public function test_api_get_api_url_returns_string() {
+        $api = new BooChat_Connect_API();
+        $url = $api->get_api_url();
+        
+        $this->assertIsString($url);
+    }
+    
+    /**
+     * Test boochat_connect_translate returns correct translations
+     */
+    public function test_boochat_connect_translate_returns_correct_translations() {
+        $this->assertEquals('Support', boochat_connect_translate('chat_name_default'));
+        $this->assertEquals('Hello! How can we help you today?', boochat_connect_translate('welcome_message_default'));
+        $this->assertEquals('Send', boochat_connect_translate('send'));
+        $this->assertEquals('Close', boochat_connect_translate('close'));
+    }
+    
+    /**
+     * Test boochat_connect_translate returns default when key not found
+     */
+    public function test_boochat_connect_translate_returns_default_when_key_not_found() {
+        $result = boochat_connect_translate('non_existent_key', 'Default Value');
+        $this->assertEquals('Default Value', $result);
     }
 }

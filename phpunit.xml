@@ -16,10 +16,12 @@
     <coverage>
         <include>
             <file>help-plugin.php</file>
+            <directory>includes</directory>
         </include>
         <exclude>
             <directory>tests</directory>
             <directory>vendor</directory>
+            <directory>assets</directory>
         </exclude>
     </coverage>
     
