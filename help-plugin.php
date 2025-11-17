@@ -3,17 +3,15 @@
  * Plugin Name: BooChat Connect
  * Plugin URI: https://boopixel.com/boochat-connect
  * Description: AI Chatbot & n8n Automation - Modern, lightweight chatbot popup that integrates seamlessly with n8n. Automate workflows, respond in real-time, collect leads, and connect to any AI model or external service. Perfect for 24/7 AI support, sales automation, and smart customer interactions.
- * Version: 1.0.11
+ * Version: 1.0.26
  * Author: BooPixel
  * Author URI: https://boopixel.com
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: boochat-connect
- * Domain Path: /languages
  * Requires at least: 5.0
  * Tested up to: 6.4
  * Requires PHP: 7.2
- * Network: false
  */
 
 // Prevent direct access
@@ -22,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define constants
-define('HELP_PLUGIN_VERSION', '1.0.11');
+define('HELP_PLUGIN_VERSION', '1.0.26');
 define('HELP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('HELP_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -415,7 +413,8 @@ class Help_Plugin {
         
         // Drop database table
         $table_name = $wpdb->prefix . 'help_plugin_interactions';
-        $wpdb->query("DROP TABLE IF EXISTS {$table_name}");
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- Required for plugin uninstall
+        $wpdb->query("DROP TABLE IF EXISTS " . esc_sql($table_name));
         
         // Clear any cached data
         if (function_exists('wp_cache_flush')) {
@@ -497,24 +496,24 @@ class Help_Plugin {
     public function save_customization() {
         // Check permissions
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have permission to access this page.', 'boochat-connect'));
+            wp_die(esc_html__('You do not have permission to access this page.', 'boochat-connect'));
         }
         
         // Verify nonce
-        if (!isset($_POST['help_plugin_customization_nonce']) || !wp_verify_nonce($_POST['help_plugin_customization_nonce'], 'help_plugin_save_customization')) {
-            wp_die(__('Security error. Please try again.', 'boochat-connect'));
+        if (!isset($_POST['help_plugin_customization_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['help_plugin_customization_nonce'])), 'help_plugin_save_customization')) {
+            wp_die(esc_html__('Security error. Please try again.', 'boochat-connect'));
         }
         
         // Save customization settings
         $language = $this->get_language();
-        update_option('help_plugin_chat_name', sanitize_text_field($_POST['chat_name'] ?? help_plugin_translate('chat_name_default')));
-        update_option('help_plugin_welcome_message', sanitize_textarea_field($_POST['welcome_message'] ?? help_plugin_translate('welcome_message_default')));
-        update_option('help_plugin_primary_color', sanitize_hex_color($_POST['primary_color'] ?? '#667eea'));
-        update_option('help_plugin_secondary_color', sanitize_hex_color($_POST['secondary_color'] ?? '#764ba2'));
-        update_option('help_plugin_chat_bg_color', sanitize_hex_color($_POST['chat_bg_color'] ?? '#ffffff'));
-        update_option('help_plugin_text_color', sanitize_hex_color($_POST['text_color'] ?? '#333333'));
-        update_option('help_plugin_font_family', sanitize_text_field($_POST['font_family'] ?? 'Arial, sans-serif'));
-        update_option('help_plugin_font_size', sanitize_text_field($_POST['font_size'] ?? '14px'));
+        update_option('help_plugin_chat_name', sanitize_text_field(wp_unslash($_POST['chat_name'] ?? help_plugin_translate('chat_name_default'))));
+        update_option('help_plugin_welcome_message', sanitize_textarea_field(wp_unslash($_POST['welcome_message'] ?? help_plugin_translate('welcome_message_default'))));
+        update_option('help_plugin_primary_color', sanitize_hex_color(wp_unslash($_POST['primary_color'] ?? '#667eea')));
+        update_option('help_plugin_secondary_color', sanitize_hex_color(wp_unslash($_POST['secondary_color'] ?? '#764ba2')));
+        update_option('help_plugin_chat_bg_color', sanitize_hex_color(wp_unslash($_POST['chat_bg_color'] ?? '#ffffff')));
+        update_option('help_plugin_text_color', sanitize_hex_color(wp_unslash($_POST['text_color'] ?? '#333333')));
+        update_option('help_plugin_font_family', sanitize_text_field(wp_unslash($_POST['font_family'] ?? 'Arial, sans-serif')));
+        update_option('help_plugin_font_size', sanitize_text_field(wp_unslash($_POST['font_size'] ?? '14px')));
         
         // Update cache version to force asset reload
         $new_version = time();
@@ -540,8 +539,8 @@ class Help_Plugin {
             rocket_clean_domain();
         }
         
-        // Redirecionar com mensagem de sucesso
-        wp_redirect(add_query_arg(array(
+        // Redirect with success message
+        wp_safe_redirect(add_query_arg(array(
             'page' => 'help-plugin',
             'customization-updated' => 'true'
         ), admin_url('admin.php')));
@@ -631,20 +630,20 @@ class Help_Plugin {
     public function save_settings() {
         // Check permissions
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have permission to access this page.', 'boochat-connect'));
+            wp_die(esc_html__('You do not have permission to access this page.', 'boochat-connect'));
         }
         
         // Verify nonce
-        if (!isset($_POST['help_plugin_settings_nonce']) || !wp_verify_nonce($_POST['help_plugin_settings_nonce'], 'help_plugin_save_settings')) {
-            wp_die(__('Security error. Please try again.', 'boochat-connect'));
+        if (!isset($_POST['help_plugin_settings_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['help_plugin_settings_nonce'])), 'help_plugin_save_settings')) {
+            wp_die(esc_html__('Security error. Please try again.', 'boochat-connect'));
         }
         
         // Save API URL
-        $api_url = isset($_POST['api_url']) ? esc_url_raw($_POST['api_url']) : '';
+        $api_url = isset($_POST['api_url']) ? esc_url_raw(wp_unslash($_POST['api_url'])) : '';
         update_option('help_plugin_api_url', $api_url);
         
         // Save language
-        $language = isset($_POST['language']) ? sanitize_text_field($_POST['language']) : '';
+        $language = isset($_POST['language']) ? sanitize_text_field(wp_unslash($_POST['language'])) : '';
         if (empty($language)) {
             // If empty, remove option to use WordPress language
             delete_option('help_plugin_language');
@@ -653,7 +652,7 @@ class Help_Plugin {
         }
         
         // Redirect with success message
-        wp_redirect(add_query_arg(array(
+        wp_safe_redirect(add_query_arg(array(
             'page' => 'help-plugin-settings',
             'settings-updated' => 'true'
         ), admin_url('admin.php')));
@@ -665,7 +664,8 @@ class Help_Plugin {
      */
     public function render_settings_page() {
         // Process success message
-        $settings_updated = isset($_GET['settings-updated']) && $_GET['settings-updated'] === 'true';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameter for display only
+        $settings_updated = isset($_GET['settings-updated']) && sanitize_text_field(wp_unslash($_GET['settings-updated'])) === 'true';
         
         $api_url = $this->get_api_url();
         $current_language = $this->get_language();
@@ -823,11 +823,9 @@ class Help_Plugin {
      * Enqueue admin assets
      */
     public function enqueue_admin_assets($hook) {
-        // Debug: log all hooks to identify the correct one
-        error_log("Help Plugin: enqueue_admin_assets called with hook: {$hook}");
-        
         // Check if we're on a plugin page by checking the page parameter
-        $current_page = isset($_GET['page']) ? $_GET['page'] : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameter for display only
+        $current_page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
         $is_plugin_page = (
             $current_page === 'help-plugin' ||
             $current_page === 'help-plugin-settings' ||
@@ -837,7 +835,6 @@ class Help_Plugin {
         );
         
         if (!$is_plugin_page) {
-            error_log("Help Plugin: Hook '{$hook}' not matching plugin pages, skipping");
             return;
         }
         
@@ -858,51 +855,21 @@ class Help_Plugin {
         
         // Load Chart.js and statistics scripts only on statistics page
         // Check if we're on the statistics page by checking the page parameter
-        $current_page = isset($_GET['page']) ? $_GET['page'] : '';
         $is_statistics_page = ($current_page === 'help-plugin-statistics');
         
         if ($is_statistics_page) {
-            error_log("Help Plugin: Loading statistics scripts for hook: {$hook}");
-            
-            // Load Chart.js with higher priority and ensure it loads
+            // Load Chart.js from local file (WordPress.org requirement: no external resources)
             wp_enqueue_script(
                 'chart-js',
-                'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
+                HELP_PLUGIN_URL . 'assets/js/chart.umd.min.js',
                 array(),
                 '4.4.0',
                 false  // Load in header to ensure it's available
             );
             
-            // Add inline script to verify Chart.js loading
-            add_action('admin_footer', function() use ($hook, $is_statistics_page) {
-                if ($is_statistics_page) {
-                    ?>
-                    <script type="text/javascript">
-                    // Verify Chart.js is loaded
-                    if (typeof Chart === 'undefined') {
-                        console.warn('Chart.js not loaded, attempting to load...');
-                        var script = document.createElement('script');
-                        script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-                        script.onload = function() {
-                            console.log('Chart.js loaded successfully via fallback');
-                        };
-                        script.onerror = function() {
-                            console.error('Failed to load Chart.js from CDN');
-                        };
-                        document.head.appendChild(script);
-                    } else {
-                        console.log('Chart.js is available');
-                    }
-                    </script>
-                    <?php
-                }
-            }, 5);
-            
             // Use cache-busting version
             $version = help_plugin_get_version();
             $script_url = HELP_PLUGIN_URL . 'assets/js/statistics-script.js';
-            
-            error_log("Help Plugin: Enqueuing statistics script: {$script_url} with version: {$version}");
             
             wp_enqueue_script(
                 'help-plugin-statistics-script',
@@ -924,11 +891,7 @@ class Help_Plugin {
                 'errorConnectingText' => help_plugin_translate('error_connecting_server', 'Error connecting to server. Please try again.'),
             );
             
-            error_log("Help Plugin: Localizing script with data: " . print_r($localize_data, true));
-            
             wp_localize_script('help-plugin-statistics-script', 'helpPluginStats', $localize_data);
-        } else {
-            error_log("Help Plugin: Statistics scripts NOT loaded. Current hook: {$hook}");
         }
     }
     
@@ -1026,8 +989,8 @@ class Help_Plugin {
         // Verify nonce for security
         check_ajax_referer('help-plugin-chat', 'nonce');
         
-        $session_id = isset($_POST['sessionId']) ? sanitize_text_field($_POST['sessionId']) : '';
-        $chat_input = isset($_POST['chatInput']) ? sanitize_text_field($_POST['chatInput']) : '';
+        $session_id = isset($_POST['sessionId']) ? sanitize_text_field(wp_unslash($_POST['sessionId'])) : '';
+        $chat_input = isset($_POST['chatInput']) ? sanitize_text_field(wp_unslash($_POST['chatInput'])) : '';
         
         if (empty($chat_input)) {
             wp_send_json_error(array('message' => help_plugin_translate('empty_message', 'Empty message.')));
@@ -1152,7 +1115,8 @@ class Help_Plugin {
      */
     public function render_admin_page() {
         // Process success message
-        $customization_updated = isset($_GET['customization-updated']) && $_GET['customization-updated'] === 'true';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameter for display only
+        $customization_updated = isset($_GET['customization-updated']) && sanitize_text_field(wp_unslash($_GET['customization-updated'])) === 'true';
         
         $settings = $this->get_customization_settings();
         ?>
@@ -1342,6 +1306,7 @@ class Help_Plugin {
         // Create table if it doesn't exist
         $this->create_interactions_table();
         
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Required for custom plugin table
         $wpdb->insert(
             $table_name,
             array(
@@ -1366,6 +1331,7 @@ class Help_Plugin {
         // Create table if it doesn't exist
         $this->create_interactions_table();
         
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Required for custom plugin table
         $wpdb->insert(
             $table_name,
             array(
@@ -1406,6 +1372,7 @@ class Help_Plugin {
         $columns_to_check = array('message', 'message_type');
         
         foreach ($columns_to_check as $column) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Required to check table schema
             $column_exists = $wpdb->get_results($wpdb->prepare(
                 "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
                 WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s",
@@ -1415,10 +1382,13 @@ class Help_Plugin {
             ));
             
             if (empty($column_exists)) {
+                $table_name_escaped = esc_sql($table_name);
                 if ($column === 'message') {
-                    $wpdb->query("ALTER TABLE $table_name ADD COLUMN message text AFTER session_id");
+                    // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- Table name is escaped with esc_sql(), required for schema update
+                    $wpdb->query("ALTER TABLE `{$table_name_escaped}` ADD COLUMN message text AFTER session_id");
                 } elseif ($column === 'message_type') {
-                    $wpdb->query("ALTER TABLE $table_name ADD COLUMN message_type varchar(20) DEFAULT 'user' AFTER message");
+                    // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- Table name is escaped with esc_sql(), required for schema update
+                    $wpdb->query("ALTER TABLE `{$table_name_escaped}` ADD COLUMN message_type varchar(20) DEFAULT 'user' AFTER message");
                 }
             }
         }
@@ -1542,11 +1512,8 @@ class Help_Plugin {
         
         $this->create_interactions_table();
         
-        $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : current_time('Y-m-d');
-        $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : current_time('Y-m-d');
-        
-        // Debug log
-        error_log("Help Plugin: ajax_get_statistics called - date_from: {$date_from}, date_to: {$date_to}");
+        $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : current_time('Y-m-d');
+        $date_to = isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : current_time('Y-m-d');
         
         // Get statistics
         $stats_1day = $this->get_interactions_count(1);
@@ -1558,9 +1525,6 @@ class Help_Plugin {
         
         // Get calendar data
         $calendar_data = $this->get_calendar_data();
-        
-        // Debug log response
-        error_log("Help Plugin: Sending response - 1day: {$stats_1day}, 7days: {$stats_7days}, 30days: {$stats_30days}, chart_labels: " . count($chart_data['labels']));
         
         wp_send_json_success(array(
             'summary' => array(
@@ -1583,20 +1547,14 @@ class Help_Plugin {
         $this->create_interactions_table();
         
         // Calculate date from (X days ago at 00:00:00)
-        $date_from = date('Y-m-d 00:00:00', strtotime("-{$days} days", current_time('timestamp')));
+        $date_from = gmdate('Y-m-d 00:00:00', strtotime("-{$days} days", current_time('timestamp')));
         
-        // Use esc_sql for table name
+        // Use esc_sql for table name - cannot use prepare() with table names
         $table_name_escaped = esc_sql($table_name);
-        
-        $query = $wpdb->prepare(
-            "SELECT COUNT(DISTINCT session_id) FROM `{$table_name_escaped}` WHERE interaction_date >= %s",
-            $date_from
-        );
-        
-        $count = $wpdb->get_var($query);
-        
-        // Debug log
-        error_log("Help Plugin: get_interactions_count({$days}) - date_from: {$date_from}, count: " . ($count ? $count : 0));
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is escaped with esc_sql()
+        $query = "SELECT COUNT(DISTINCT session_id) FROM `{$table_name_escaped}` WHERE interaction_date >= %s";
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics, values are prepared correctly
+        $count = $wpdb->get_var($wpdb->prepare($query, $date_from));
         
         return intval($count ? $count : 0);
     }
@@ -1610,28 +1568,21 @@ class Help_Plugin {
         
         $this->create_interactions_table();
         
-        $date_from_formatted = date('Y-m-d', strtotime($date_from));
-        $date_to_formatted = date('Y-m-d', strtotime($date_to));
+        $date_from_formatted = gmdate('Y-m-d', strtotime($date_from));
+        $date_to_formatted = gmdate('Y-m-d', strtotime($date_to));
         $date_from_start = $date_from_formatted . ' 00:00:00';
         $date_to_end = $date_to_formatted . ' 23:59:59';
         
-        // Use esc_sql for table name
+        // Use esc_sql for table name - cannot use prepare() with table names
         $table_name_escaped = esc_sql($table_name);
-        
-        $query = $wpdb->prepare(
-            "SELECT DATE(interaction_date) as date, COUNT(DISTINCT session_id) as count 
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is escaped with esc_sql()
+        $query = "SELECT DATE(interaction_date) as date, COUNT(DISTINCT session_id) as count 
             FROM `{$table_name_escaped}` 
             WHERE interaction_date >= %s AND interaction_date <= %s 
             GROUP BY DATE(interaction_date) 
-            ORDER BY date ASC",
-            $date_from_start,
-            $date_to_end
-        );
-        
-        $results = $wpdb->get_results($query);
-        
-        // Debug log
-        error_log("Help Plugin: get_chart_data - date_from: {$date_from_start}, date_to: {$date_to_end}, results: " . (is_array($results) ? count($results) : 0));
+            ORDER BY date ASC";
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics, values are prepared correctly
+        $results = $wpdb->get_results($wpdb->prepare($query, $date_from_start, $date_to_end));
         
         $labels = array();
         $data = array();
@@ -1642,7 +1593,6 @@ class Help_Plugin {
             foreach ($results as $result) {
                 if (isset($result->date) && isset($result->count)) {
                     $results_map[$result->date] = intval($result->count);
-                    error_log("Help Plugin: Chart data - date: {$result->date}, count: {$result->count}");
                 }
             }
         }
@@ -1661,7 +1611,6 @@ class Help_Plugin {
                 $data[] = isset($results_map[$date_str]) ? $results_map[$date_str] : 0;
             }
         } catch (Exception $e) {
-            error_log("Help Plugin: Error in get_chart_data - " . $e->getMessage());
             return array('labels' => array(), 'data' => array());
         }
         
@@ -1677,24 +1626,18 @@ class Help_Plugin {
         
         $this->create_interactions_table();
         
-        $date_from = date('Y-m-d 00:00:00', strtotime('-365 days', current_time('timestamp')));
+        $date_from = gmdate('Y-m-d 00:00:00', strtotime('-365 days', current_time('timestamp')));
         
-        // Use esc_sql for table name
+        // Use esc_sql for table name - cannot use prepare() with table names
         $table_name_escaped = esc_sql($table_name);
-        
-        $query = $wpdb->prepare(
-            "SELECT DATE(interaction_date) as date, COUNT(DISTINCT session_id) as count 
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is escaped with esc_sql()
+        $query = "SELECT DATE(interaction_date) as date, COUNT(DISTINCT session_id) as count 
             FROM `{$table_name_escaped}` 
             WHERE interaction_date >= %s 
             GROUP BY DATE(interaction_date) 
-            ORDER BY date ASC",
-            $date_from
-        );
-        
-        $results = $wpdb->get_results($query);
-        
-        // Debug log
-        error_log("Help Plugin: get_calendar_data - date_from: {$date_from}, results: " . (is_array($results) ? count($results) : 0));
+            ORDER BY date ASC";
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics, values are prepared correctly
+        $results = $wpdb->get_results($wpdb->prepare($query, $date_from));
         
         $calendar_map = array();
         if ($results && is_array($results)) {
