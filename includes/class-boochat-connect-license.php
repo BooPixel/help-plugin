@@ -70,7 +70,10 @@ class BooChat_Connect_License {
     /**
      * Get API headers with authentication
      *
-     * @return array Headers array.
+     * Used for authenticated endpoints like /activate, /verify, /deactivate.
+     * Public endpoints like /create-checkout and /check-payment don't use this.
+     *
+     * @return array Headers array with X-API-Key if configured.
      */
     private function get_api_headers() {
         $headers = array(
@@ -269,6 +272,8 @@ class BooChat_Connect_License {
      * Request checkout URL from API
      *
      * The API will create the Stripe checkout session using its own credentials.
+     * This endpoint is public (no authentication required) to allow users to
+     * initiate checkout before having a license token.
      *
      * @return array Response with checkout URL and session ID.
      */
@@ -276,9 +281,14 @@ class BooChat_Connect_License {
         $return_url = admin_url('admin.php?page=boochat-connect-pro&payment=success&session_id={CHECKOUT_SESSION_ID}');
         $cancel_url = admin_url('admin.php?page=boochat-connect-pro&payment=cancel');
         
+        // Checkout endpoint is public - no API key required
+        // This allows users to pay before receiving their license token
         $response = wp_remote_post($this->get_api_url() . 'create-checkout', array(
             'timeout' => 30,
-            'headers' => $this->get_api_headers(),
+            'headers' => array(
+                'Content-Type' => 'application/json'
+                // No X-API-Key header - endpoint is public
+            ),
             'body' => wp_json_encode(array(
                 'site_url' => esc_url_raw(home_url()),
                 'plugin_version' => BOOCHAT_CONNECT_VERSION,
@@ -326,6 +336,9 @@ class BooChat_Connect_License {
      * This is called when user returns from checkout.
      * The API handles the Stripe webhook and generates the license automatically.
      * This method just checks if license was generated and activates it.
+     * 
+     * This endpoint validates by session_id + site_url (no token required)
+     * since user may not have received their token yet.
      *
      * @param string $session_id Stripe checkout session ID.
      * @return array Response with success status and license key.
@@ -339,9 +352,13 @@ class BooChat_Connect_License {
         }
         
         // Check payment status with API
+        // Endpoint validates by session_id + site_url (public endpoint)
         $response = wp_remote_post($this->get_api_url() . 'check-payment', array(
             'timeout' => 30,
-            'headers' => $this->get_api_headers(),
+            'headers' => array(
+                'Content-Type' => 'application/json'
+                // No X-API-Key - validated by session_id + site_url
+            ),
             'body' => wp_json_encode(array(
                 'session_id' => sanitize_text_field($session_id),
                 'site_url' => esc_url_raw(home_url())
