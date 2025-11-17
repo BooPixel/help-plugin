@@ -87,13 +87,26 @@ class Help_Plugin_Test extends TestCase {
         
         if (!function_exists('current_time')) {
             function current_time($type, $gmt = 0) {
-                return date('Y-m-d H:i:s');
+                return gmdate('Y-m-d H:i:s');
+            }
+        }
+        
+        if (!function_exists('wp_strip_all_tags')) {
+            function wp_strip_all_tags($string, $remove_breaks = false) {
+                $string = preg_replace('@<(script|style)[^>]*?>.*?</\\1>@si', '', $string);
+                // Use native PHP strip_tags as fallback in test environment
+                // In real WordPress, wp_strip_all_tags uses strip_tags internally
+                $string = preg_replace('@<[^>]*?>@', '', $string);
+                if ($remove_breaks) {
+                    $string = preg_replace('/[\r\n\t ]+/', ' ', $string);
+                }
+                return trim($string);
             }
         }
         
         if (!function_exists('sanitize_text_field')) {
             function sanitize_text_field($str) {
-                return trim(strip_tags($str));
+                return trim(wp_strip_all_tags($str));
             }
         }
         
@@ -270,7 +283,9 @@ class Help_Plugin_Test extends TestCase {
         if (!function_exists('selected')) {
             function selected($selected, $current = true, $echo = true) {
                 $result = ($selected == $current) ? ' selected="selected"' : '';
-                if ($echo) echo $result;
+                if ($echo) {
+                    echo esc_attr($result);
+                }
                 return $result;
             }
         }
