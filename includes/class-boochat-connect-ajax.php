@@ -46,6 +46,20 @@ class BooChat_Connect_Ajax {
     }
     
     /**
+     * Send error response
+     *
+     * @param string $message Error message.
+     * @param string $session_id Session ID.
+     */
+    private function send_error($message, $session_id = '') {
+        $response = array('message' => $message);
+        if (!empty($session_id)) {
+            $response['sessionId'] = $session_id;
+        }
+        wp_send_json_error($response);
+    }
+    
+    /**
      * AJAX handler to send message
      */
     public function send_message() {
@@ -56,7 +70,7 @@ class BooChat_Connect_Ajax {
         $chat_input = isset($_POST['chatInput']) ? sanitize_text_field(wp_unslash($_POST['chatInput'])) : '';
         
         if (empty($chat_input)) {
-            wp_send_json_error(array('message' => boochat_connect_translate('empty_message', 'Empty message.')));
+            $this->send_error(boochat_connect_translate('empty_message', 'Empty message.'));
             return;
         }
         
@@ -72,10 +86,7 @@ class BooChat_Connect_Ajax {
         $response = $this->api->send_message($session_id, $chat_input);
         
         if (is_wp_error($response)) {
-            wp_send_json_error(array(
-                'message' => boochat_connect_translate('api_connection_error', 'Error connecting to the service. Please try again.'),
-                'sessionId' => $session_id
-            ));
+            $this->send_error(boochat_connect_translate('api_connection_error', 'Error connecting to the service. Please try again.'), $session_id);
             return;
         }
         
@@ -84,28 +95,14 @@ class BooChat_Connect_Ajax {
         $response_code = isset($response['response']['code']) ? $response['response']['code'] : 0;
         
         if ($response_code !== 200) {
-            wp_send_json_error(array(
-                'message' => boochat_connect_translate('api_connection_error', 'Error connecting to the service. Please try again.'),
-                'sessionId' => $session_id
-            ));
+            $this->send_error(boochat_connect_translate('api_connection_error', 'Error connecting to the service. Please try again.'), $session_id);
             return;
         }
         
         $data = json_decode($body, true);
         
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            wp_send_json_error(array(
-                'message' => boochat_connect_translate('server_response_error', 'Error processing server response.'),
-                'sessionId' => $session_id
-            ));
-            return;
-        }
-        
-        if (!isset($data['output'])) {
-            wp_send_json_error(array(
-                'message' => boochat_connect_translate('server_response_error', 'Error processing server response.'),
-                'sessionId' => $session_id
-            ));
+        if (json_last_error() !== JSON_ERROR_NONE || !isset($data['output'])) {
+            $this->send_error(boochat_connect_translate('server_response_error', 'Error processing server response.'), $session_id);
             return;
         }
         
@@ -132,25 +129,14 @@ class BooChat_Connect_Ajax {
         $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : current_time('Y-m-d');
         $date_to = isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : current_time('Y-m-d');
         
-        // Get statistics
-        $stats_1day = $this->database->get_interactions_count(1);
-        $stats_7days = $this->database->get_interactions_count(7);
-        $stats_30days = $this->database->get_interactions_count(30);
-        
-        // Get chart data
-        $chart_data = $this->database->get_chart_data($date_from, $date_to);
-        
-        // Get calendar data
-        $calendar_data = $this->database->get_calendar_data();
-        
         wp_send_json_success(array(
             'summary' => array(
-                '1day' => $stats_1day,
-                '7days' => $stats_7days,
-                '30days' => $stats_30days
+                '1day' => $this->database->get_interactions_count(1),
+                '7days' => $this->database->get_interactions_count(7),
+                '30days' => $this->database->get_interactions_count(30)
             ),
-            'chart' => $chart_data,
-            'calendar' => $calendar_data
+            'chart' => $this->database->get_chart_data($date_from, $date_to),
+            'calendar' => $this->database->get_calendar_data()
         ));
     }
 }

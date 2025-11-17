@@ -80,62 +80,57 @@ class BooChat_Connect_Frontend {
         
         $settings = $this->settings->get_customization_settings();
         $cache_version = boochat_connect_get_version();
+        $gradient = sprintf('linear-gradient(135deg, %s 0%%, %s 100%%)', esc_attr($settings['primary_color']), esc_attr($settings['secondary_color']));
         ?>
         <style id="boochat-connect-custom-css" data-version="<?php echo esc_attr($cache_version); ?>">
-            .boochat-connect-popup-content {
-                background: linear-gradient(135deg, <?php echo esc_attr($settings['primary_color']); ?> 0%, <?php echo esc_attr($settings['secondary_color']); ?> 100%) !important;
+            .boochat-connect-popup-content,
+            .boochat-connect-chat-header,
+            .boochat-connect-chat-send {
+                background: <?php echo esc_attr($gradient); ?> !important;
             }
             
-            .boochat-connect-chat-header {
-                background: linear-gradient(135deg, <?php echo esc_attr($settings['primary_color']); ?> 0%, <?php echo esc_attr($settings['secondary_color']); ?> 100%) !important;
-            }
-            
-            .boochat-connect-chat-window {
-                background: <?php echo esc_attr($settings['chat_bg_color']); ?> !important;
-                font-family: <?php echo esc_attr($settings['font_family']); ?> !important;
-                font-size: <?php echo esc_attr($settings['font_size']); ?> !important;
-            }
-            
+            .boochat-connect-chat-window,
             .boochat-connect-chat-body {
                 background: <?php echo esc_attr($settings['chat_bg_color']); ?> !important;
             }
             
-            .boochat-connect-chat-message p {
-                font-family: <?php echo esc_attr($settings['font_family']); ?> !important;
-                font-size: <?php echo esc_attr($settings['font_size']); ?> !important;
-            }
-            
-            .boochat-connect-chat-message-admin p {
-                color: #333 !important;
-            }
-            
-            .boochat-connect-chat-message-system {
-                background: #e9ecef !important;
-                color: #333 !important;
-            }
-            
-            .boochat-connect-chat-message-system p {
-                color: #333 !important;
-            }
-            
-            .boochat-connect-chat-send {
-                background: linear-gradient(135deg, <?php echo esc_attr($settings['primary_color']); ?> 0%, <?php echo esc_attr($settings['secondary_color']); ?> 100%) !important;
-            }
-            
+            .boochat-connect-chat-window,
+            .boochat-connect-chat-message p,
             .boochat-connect-chat-input {
                 font-family: <?php echo esc_attr($settings['font_family']); ?> !important;
                 font-size: <?php echo esc_attr($settings['font_size']); ?> !important;
             }
             
-            .boochat-connect-chat-message-user {
-                color: #e9ecef !important;
+            .boochat-connect-chat-message-admin p,
+            .boochat-connect-chat-message-system,
+            .boochat-connect-chat-message-system p {
+                color: #333 !important;
             }
             
+            .boochat-connect-chat-message-system {
+                background: #e9ecef !important;
+            }
+            
+            .boochat-connect-chat-message-user,
             .boochat-connect-chat-message-user p {
                 color: #e9ecef !important;
             }
         </style>
         <?php
+    }
+    
+    /**
+     * Load view template
+     *
+     * @param string $view_name View file name (without .php).
+     * @param array  $vars      Variables to pass to the view.
+     */
+    private function load_view($view_name, $vars = array()) {
+        $view_file = BOOCHAT_CONNECT_DIR . 'includes/views/' . $view_name . '.php';
+        if (file_exists($view_file)) {
+            extract($vars);
+            include $view_file;
+        }
     }
     
     /**
@@ -148,47 +143,9 @@ class BooChat_Connect_Frontend {
         }
         
         $settings = $this->settings->get_customization_settings();
-        ?>
-        <div id="boochat-connect-popup" class="boochat-connect-popup">
-            <div class="boochat-connect-popup-content">
-                <div class="boochat-connect-popup-header">
-                    <span class="boochat-connect-popup-icon">💬</span>
-                    <span class="boochat-connect-popup-text"><?php echo esc_html(boochat_connect_translate('need_help')); ?></span>
-                </div>
-                <button class="boochat-connect-popup-close" aria-label="<?php echo esc_attr(boochat_connect_translate('close')); ?>">&times;</button>
-            </div>
-        </div>
-
-        <div id="boochat-connect-chat-window" class="boochat-connect-chat-window">
-            <div class="boochat-connect-chat-header">
-                <div class="boochat-connect-chat-title">
-                    <span class="boochat-connect-chat-icon">💬</span>
-                    <span><?php echo esc_html($settings['chat_name']); ?></span>
-                </div>
-                <button class="boochat-connect-chat-close" aria-label="<?php echo esc_attr(boochat_connect_translate('close_chat')); ?>">&times;</button>
-            </div>
-            <div class="boochat-connect-chat-body">
-                <div class="boochat-connect-chat-messages" id="boochat-connect-chat-messages">
-                    <div class="boochat-connect-chat-message boochat-connect-chat-message-system">
-                        <p><?php echo esc_html($settings['welcome_message']); ?></p>
-                    </div>
-                </div>
-            </div>
-            <div class="boochat-connect-chat-footer">
-                <form id="boochat-connect-chat-form" class="boochat-connect-chat-form">
-                    <input 
-                        type="text" 
-                        id="boochat-connect-chat-input" 
-                        class="boochat-connect-chat-input" 
-                        placeholder="<?php echo esc_attr(boochat_connect_translate('type_message')); ?>"
-                        autocomplete="off"
-                    >
-                    <button type="submit" class="boochat-connect-chat-send">
-                        <span><?php echo esc_html(boochat_connect_translate('send')); ?></span>
-                    </button>
-                </form>
-            </div>
-        </div>
-        <?php
+        
+        $this->load_view('frontend-chat', array(
+            'settings' => $settings,
+        ));
     }
 }

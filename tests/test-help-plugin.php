@@ -760,4 +760,174 @@ class BooChat_Connect_Test extends TestCase {
         $result = boochat_connect_translate('non_existent_key', 'Default Value');
         $this->assertEquals('Default Value', $result);
     }
+    
+    /**
+     * Test Admin class has load_view method
+     */
+    public function test_admin_has_load_view_method() {
+        $admin = new BooChat_Connect_Admin(
+            new BooChat_Connect_API(),
+            new BooChat_Connect_Settings()
+        );
+        $this->assertTrue(method_exists($admin, 'load_view'));
+    }
+    
+    /**
+     * Test Admin class has verify_request method
+     */
+    public function test_admin_has_verify_request_method() {
+        $admin = new BooChat_Connect_Admin(
+            new BooChat_Connect_API(),
+            new BooChat_Connect_Settings()
+        );
+        $this->assertTrue(method_exists($admin, 'verify_request'));
+    }
+    
+    /**
+     * Test Statistics class has load_view method
+     */
+    public function test_statistics_has_load_view_method() {
+        $database = new BooChat_Connect_Database();
+        $statistics = new BooChat_Connect_Statistics($database);
+        $this->assertTrue(method_exists($statistics, 'load_view'));
+    }
+    
+    /**
+     * Test Frontend class has load_view method
+     */
+    public function test_frontend_has_load_view_method() {
+        $frontend = new BooChat_Connect_Frontend(
+            new BooChat_Connect_Settings()
+        );
+        $this->assertTrue(method_exists($frontend, 'load_view'));
+    }
+    
+    /**
+     * Test template files exist
+     */
+    public function test_template_files_exist() {
+        $template_dir = BOOCHAT_CONNECT_DIR . 'includes/views/';
+        $templates = array(
+            'admin-main.php',
+            'admin-customization.php',
+            'admin-settings.php',
+            'admin-statistics.php',
+            'frontend-chat.php'
+        );
+        
+        foreach ($templates as $template) {
+            $this->assertFileExists($template_dir . $template, "Template file {$template} should exist");
+        }
+    }
+    
+    /**
+     * Test CSS files exist
+     */
+    public function test_css_files_exist() {
+        $css_dir = BOOCHAT_CONNECT_DIR . 'assets/css/';
+        $css_files = array(
+            'admin-style.css',
+            'admin-main.css',
+            'admin-statistics.css',
+            'chat-style.css'
+        );
+        
+        foreach ($css_files as $css_file) {
+            $this->assertFileExists($css_dir . $css_file, "CSS file {$css_file} should exist");
+        }
+    }
+    
+    /**
+     * Test Admin enqueue_admin_assets method exists
+     */
+    public function test_admin_enqueue_admin_assets_method_exists() {
+        $admin = new BooChat_Connect_Admin(
+            new BooChat_Connect_API(),
+            new BooChat_Connect_Settings()
+        );
+        $this->assertTrue(method_exists($admin, 'enqueue_admin_assets'));
+    }
+    
+    /**
+     * Test Admin render_admin_page method exists
+     */
+    public function test_admin_render_admin_page_method_exists() {
+        $admin = new BooChat_Connect_Admin(
+            new BooChat_Connect_API(),
+            new BooChat_Connect_Settings()
+        );
+        $this->assertTrue(method_exists($admin, 'render_admin_page'));
+    }
+    
+    /**
+     * Test Admin render_customization_page method exists
+     */
+    public function test_admin_render_customization_page_method_exists() {
+        $admin = new BooChat_Connect_Admin(
+            new BooChat_Connect_API(),
+            new BooChat_Connect_Settings()
+        );
+        $this->assertTrue(method_exists($admin, 'render_customization_page'));
+    }
+    
+    /**
+     * Test Admin render_settings_page method exists
+     */
+    public function test_admin_render_settings_page_method_exists() {
+        $admin = new BooChat_Connect_Admin(
+            new BooChat_Connect_API(),
+            new BooChat_Connect_Settings()
+        );
+        $this->assertTrue(method_exists($admin, 'render_settings_page'));
+    }
+    
+    /**
+     * Test Frontend output_custom_css method exists
+     */
+    public function test_frontend_output_custom_css_method_exists() {
+        $frontend = new BooChat_Connect_Frontend(
+            new BooChat_Connect_Settings()
+        );
+        $this->assertTrue(method_exists($frontend, 'output_custom_css'));
+    }
+    
+    /**
+     * Test Frontend render_chat_widget method exists
+     */
+    public function test_frontend_render_chat_widget_method_exists() {
+        $frontend = new BooChat_Connect_Frontend(
+            new BooChat_Connect_Settings()
+        );
+        $this->assertTrue(method_exists($frontend, 'render_chat_widget'));
+    }
+    
+    /**
+     * Test AJAX send_error method exists
+     */
+    public function test_ajax_send_error_method_exists() {
+        $database = new BooChat_Connect_Database();
+        $api = new BooChat_Connect_API();
+        $ajax = new BooChat_Connect_Ajax($database, $api);
+        $this->assertTrue(method_exists($ajax, 'send_error'));
+    }
+    
+    /**
+     * Test AJAX send_message method exists
+     */
+    public function test_ajax_send_message_method_exists() {
+        $database = new BooChat_Connect_Database();
+        $api = new BooChat_Connect_API();
+        $ajax = new BooChat_Connect_Ajax($database, $api);
+        $this->assertTrue(method_exists($ajax, 'send_message'));
+    }
+    
+    /**
+     * Test AJAX get_statistics method exists
+     */
+    public function test_ajax_get_statistics_method_exists() {
+        $database = new BooChat_Connect_Database();
+        $api = new BooChat_Connect_API();
+        $ajax = new BooChat_Connect_Ajax($database, $api);
+        $this->assertTrue(method_exists($ajax, 'get_statistics'));
+    }
 }

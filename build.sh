@@ -55,6 +55,8 @@ zip -r "$ZIP_NAME" . \
     -x ".gitignore" \
     -x "README.md" \
     -x "*.md" \
+    -x "*.bak*" \
+    -x "*backup*" \
     > /dev/null 2>&1
 
 echo "Build complete: $ZIP_NAME (version $NEW_VERSION)"

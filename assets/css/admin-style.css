@@ -69,3 +69,11 @@
 .boochat-connect-card .button {
     margin-top: 10px;
 }
+
+.boochat-connect-status-success {
+    color: green;
+}
+
+.boochat-connect-status-error {
+    color: red;
+}

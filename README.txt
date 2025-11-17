@@ -4,7 +4,7 @@ Tags: chatbot, ai, n8n, automation, customer service
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.0.45
+Stable tag: 1.0.63
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -132,25 +132,6 @@ Yes! The plugin includes a comprehensive statistics dashboard with quick summari
 3. Customization panel for chat appearance settings
 4. Settings page with n8n webhook configuration
 5. Statistics dashboard with charts
-
-== Changelog ==
-
-= 1.0.45 =
-* Code refactoring and optimization
-* Improved admin panel design
-* Enhanced statistics dashboard
-* Better code organization and structure
-* WordPress coding standards compliance
-* Performance improvements
-
-= 1.0.0 =
-* Initial release
-* n8n webhook integration
-* Customizable chat interface
-* Multi-language support
-* Statistics dashboard
-* Session management
-* Message logging
 
 == Upgrade Notice ==
 

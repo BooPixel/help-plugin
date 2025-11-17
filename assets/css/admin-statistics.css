@@ -1,0 +1,135 @@
+/**
+ * Admin statistics page styles
+ *
+ * @package BooChat_Connect
+ */
+
+.boochat-connect-statistics-card {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    margin-top: 20px;
+}
+
+.boochat-connect-statistics-section {
+    margin: 30px 0;
+}
+
+.boochat-connect-statistics-summary {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.boochat-connect-statistics-box {
+    background: #f0f0f1;
+    padding: 20px;
+    border-radius: 5px;
+    min-width: 180px;
+}
+
+.boochat-connect-statistics-box-label {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.boochat-connect-statistics-box-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #2271b1;
+}
+
+.boochat-connect-statistics-filters {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.boochat-connect-statistics-filter-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.boochat-connect-statistics-filter-group input[type="date"] {
+    padding: 8px 12px;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.boochat-connect-statistics-filter-group .button {
+    padding: 8px 20px;
+    height: 38px;
+}
+
+.boochat-connect-statistics-chart-container {
+    background: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+.boochat-connect-statistics-chart {
+    max-height: 400px;
+}
+
+.boochat-connect-calendar-heatmap {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+.boochat-connect-calendar-legend {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: #646970;
+}
+
+.boochat-connect-calendar-legend-colors {
+    display: flex;
+    gap: 3px;
+}
+
+.boochat-connect-calendar-legend-color {
+    width: 12px;
+    height: 12px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+}
+
+.boochat-connect-calendar-legend-color.level-0 {
+    background: #ebedf0;
+}
+
+.boochat-connect-calendar-legend-color.level-1 {
+    background: #c6e48b;
+}
+
+.boochat-connect-calendar-legend-color.level-2 {
+    background: #7bc96f;
+}
+
+.boochat-connect-calendar-legend-color.level-3 {
+    background: #239a3b;
+}
+
+.boochat-connect-calendar-legend-color.level-4 {
+    background: #196127;
+}
+
+.boochat-connect-calendar-description {
+    margin-bottom: 15px;
+    color: #646970;
+}
+

@@ -24,6 +24,8 @@ Perfect for businesses that want to automate customer support, boost conversions
   - Message content logging
 - **Settings Management**: Configure API URL and chat settings
 - **Responsive Design**: Mobile-friendly chat interface
+- **Clean Architecture**: Separated HTML templates and CSS files for better maintainability
+- **WordPress Standards**: Full compliance with WordPress coding standards and security best practices
 
 ## What You Can Automate
 
@@ -155,9 +157,26 @@ boochat-connect/
 ├── README.txt                   # WordPress.org format documentation
 ├── banner-772x250.png           # Plugin banner (772x250px)
 ├── icon-256x256.png             # Plugin icon (256x256px)
+├── includes/                    # Plugin core classes
+│   ├── views/                   # HTML templates (separated from PHP logic)
+│   │   ├── admin-main.php       # Main admin dashboard template
+│   │   ├── admin-customization.php # Customization page template
+│   │   ├── admin-settings.php   # Settings page template
+│   │   ├── admin-statistics.php # Statistics dashboard template
+│   │   └── frontend-chat.php    # Frontend chat widget template
+│   ├── class-boochat-connect-admin.php
+│   ├── class-boochat-connect-ajax.php
+│   ├── class-boochat-connect-api.php
+│   ├── class-boochat-connect-database.php
+│   ├── class-boochat-connect-frontend.php
+│   ├── class-boochat-connect-settings.php
+│   ├── class-boochat-connect-statistics.php
+│   └── helpers.php
 ├── assets/
 │   ├── css/
-│   │   ├── admin-style.css      # Admin page styles
+│   │   ├── admin-style.css      # Base admin styles (always loaded)
+│   │   ├── admin-main.css       # Main admin page styles
+│   │   ├── admin-statistics.css # Statistics page styles
 │   │   └── chat-style.css       # Frontend chat styles
 │   ├── js/
 │   │   ├── admin-script.js      # Admin page scripts
@@ -235,12 +254,16 @@ Coverage report will be generated in the `coverage/` directory.
 The plugin includes comprehensive unit tests covering:
 - Singleton pattern implementation
 - Menu registration
-- Asset enqueueing
-- Page rendering
+- Asset enqueueing (CSS and JS)
+- Page rendering with template separation
+- Template file existence
+- CSS file existence
 - API integration
 - Statistics tracking
 - Customization settings
 - Database interactions
+- Helper methods (load_view, verify_request, send_error)
+- Frontend chat widget rendering
 
 ## Database
 
@@ -267,18 +290,6 @@ This table is automatically created on first use.
 - ✅ Popular caching plugins (W3 Total Cache, WP Super Cache, WP Rocket)
 - ✅ Mobile responsive
 - ✅ All modern browsers
-
-## Version
-
-Current version: **1.0.45**
-
-### Recent Updates (1.0.45)
-- Code refactoring and optimization
-- Improved admin panel design with better information structure
-- Enhanced statistics dashboard
-- Better code organization and modular structure
-- WordPress coding standards compliance
-- Performance improvements
 
 ## Support
 

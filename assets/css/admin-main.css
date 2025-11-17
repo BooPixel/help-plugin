@@ -1,0 +1,310 @@
+/**
+ * Admin main page styles
+ *
+ * @package BooChat_Connect
+ */
+
+.boochat-connect-header {
+    margin-bottom: 30px;
+}
+
+.boochat-connect-header h1 {
+    margin: 0 0 10px 0;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.boochat-connect-header p {
+    margin: 0;
+    color: #646970;
+    font-size: 14px;
+}
+
+.boochat-connect-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.boochat-connect-content-left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.boochat-connect-card-hero {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.boochat-connect-card-hero-content {
+    flex: 1;
+}
+
+.boochat-connect-card-hero-content h2 {
+    margin-top: 0;
+    font-size: 24px;
+    color: #1d2327;
+}
+
+.boochat-connect-card-hero-content p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #50575e;
+    margin: 15px 0;
+}
+
+.boochat-connect-card-hero-icon {
+    font-size: 48px;
+    opacity: 0.1;
+}
+
+.boochat-connect-status-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.boochat-connect-status-card {
+    padding: 20px;
+}
+
+.boochat-connect-status-card > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.boochat-connect-status-card.has-button {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.boochat-connect-status-card.has-button > div:first-child {
+    margin-bottom: 10px;
+}
+
+.boochat-connect-status-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+}
+
+.boochat-connect-status-icon.success {
+    background: #00a32a;
+}
+
+.boochat-connect-status-icon.error {
+    background: #d63638;
+}
+
+.boochat-connect-status-info h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #646970;
+    font-weight: 500;
+}
+
+.boochat-connect-status-info p {
+    margin: 5px 0 0 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.boochat-connect-getting-started h2 {
+    margin-top: 0;
+    font-size: 20px;
+    border-bottom: 2px solid #f0f0f1;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+}
+
+.boochat-connect-getting-started-list {
+    display: grid;
+    gap: 20px;
+}
+
+.boochat-connect-getting-started-item {
+    display: flex;
+    gap: 15px;
+}
+
+.boochat-connect-getting-started-number {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #2271b1;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.boochat-connect-getting-started-content {
+    flex: 1;
+}
+
+.boochat-connect-getting-started-content h3 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+    color: #1d2327;
+}
+
+.boochat-connect-getting-started-content p {
+    margin: 0;
+    color: #646970;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.boochat-connect-api-guide h2 {
+    margin-top: 0;
+    font-size: 20px;
+    border-bottom: 2px solid #f0f0f1;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+}
+
+.boochat-connect-api-guide p {
+    color: #646970;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.boochat-connect-code-block {
+    background: #1d2327;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+.boochat-connect-code-block pre {
+    margin: 0;
+    color: #f0f0f1;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.boochat-connect-info-box {
+    background: #f0f6fc;
+    border-left: 4px solid #2271b1;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.boochat-connect-info-box p {
+    margin: 0;
+    color: #1d2327;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.boochat-connect-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.boochat-connect-sidebar-card h2 {
+    margin-top: 0;
+    font-size: 18px;
+    border-bottom: 2px solid #f0f0f1;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+}
+
+.boochat-connect-quick-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.boochat-connect-quick-links .button {
+    text-align: center;
+    padding: 12px;
+    text-decoration: none;
+    display: block;
+}
+
+.boochat-connect-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.boochat-connect-features-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.boochat-connect-features-list .icon {
+    color: #00a32a;
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+.boochat-connect-features-list .text {
+    color: #50575e;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.boochat-connect-support-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.boochat-connect-support-item-label {
+    font-size: 12px;
+    color: #646970;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.boochat-connect-support-item-value {
+    font-size: 15px;
+    color: #1d2327;
+    font-weight: 600;
+}
+
+.boochat-connect-support-item-link {
+    color: #2271b1;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.boochat-connect-license-card {
+    background: #f0f6fc;
+    border: 1px solid #c7d2fe;
+}
+
+.boochat-connect-license-card p {
+    margin: 0;
+    color: #1d2327;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.boochat-connect-license-card a {
+    color: #2271b1;
+    text-decoration: none;
+}
+
