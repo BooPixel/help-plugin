@@ -93,6 +93,27 @@ switch ($boochat_connect_wp_language) {
                                 </p>
                             </td>
                         </tr>
+                        <tr>
+                            <th scope="row">
+                                <label for="api_key"><?php echo esc_html__('License API Key', 'boochat-connect'); ?></label>
+                            </th>
+                            <td>
+                                <?php
+                                $boochat_connect_api_key = get_option('boochat_connect_api_key', '');
+                                ?>
+                                <input 
+                                    type="password" 
+                                    id="api_key" 
+                                    name="api_key" 
+                                    value="<?php echo esc_attr($boochat_connect_api_key); ?>" 
+                                    class="regular-text"
+                                    placeholder="<?php echo esc_attr__('Enter your API Key for license activation', 'boochat-connect'); ?>"
+                                >
+                                <p class="description">
+                                    <?php echo esc_html__('Required for PRO license activation. Get your API Key from BooPixel.', 'boochat-connect'); ?>
+                                </p>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
                 

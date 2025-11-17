@@ -13,36 +13,49 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display only
-$payment_status = isset($_GET['payment']) ? sanitize_text_field(wp_unslash($_GET['payment'])) : '';
-$license_activated = isset($_GET['license_activated']) && sanitize_text_field(wp_unslash($_GET['license_activated'])) === '1';
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET parameters from external redirect (Stripe), display only
+$boochat_connect_payment_status = isset($_GET['payment']) ? sanitize_text_field(wp_unslash($_GET['payment'])) : '';
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET parameter from external redirect (Stripe), display only
+$boochat_connect_license_activated = isset($_GET['license_activated']) && sanitize_text_field(wp_unslash($_GET['license_activated'])) === '1';
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET parameter from external redirect (Stripe), display only
+$boochat_connect_license_received = isset($_GET['license_received']) && sanitize_text_field(wp_unslash($_GET['license_received'])) === '1';
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET parameter from external redirect (Stripe), display only
+$boochat_connect_needs_api_key = isset($_GET['needs_api_key']) && sanitize_text_field(wp_unslash($_GET['needs_api_key'])) === '1';
 ?>
 <div class="wrap boochat-connect-wrap">
     <div class="boochat-connect-pro-upgrade">
         
-        <?php if ($payment_status === 'success' && $license_activated): ?>
+        <?php if ($boochat_connect_payment_status === 'success' && $boochat_connect_license_activated): ?>
             <div class="notice notice-success is-dismissible">
                 <p><strong><?php echo esc_html__('Payment Successful!', 'boochat-connect'); ?></strong></p>
-                <p><?php echo esc_html__('Your PRO license has been activated. You can now access all premium features!', 'boochat-connect'); ?></p>
+                <p><?php echo esc_html__('Your PRO license has been activated automatically. You can now access all premium features!', 'boochat-connect'); ?></p>
             </div>
-        <?php elseif ($payment_status === 'success'): ?>
+        <?php elseif ($boochat_connect_payment_status === 'success' && $boochat_connect_license_received && $boochat_connect_needs_api_key): ?>
+            <div class="notice notice-warning is-dismissible">
+                <p><strong><?php echo esc_html__('Payment Successful!', 'boochat-connect'); ?></strong></p>
+                <p><?php echo esc_html__('Your license key has been received. To activate your PRO license, please configure your API Key in', 'boochat-connect'); ?> 
+                   <a href="<?php echo esc_url(admin_url('admin.php?page=boochat-connect-settings')); ?>"><?php echo esc_html__('Settings', 'boochat-connect'); ?></a>.
+                   <?php echo esc_html__('The license will be activated automatically once the API Key is configured.', 'boochat-connect'); ?>
+                </p>
+            </div>
+        <?php elseif ($boochat_connect_payment_status === 'success'): ?>
             <div class="notice notice-info is-dismissible">
                 <p><?php echo esc_html__('Payment received. Processing license activation...', 'boochat-connect'); ?></p>
             </div>
         <?php endif; ?>
         
-        <?php if ($payment_status === 'cancel'): ?>
+        <?php if ($boochat_connect_payment_status === 'cancel'): ?>
             <div class="notice notice-warning is-dismissible">
                 <p><?php echo esc_html__('Payment was cancelled.', 'boochat-connect'); ?></p>
             </div>
         <?php endif; ?>
         
-        <?php if ($payment_status === 'error'): ?>
+        <?php if ($boochat_connect_payment_status === 'error'): ?>
             <div class="notice notice-error is-dismissible">
                 <p>
                     <strong><?php echo esc_html__('Payment Error', 'boochat-connect'); ?></strong>
                     <?php
-                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display only
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET parameter from external redirect (Stripe), display only
                     if (isset($_GET['message'])) {
                         echo ' - ' . esc_html(urldecode(sanitize_text_field(wp_unslash($_GET['message']))));
                     }
@@ -130,13 +143,13 @@ $license_activated = isset($_GET['license_activated']) && sanitize_text_field(wp
                     
                     <?php
                     // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display only
-                    $activation_message = isset($_GET['activation']) ? sanitize_text_field(wp_unslash($_GET['activation'])) : '';
-                    if ($activation_message === 'success'):
+                    $boochat_connect_activation_message = isset($_GET['activation']) ? sanitize_text_field(wp_unslash($_GET['activation'])) : '';
+                    if ($boochat_connect_activation_message === 'success'):
                     ?>
                         <div class="notice notice-success is-dismissible">
                             <p><?php echo esc_html__('License activated successfully!', 'boochat-connect'); ?></p>
                         </div>
-                    <?php elseif ($activation_message === 'error'): ?>
+                    <?php elseif ($boochat_connect_activation_message === 'error'): ?>
                         <div class="notice notice-error is-dismissible">
                             <p><?php echo esc_html__('Failed to activate license. Please check your license key.', 'boochat-connect'); ?></p>
                         </div>
