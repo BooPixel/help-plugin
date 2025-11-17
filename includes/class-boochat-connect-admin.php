@@ -79,6 +79,15 @@ class BooChat_Connect_Admin {
         
         add_submenu_page(
             'boochat-connect',
+            boochat_connect_translate('customization'),
+            boochat_connect_translate('customization'),
+            'manage_options',
+            'boochat-connect-customization',
+            array($this, 'render_customization_page')
+        );
+        
+        add_submenu_page(
+            'boochat-connect',
             boochat_connect_translate('settings'),
             boochat_connect_translate('settings'),
             'manage_options',
@@ -106,6 +115,7 @@ class BooChat_Connect_Admin {
         $current_page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
         $is_plugin_page = (
             $current_page === 'boochat-connect' ||
+            $current_page === 'boochat-connect-customization' ||
             $current_page === 'boochat-connect-settings' ||
             $current_page === 'boochat-connect-statistics' ||
             strpos($hook, 'boochat-connect') !== false
@@ -190,7 +200,7 @@ class BooChat_Connect_Admin {
         $this->settings->clear_cache();
         
         wp_safe_redirect(add_query_arg(array(
-            'page' => 'boochat-connect',
+            'page' => 'boochat-connect-customization',
             'customization-updated' => 'true'
         ), admin_url('admin.php')));
         exit;
@@ -226,16 +236,293 @@ class BooChat_Connect_Admin {
     }
     
     /**
-     * Render admin page (customization)
+     * Render admin page (main panel)
      */
     public function render_admin_page() {
+        $api_url = $this->api->get_api_url();
+        $api_configured = !empty($api_url);
+        ?>
+        <div class="wrap boochat-connect-wrap">
+            <div class="boochat-connect-header" style="margin-bottom: 30px;">
+                <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 600;"><?php echo esc_html(get_admin_page_title()); ?></h1>
+                <p style="margin: 0; color: #646970; font-size: 14px;">
+                    <?php echo esc_html__('Version', 'boochat-connect'); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
+                    <?php echo esc_html__('AI Chatbot & n8n Automation', 'boochat-connect'); ?>
+                </p>
+            </div>
+            
+            <div class="boochat-connect-content" style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                
+                <!-- Left Column -->
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    
+                    <!-- Welcome Card -->
+                    <div class="boochat-connect-card boochat-connect-card-hero">
+                        <div style="display: flex; align-items: flex-start; gap: 20px;">
+                            <div style="flex: 1;">
+                                <h2 style="margin-top: 0; font-size: 24px; color: #1d2327;">
+                                    <?php echo esc_html__('Welcome to BooChat Connect', 'boochat-connect'); ?>
+                                </h2>
+                                <p style="font-size: 15px; line-height: 1.7; color: #50575e; margin: 15px 0;">
+                                    <?php echo esc_html__('Modern, lightweight chatbot popup that integrates seamlessly with n8n. Automate workflows, respond in real-time, collect leads, and connect to any AI model or external service.', 'boochat-connect'); ?>
+                                </p>
+                            </div>
+                            <div style="font-size: 48px; opacity: 0.1;">💬</div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Status Cards -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="boochat-connect-card boochat-connect-status-card">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                                <div style="width: 40px; height: 40px; border-radius: 8px; background: <?php echo $api_configured ? '#00a32a' : '#d63638'; ?>; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">
+                                    <?php echo $api_configured ? '✓' : '✗'; ?>
+                                </div>
+                                <div>
+                                    <h3 style="margin: 0; font-size: 14px; color: #646970; font-weight: 500;">
+                                        <?php echo esc_html__('API Status', 'boochat-connect'); ?>
+                                    </h3>
+                                    <p style="margin: 5px 0 0 0; font-size: 18px; font-weight: 600; color: #1d2327;">
+                                        <?php echo $api_configured ? esc_html__('Configured', 'boochat-connect') : esc_html__('Not Configured', 'boochat-connect'); ?>
+                                    </p>
+                                </div>
+                            </div>
+                            <?php if (!$api_configured): ?>
+                                <a href="<?php echo esc_url(admin_url('admin.php?page=boochat-connect-settings')); ?>" class="button button-small" style="margin-top: 10px;">
+                                    <?php echo esc_html__('Configure Now', 'boochat-connect'); ?>
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <div class="boochat-connect-card boochat-connect-status-card">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 40px; height: 40px; border-radius: 8px; background: #00a32a; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">
+                                    ✓
+                                </div>
+                                <div>
+                                    <h3 style="margin: 0; font-size: 14px; color: #646970; font-weight: 500;">
+                                        <?php echo esc_html__('Chat Widget', 'boochat-connect'); ?>
+                                    </h3>
+                                    <p style="margin: 5px 0 0 0; font-size: 18px; font-weight: 600; color: #1d2327;">
+                                        <?php echo esc_html__('Active', 'boochat-connect'); ?>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Getting Started -->
+                    <div class="boochat-connect-card">
+                        <h2 style="margin-top: 0; font-size: 20px; border-bottom: 2px solid #f0f0f1; padding-bottom: 12px; margin-bottom: 20px;">
+                            <?php echo esc_html__('Getting Started', 'boochat-connect'); ?>
+                        </h2>
+                        <div style="display: grid; gap: 20px;">
+                            <div style="display: flex; gap: 15px;">
+                                <div style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: #2271b1; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 16px;">1</div>
+                                <div style="flex: 1;">
+                                    <h3 style="margin: 0 0 5px 0; font-size: 16px; color: #1d2327;">
+                                        <?php echo esc_html__('Configure API URL', 'boochat-connect'); ?>
+                                    </h3>
+                                    <p style="margin: 0; color: #646970; font-size: 14px; line-height: 1.6;">
+                                        <?php echo esc_html__('Go to Settings and configure your n8n webhook URL or external API endpoint.', 'boochat-connect'); ?>
+                                    </p>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 15px;">
+                                <div style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: #2271b1; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 16px;">2</div>
+                                <div style="flex: 1;">
+                                    <h3 style="margin: 0 0 5px 0; font-size: 16px; color: #1d2327;">
+                                        <?php echo esc_html__('Customize Appearance', 'boochat-connect'); ?>
+                                    </h3>
+                                    <p style="margin: 0; color: #646970; font-size: 14px; line-height: 1.6;">
+                                        <?php echo esc_html__('Personalize colors, fonts, welcome message, and chat name to match your brand.', 'boochat-connect'); ?>
+                                    </p>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 15px;">
+                                <div style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: #2271b1; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 16px;">3</div>
+                                <div style="flex: 1;">
+                                    <h3 style="margin: 0 0 5px 0; font-size: 16px; color: #1d2327;">
+                                        <?php echo esc_html__('Test the Chat', 'boochat-connect'); ?>
+                                    </h3>
+                                    <p style="margin: 0; color: #646970; font-size: 14px; line-height: 1.6;">
+                                        <?php echo esc_html__('Visit your website frontend and test the chat integration.', 'boochat-connect'); ?>
+                                    </p>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 15px;">
+                                <div style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: #2271b1; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 16px;">4</div>
+                                <div style="flex: 1;">
+                                    <h3 style="margin: 0 0 5px 0; font-size: 16px; color: #1d2327;">
+                                        <?php echo esc_html__('Monitor Statistics', 'boochat-connect'); ?>
+                                    </h3>
+                                    <p style="margin: 0; color: #646970; font-size: 14px; line-height: 1.6;">
+                                        <?php echo esc_html__('Track user interactions and analyze chat usage over time.', 'boochat-connect'); ?>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- API Integration Guide -->
+                    <div class="boochat-connect-card">
+                        <h2 style="margin-top: 0; font-size: 20px; border-bottom: 2px solid #f0f0f1; padding-bottom: 12px; margin-bottom: 20px;">
+                            <?php echo esc_html__('API Integration Guide', 'boochat-connect'); ?>
+                        </h2>
+                        <p style="color: #646970; font-size: 14px; margin-bottom: 15px;">
+                            <?php echo esc_html__('Your API endpoint should accept POST requests with the following JSON format:', 'boochat-connect'); ?>
+                        </p>
+                        <div style="background: #1d2327; border-radius: 8px; padding: 20px; margin-bottom: 20px; overflow-x: auto;">
+                            <pre style="margin: 0; color: #f0f0f1; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6;"><code>{
+  "sessionId": "unique-session-id",
+  "action": "sendMessage",
+  "chatInput": "user message text"
+}</code></pre>
+                        </div>
+                        <p style="color: #646970; font-size: 14px; margin-bottom: 15px;">
+                            <?php echo esc_html__('The API should respond with JSON in this format:', 'boochat-connect'); ?>
+                        </p>
+                        <div style="background: #1d2327; border-radius: 8px; padding: 20px; margin-bottom: 20px; overflow-x: auto;">
+                            <pre style="margin: 0; color: #f0f0f1; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6;"><code>{
+  "output": "bot response message"
+}</code></pre>
+                        </div>
+                        <div style="background: #f0f6fc; border-left: 4px solid #2271b1; padding: 15px; border-radius: 4px;">
+                            <p style="margin: 0; color: #1d2327; font-size: 14px; line-height: 1.6;">
+                                <strong><?php echo esc_html__('n8n Integration:', 'boochat-connect'); ?></strong>
+                                <?php echo esc_html__('Create a webhook node in n8n and use the webhook URL as your API URL. The webhook will receive chat messages for processing in your n8n workflow.', 'boochat-connect'); ?>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column -->
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    
+                    <!-- Quick Links -->
+                    <div class="boochat-connect-card">
+                        <h2 style="margin-top: 0; font-size: 18px; border-bottom: 2px solid #f0f0f1; padding-bottom: 12px; margin-bottom: 20px;">
+                            <?php echo esc_html__('Quick Links', 'boochat-connect'); ?>
+                        </h2>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=boochat-connect-customization')); ?>" class="button button-primary button-large" style="text-align: center; padding: 12px; text-decoration: none; display: block;">
+                                <?php echo esc_html__('Customization', 'boochat-connect'); ?>
+                            </a>
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=boochat-connect-settings')); ?>" class="button button-primary button-large" style="text-align: center; padding: 12px; text-decoration: none; display: block;">
+                                <?php echo esc_html__('Settings', 'boochat-connect'); ?>
+                            </a>
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=boochat-connect-statistics')); ?>" class="button button-primary button-large" style="text-align: center; padding: 12px; text-decoration: none; display: block;">
+                                <?php echo esc_html__('Statistics', 'boochat-connect'); ?>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <div class="boochat-connect-card">
+                        <h2 style="margin-top: 0; font-size: 18px; border-bottom: 2px solid #f0f0f1; padding-bottom: 12px; margin-bottom: 20px;">
+                            <?php echo esc_html__('Features', 'boochat-connect'); ?>
+                        </h2>
+                        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                            <li style="display: flex; align-items: flex-start; gap: 10px;">
+                                <span style="color: #00a32a; font-size: 18px; line-height: 1.4;">✓</span>
+                                <span style="color: #50575e; font-size: 14px; line-height: 1.6;"><?php echo esc_html__('Modern responsive design', 'boochat-connect'); ?></span>
+                            </li>
+                            <li style="display: flex; align-items: flex-start; gap: 10px;">
+                                <span style="color: #00a32a; font-size: 18px; line-height: 1.4;">✓</span>
+                                <span style="color: #50575e; font-size: 14px; line-height: 1.6;"><?php echo esc_html__('Full customization options', 'boochat-connect'); ?></span>
+                            </li>
+                            <li style="display: flex; align-items: flex-start; gap: 10px;">
+                                <span style="color: #00a32a; font-size: 18px; line-height: 1.4;">✓</span>
+                                <span style="color: #50575e; font-size: 14px; line-height: 1.6;"><?php echo esc_html__('n8n & API integration', 'boochat-connect'); ?></span>
+                            </li>
+                            <li style="display: flex; align-items: flex-start; gap: 10px;">
+                                <span style="color: #00a32a; font-size: 18px; line-height: 1.4;">✓</span>
+                                <span style="color: #50575e; font-size: 14px; line-height: 1.6;"><?php echo esc_html__('Session management', 'boochat-connect'); ?></span>
+                            </li>
+                            <li style="display: flex; align-items: flex-start; gap: 10px;">
+                                <span style="color: #00a32a; font-size: 18px; line-height: 1.4;">✓</span>
+                                <span style="color: #50575e; font-size: 14px; line-height: 1.6;"><?php echo esc_html__('Statistics & analytics', 'boochat-connect'); ?></span>
+                            </li>
+                            <li style="display: flex; align-items: flex-start; gap: 10px;">
+                                <span style="color: #00a32a; font-size: 18px; line-height: 1.4;">✓</span>
+                                <span style="color: #50575e; font-size: 14px; line-height: 1.6;"><?php echo esc_html__('Multi-language support', 'boochat-connect'); ?></span>
+                            </li>
+                            <li style="display: flex; align-items: flex-start; gap: 10px;">
+                                <span style="color: #00a32a; font-size: 18px; line-height: 1.4;">✓</span>
+                                <span style="color: #50575e; font-size: 14px; line-height: 1.6;"><?php echo esc_html__('Lightweight & fast', 'boochat-connect'); ?></span>
+                            </li>
+                            <li style="display: flex; align-items: flex-start; gap: 10px;">
+                                <span style="color: #00a32a; font-size: 18px; line-height: 1.4;">✓</span>
+                                <span style="color: #50575e; font-size: 14px; line-height: 1.6;"><?php echo esc_html__('Mobile-friendly', 'boochat-connect'); ?></span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Support & Contact -->
+                    <div class="boochat-connect-card">
+                        <h2 style="margin-top: 0; font-size: 18px; border-bottom: 2px solid #f0f0f1; padding-bottom: 12px; margin-bottom: 20px;">
+                            <?php echo esc_html__('Support & Contact', 'boochat-connect'); ?>
+                        </h2>
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <div>
+                                <div style="font-size: 12px; color: #646970; margin-bottom: 5px; font-weight: 500;">
+                                    <?php echo esc_html__('Company', 'boochat-connect'); ?>
+                                </div>
+                                <div style="font-size: 15px; color: #1d2327; font-weight: 600;">
+                                    BooPixel
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: #646970; margin-bottom: 5px; font-weight: 500;">
+                                    <?php echo esc_html__('Website', 'boochat-connect'); ?>
+                                </div>
+                                <div>
+                                    <a href="https://boopixel.com" target="_blank" rel="noopener noreferrer" style="color: #2271b1; text-decoration: none; font-size: 14px;">
+                                        boopixel.com →
+                                    </a>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: #646970; margin-bottom: 5px; font-weight: 500;">
+                                    <?php echo esc_html__('Documentation', 'boochat-connect'); ?>
+                                </div>
+                                <div>
+                                    <a href="https://boopixel.com/boochat-connect" target="_blank" rel="noopener noreferrer" style="color: #2271b1; text-decoration: none; font-size: 14px;">
+                                        <?php echo esc_html__('View Docs →', 'boochat-connect'); ?>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- License -->
+                    <div class="boochat-connect-card" style="background: #f0f6fc; border: 1px solid #c7d2fe;">
+                        <p style="margin: 0; color: #1d2327; font-size: 13px; line-height: 1.6;">
+                            <?php echo esc_html__('Licensed under', 'boochat-connect'); ?>
+                            <a href="https://www.gnu.org/licenses/gpl-2.0.html" target="_blank" rel="noopener noreferrer" style="color: #2271b1; text-decoration: none;">
+                                <strong>GPLv2+</strong>
+                            </a>
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+    
+    /**
+     * Render customization page
+     */
+    public function render_customization_page() {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameter for display only
         $customization_updated = isset($_GET['customization-updated']) && sanitize_text_field(wp_unslash($_GET['customization-updated'])) === 'true';
         
         $settings = $this->settings->get_customization_settings();
         ?>
         <div class="wrap boochat-connect-wrap">
-            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+            <h1><?php echo esc_html(boochat_connect_translate('chat_customization')); ?></h1>
             
             <?php if ($customization_updated): ?>
                 <div class="notice notice-success is-dismissible">
