@@ -270,7 +270,7 @@ This table is automatically created on first use.
 
 ## Version
 
-Current version: **1.0.0**
+Current version: **1.0.11**
 
 ## Support
 
