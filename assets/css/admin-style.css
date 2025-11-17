@@ -2,6 +2,21 @@
  * Admin page styles for BooChat Connect
  */
 
+/* PRO Badge in Menu */
+.boochat-connect-pro-badge {
+    display: inline-block;
+    background: #d63638;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    text-transform: uppercase;
+    line-height: 1.4;
+    vertical-align: middle;
+}
+
 .boochat-connect-wrap {
     margin: 20px 20px 0 0;
 }
@@ -30,7 +45,7 @@
 
 .boochat-connect-card-hero {
     background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    border: 1px solid #dcdcde;
+    border: none;
 }
 
 .boochat-connect-status-card {
