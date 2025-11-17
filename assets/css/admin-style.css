@@ -1,20 +1,20 @@
 /**
- * Estilos para a página do admin do Help Plugin
+ * Admin page styles for BooChat Connect
  */
 
-.help-plugin-wrap {
+.boochat-connect-wrap {
     margin: 20px 20px 0 0;
 }
 
-.help-plugin-wrap h1 {
+.boochat-connect-wrap h1 {
     margin-bottom: 20px;
 }
 
-.help-plugin-content {
+.boochat-connect-content {
     margin-top: 20px;
 }
 
-.help-plugin-card {
+.boochat-connect-card {
     background: #fff;
     border: 1px solid #ccd0d4;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
@@ -22,36 +22,35 @@
     margin-bottom: 20px;
 }
 
-.help-plugin-card h2 {
+.boochat-connect-card h2 {
     margin-top: 0;
     border-bottom: 1px solid #eee;
     padding-bottom: 10px;
 }
 
-.help-plugin-card h3 {
+.boochat-connect-card h3 {
     margin-top: 0;
     color: #23282d;
 }
 
-.help-plugin-card p {
+.boochat-connect-card p {
     line-height: 1.6;
     color: #555;
 }
 
-.help-plugin-card table {
+.boochat-connect-card table {
     margin-top: 15px;
 }
 
-.help-plugin-card table td {
+.boochat-connect-card table td {
     padding: 10px;
     border-bottom: 1px solid #eee;
 }
 
-.help-plugin-card table tr:last-child td {
+.boochat-connect-card table tr:last-child td {
     border-bottom: none;
 }
 
-.help-plugin-card .button {
+.boochat-connect-card .button {
     margin-top: 10px;
 }
-
