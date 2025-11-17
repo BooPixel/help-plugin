@@ -77,3 +77,132 @@
 .boochat-connect-status-error {
     color: red;
 }
+
+/* PRO Upgrade Page Styles */
+.boochat-connect-pro-upgrade {
+    max-width: 900px;
+}
+
+.boochat-connect-pro-upgrade .intro-text {
+    font-size: 16px;
+    color: #50575e;
+    margin-bottom: 30px;
+}
+
+.pro-features {
+    margin: 30px 0;
+    padding: 20px;
+    background: #f0f6fc;
+    border-left: 4px solid #2271b1;
+    border-radius: 4px;
+}
+
+.pro-features h2 {
+    margin-top: 0;
+    color: #1d2327;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+}
+
+.feature-list li {
+    padding: 10px 0;
+    font-size: 15px;
+    color: #50575e;
+    line-height: 1.6;
+}
+
+.pricing-section {
+    margin: 40px 0;
+    text-align: center;
+}
+
+.pricing-section h2 {
+    margin-bottom: 20px;
+}
+
+.price-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 2px solid #2271b1;
+    border-radius: 12px;
+    padding: 40px;
+    max-width: 400px;
+    margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.price-card h3 {
+    margin-top: 0;
+    font-size: 24px;
+    color: #1d2327;
+}
+
+.price {
+    margin: 30px 0;
+    font-size: 48px;
+    font-weight: bold;
+    color: #2271b1;
+    line-height: 1;
+}
+
+.price .currency {
+    font-size: 32px;
+    vertical-align: top;
+}
+
+.price .amount {
+    font-size: 64px;
+}
+
+.price .period {
+    font-size: 18px;
+    font-weight: normal;
+    color: #646970;
+    margin-left: 5px;
+}
+
+.price-description {
+    color: #646970;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.button-hero {
+    padding: 15px 40px;
+    font-size: 16px;
+    height: auto;
+}
+
+.license-activation-section {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px solid #ccd0d4;
+}
+
+.license-activation-section h2 {
+    margin-top: 0;
+}
+
+.license-form {
+    margin-top: 20px;
+}
+
+.boochat-connect-pro-active {
+    background: linear-gradient(135deg, #f0f6fc 0%, #ffffff 100%);
+    border: 2px solid #00a32a;
+}
+
+.license-info {
+    margin-top: 20px;
+}
+
+.license-info code {
+    background: #f0f0f1;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Courier New', monospace;
+}

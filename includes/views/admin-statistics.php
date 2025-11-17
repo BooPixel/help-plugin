@@ -42,6 +42,8 @@ if (!defined('ABSPATH')) {
         <!-- Date Selection -->
         <div class="boochat-connect-statistics-section">
             <h3><?php echo esc_html(boochat_connect_translate('select_period')); ?></h3>
+            <!-- Message area for errors/success -->
+            <div id="statistics-messages"></div>
             <div class="boochat-connect-statistics-filters">
                 <div class="boochat-connect-statistics-filter-group">
                     <label for="date-from"><?php echo esc_html(boochat_connect_translate('start_date')); ?></label>
@@ -88,16 +90,3 @@ if (!defined('ABSPATH')) {
         </div>
     </div>
 </div>
-
-<script type="text/javascript">
-var boochatConnectStats = {
-    ajaxUrl: <?php echo json_encode($ajax_url); ?>,
-    nonce: <?php echo json_encode($nonce); ?>,
-    loadStatisticsText: <?php echo json_encode(boochat_connect_translate('load_statistics')); ?>,
-    loadingText: <?php echo json_encode(boochat_connect_translate('loading', 'Loading...')); ?>,
-    selectDatesText: <?php echo json_encode(boochat_connect_translate('select_dates', 'Please select start and end dates.')); ?>,
-    invalidDateRangeText: <?php echo json_encode(boochat_connect_translate('invalid_date_range', 'Start date must be before end date.')); ?>,
-    errorLoadingText: <?php echo json_encode(boochat_connect_translate('error_loading_statistics', 'Error loading statistics: ')); ?>,
-    errorConnectingText: <?php echo json_encode(boochat_connect_translate('error_connecting_server', 'Error connecting to server. Please try again.')); ?>
-};
-</script>

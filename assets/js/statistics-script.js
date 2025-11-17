@@ -9,13 +9,31 @@
             return;
         }
         
+        // Wait for DOM to be ready
+        if (!$('#date-from').length || !$('#date-to').length) {
+            setTimeout(initStatistics, 100);
+            return;
+        }
+        
         // Set default dates to today
         const today = new Date().toISOString().split('T')[0];
-        $('#date-from').val(today);
-        $('#date-to').val(today);
+        const dateFrom = $('#date-from').val();
+        const dateTo = $('#date-to').val();
         
-        // Load statistics on page load
-        loadStatistics();
+        // Only set if not already set
+        if (!dateFrom) {
+            $('#date-from').val(today);
+        }
+        if (!dateTo) {
+            $('#date-to').val(today);
+        }
+        
+        // Load statistics on page load (only if dates are set)
+        const finalDateFrom = $('#date-from').val();
+        const finalDateTo = $('#date-to').val();
+        if (finalDateFrom && finalDateTo) {
+            loadStatistics();
+        }
         
         // Load statistics on button click
         $('#load-statistics').on('click', function(e) {
@@ -24,9 +42,34 @@
         });
     }
     
+    function showMessage(message, type) {
+        type = type || 'error';
+        const messageClass = type === 'error' ? 'notice-error' : 'notice-success';
+        const $message = $('<div>')
+            .addClass('notice ' + messageClass + ' is-dismissible')
+            .css({
+                margin: '10px 0',
+                padding: '10px 15px'
+            })
+            .html('<p>' + message + '</p>');
+        
+        // Remove existing messages
+        $('.boochat-connect-statistics-message').remove();
+        
+        // Insert message before the date filters
+        $('.boochat-connect-statistics-filters').before($message.addClass('boochat-connect-statistics-message'));
+        
+        // Auto-dismiss after 5 seconds
+        setTimeout(function() {
+            $message.fadeOut(function() {
+                $(this).remove();
+            });
+        }, 5000);
+    }
+    
     function loadStatistics() {
         if (typeof boochatConnectStats === 'undefined') {
-            alert('Error: Statistics configuration not loaded. Please refresh the page.');
+            showMessage('Error: Statistics configuration not loaded. Please refresh the page.', 'error');
             return;
         }
         
@@ -34,12 +77,12 @@
         const dateTo = $('#date-to').val();
         
         if (!dateFrom || !dateTo) {
-            alert(boochatConnectStats.selectDatesText || 'Please select start and end dates.');
+            showMessage(boochatConnectStats.selectDatesText || 'Please select start and end dates.', 'error');
             return;
         }
         
         if (new Date(dateFrom) > new Date(dateTo)) {
-            alert(boochatConnectStats.invalidDateRangeText || 'Start date must be before end date.');
+            showMessage(boochatConnectStats.invalidDateRangeText || 'Start date must be before end date.', 'error');
             return;
         }
         
@@ -71,12 +114,18 @@
                     if (response.data.calendar) {
                         updateCalendar(response.data.calendar);
                     }
+                    
+                    // Show success message if data loaded
+                    if (response.data.summary || response.data.chart) {
+                        showMessage('Statistics loaded successfully.', 'success');
+                    }
                 } else {
-                    alert(boochatConnectStats.errorLoadingText + (response.data.message || ''));
+                    let errorMessage = boochatConnectStats.errorLoadingText + (response.data.message || '');
+                    showMessage(errorMessage, 'error');
                 }
             },
-            error: function() {
-                alert(boochatConnectStats.errorConnectingText);
+            error: function(xhr, status, error) {
+                showMessage(boochatConnectStats.errorConnectingText || 'Error connecting to server. Please try again.', 'error');
             },
             complete: function() {
                 $button.prop('disabled', false).text(boochatConnectStats.loadStatisticsText);
@@ -254,8 +303,16 @@
             return;
         }
         
+        if (typeof jQuery === 'undefined') {
+            setTimeout(waitForChartAndInit, 100);
+            return;
+        }
+        
         $(document).ready(function() {
-            initStatistics();
+            // Small delay to ensure all DOM elements are ready
+            setTimeout(function() {
+                initStatistics();
+            }, 100);
         });
     }
     
