@@ -3,7 +3,7 @@
  * Plugin Name: BooChat Connect
  * Plugin URI: https://boopixel.com/boochat-connect
  * Description: AI Chatbot & n8n Automation - Modern, lightweight chatbot popup that integrates seamlessly with n8n. Automate workflows, respond in real-time, collect leads, and connect to any AI model or external service. Perfect for 24/7 AI support, sales automation, and smart customer interactions.
- * Version: 1.0.0
+ * Version: 1.0.10
  * Author: BooPixel
  * Author URI: https://boopixel.com
  * License: GPLv2 or later
@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define constants
-define('HELP_PLUGIN_VERSION', '1.0.0');
+define('HELP_PLUGIN_VERSION', '1.0.10');
 define('HELP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('HELP_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -131,7 +131,16 @@ function help_plugin_translate($key, $default = '') {
             'start_date' => 'Start Date:',
             'end_date' => 'End Date:',
             'load_statistics' => 'Load Statistics',
+            'loading' => 'Loading...',
+            'select_dates' => 'Please select start and end dates.',
+            'invalid_date_range' => 'Start date must be before end date.',
+            'error_loading_statistics' => 'Error loading statistics: ',
+            'error_connecting_server' => 'Error connecting to server. Please try again.',
             'interactions_chart' => 'Interactions Chart',
+            'calendar_heatmap' => 'Interaction Calendar',
+            'calendar_description' => 'Visualize user interactions over the past year. Darker colors indicate more interactions.',
+            'less' => 'Less',
+            'more' => 'More',
             'main_panel' => 'Main Panel',
             'settings' => 'Settings',
             'statistics' => 'Statistics',
@@ -202,7 +211,16 @@ function help_plugin_translate($key, $default = '') {
             'start_date' => 'Data Inicial:',
             'end_date' => 'Data Final:',
             'load_statistics' => 'Carregar Estatísticas',
+            'loading' => 'Carregando...',
+            'select_dates' => 'Por favor, selecione as datas inicial e final.',
+            'invalid_date_range' => 'A data inicial deve ser anterior à data final.',
+            'error_loading_statistics' => 'Erro ao carregar estatísticas: ',
+            'error_connecting_server' => 'Erro ao conectar ao servidor. Tente novamente.',
             'interactions_chart' => 'Gráfico de Interações',
+            'calendar_heatmap' => 'Calendário de Interações',
+            'calendar_description' => 'Visualize as interações dos usuários ao longo do último ano. Cores mais escuras indicam mais interações.',
+            'less' => 'Menos',
+            'more' => 'Mais',
             'main_panel' => 'Painel Principal',
             'settings' => 'Configurações',
             'statistics' => 'Estatísticas',
@@ -273,7 +291,16 @@ function help_plugin_translate($key, $default = '') {
             'start_date' => 'Fecha Inicial:',
             'end_date' => 'Fecha Final:',
             'load_statistics' => 'Cargar Estadísticas',
+            'loading' => 'Cargando...',
+            'select_dates' => 'Por favor, seleccione las fechas inicial y final.',
+            'invalid_date_range' => 'La fecha inicial debe ser anterior a la fecha final.',
+            'error_loading_statistics' => 'Error al cargar estadísticas: ',
+            'error_connecting_server' => 'Error al conectar al servidor. Inténtelo de nuevo.',
             'interactions_chart' => 'Gráfico de Interacciones',
+            'calendar_heatmap' => 'Calendario de Interacciones',
+            'calendar_description' => 'Visualiza las interacciones de los usuarios durante el último año. Los colores más oscuros indican más interacciones.',
+            'less' => 'Menos',
+            'more' => 'Más',
             'main_panel' => 'Panel Principal',
             'settings' => 'Configuración',
             'statistics' => 'Estadísticas',
@@ -354,6 +381,46 @@ class Help_Plugin {
      */
     public static function deactivate() {
         flush_rewrite_rules();
+    }
+    
+    /**
+     * Plugin uninstall hook - Remove all plugin data
+     */
+    public static function uninstall() {
+        global $wpdb;
+        
+        // Check if user has permission
+        if (!current_user_can('activate_plugins')) {
+            return;
+        }
+        
+        // Remove all plugin options
+        $options = array(
+            'help_plugin_cache_version',
+            'help_plugin_language',
+            'help_plugin_chat_name',
+            'help_plugin_welcome_message',
+            'help_plugin_primary_color',
+            'help_plugin_secondary_color',
+            'help_plugin_chat_bg_color',
+            'help_plugin_text_color',
+            'help_plugin_font_family',
+            'help_plugin_font_size',
+            'help_plugin_api_url'
+        );
+        
+        foreach ($options as $option) {
+            delete_option($option);
+        }
+        
+        // Drop database table
+        $table_name = $wpdb->prefix . 'help_plugin_interactions';
+        $wpdb->query("DROP TABLE IF EXISTS {$table_name}");
+        
+        // Clear any cached data
+        if (function_exists('wp_cache_flush')) {
+            wp_cache_flush();
+        }
     }
     
     /**
@@ -750,8 +817,21 @@ class Help_Plugin {
      * Enqueue admin assets
      */
     public function enqueue_admin_assets($hook) {
-        // Load on plugin pages only
-        if ($hook !== 'toplevel_page_help-plugin' && $hook !== 'help-plugin_page_help-plugin-settings' && $hook !== 'help-plugin_page_help-plugin-statistics') {
+        // Debug: log all hooks to identify the correct one
+        error_log("Help Plugin: enqueue_admin_assets called with hook: {$hook}");
+        
+        // Check if we're on a plugin page by checking the page parameter
+        $current_page = isset($_GET['page']) ? $_GET['page'] : '';
+        $is_plugin_page = (
+            $current_page === 'help-plugin' ||
+            $current_page === 'help-plugin-settings' ||
+            $current_page === 'help-plugin-statistics' ||
+            strpos($hook, 'help-plugin') !== false ||
+            strpos($hook, 'boochat-connect') !== false
+        );
+        
+        if (!$is_plugin_page) {
+            error_log("Help Plugin: Hook '{$hook}' not matching plugin pages, skipping");
             return;
         }
         
@@ -771,27 +851,78 @@ class Help_Plugin {
         );
         
         // Load Chart.js and statistics scripts only on statistics page
-        if ($hook === 'help-plugin_page_help-plugin-statistics') {
+        // Check if we're on the statistics page by checking the page parameter
+        $current_page = isset($_GET['page']) ? $_GET['page'] : '';
+        $is_statistics_page = ($current_page === 'help-plugin-statistics');
+        
+        if ($is_statistics_page) {
+            error_log("Help Plugin: Loading statistics scripts for hook: {$hook}");
+            
+            // Load Chart.js with higher priority and ensure it loads
             wp_enqueue_script(
                 'chart-js',
                 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
                 array(),
                 '4.4.0',
-                true
+                false  // Load in header to ensure it's available
             );
+            
+            // Add inline script to verify Chart.js loading
+            add_action('admin_footer', function() use ($hook, $is_statistics_page) {
+                if ($is_statistics_page) {
+                    ?>
+                    <script type="text/javascript">
+                    // Verify Chart.js is loaded
+                    if (typeof Chart === 'undefined') {
+                        console.warn('Chart.js not loaded, attempting to load...');
+                        var script = document.createElement('script');
+                        script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+                        script.onload = function() {
+                            console.log('Chart.js loaded successfully via fallback');
+                        };
+                        script.onerror = function() {
+                            console.error('Failed to load Chart.js from CDN');
+                        };
+                        document.head.appendChild(script);
+                    } else {
+                        console.log('Chart.js is available');
+                    }
+                    </script>
+                    <?php
+                }
+            }, 5);
+            
+            // Use cache-busting version
+            $version = help_plugin_get_version();
+            $script_url = HELP_PLUGIN_URL . 'assets/js/statistics-script.js';
+            
+            error_log("Help Plugin: Enqueuing statistics script: {$script_url} with version: {$version}");
             
             wp_enqueue_script(
                 'help-plugin-statistics-script',
-                HELP_PLUGIN_URL . 'assets/js/statistics-script.js',
+                $script_url,
                 array('jquery', 'chart-js'),
-                HELP_PLUGIN_VERSION,
-                true
+                $version,
+                false  // Load in header to ensure it's available
             );
             
-            wp_localize_script('help-plugin-statistics-script', 'helpPluginStats', array(
+            // Localize script - MUST be called AFTER wp_enqueue_script
+            $localize_data = array(
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('help-plugin-statistics'),
-            ));
+                'loadStatisticsText' => help_plugin_translate('load_statistics'),
+                'loadingText' => help_plugin_translate('loading', 'Loading...'),
+                'selectDatesText' => help_plugin_translate('select_dates', 'Please select start and end dates.'),
+                'invalidDateRangeText' => help_plugin_translate('invalid_date_range', 'Start date must be before end date.'),
+                'errorLoadingText' => help_plugin_translate('error_loading_statistics', 'Error loading statistics: '),
+                'errorConnectingText' => help_plugin_translate('error_connecting_server', 'Error connecting to server. Please try again.'),
+            );
+            
+            error_log("Help Plugin: Localizing script with data: " . print_r($localize_data, true));
+            
+            wp_localize_script('help-plugin-statistics-script', 'helpPluginStats', $localize_data);
+        } else {
+            error_log("Help Plugin: Statistics scripts NOT loaded. Current hook: {$hook}");
         }
     }
     
@@ -1294,61 +1425,98 @@ class Help_Plugin {
      * Render statistics page
      */
     public function render_statistics_page() {
+        $ajax_url = admin_url('admin-ajax.php');
+        $nonce = wp_create_nonce('help-plugin-statistics');
+        $today = current_time('Y-m-d');
         ?>
-        <div class="wrap help-plugin-wrap">
+        <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
             
-            <div class="help-plugin-content">
-                <div class="help-plugin-card">
-                    <h2><?php echo esc_html(help_plugin_translate('statistics_interactions')); ?></h2>
-                    <p><?php echo esc_html(help_plugin_translate('view_interactions_period')); ?></p>
-                    
-                    <div style="margin: 20px 0;">
-                        <h3><?php echo esc_html(help_plugin_translate('quick_summary')); ?></h3>
-                        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin: 15px 0;">
-                            <div style="background: #f0f0f1; padding: 15px; border-radius: 5px; min-width: 150px;">
-                                <strong><?php echo esc_html(help_plugin_translate('last_24_hours')); ?></strong>
-                                <div id="stats-1day" style="font-size: 24px; font-weight: bold; color: #667eea;">-</div>
-                            </div>
-                            <div style="background: #f0f0f1; padding: 15px; border-radius: 5px; min-width: 150px;">
-                                <strong><?php echo esc_html(help_plugin_translate('last_7_days')); ?></strong>
-                                <div id="stats-7days" style="font-size: 24px; font-weight: bold; color: #667eea;">-</div>
-                            </div>
-                            <div style="background: #f0f0f1; padding: 15px; border-radius: 5px; min-width: 150px;">
-                                <strong><?php echo esc_html(help_plugin_translate('last_month')); ?></strong>
-                                <div id="stats-30days" style="font-size: 24px; font-weight: bold; color: #667eea;">-</div>
-                            </div>
+            <div class="help-plugin-card" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); margin-top: 20px;">
+                <h2><?php echo esc_html(help_plugin_translate('statistics_interactions')); ?></h2>
+                <p><?php echo esc_html(help_plugin_translate('view_interactions_period')); ?></p>
+                
+                <!-- Quick Summary -->
+                <div style="margin: 30px 0;">
+                    <h3><?php echo esc_html(help_plugin_translate('quick_summary')); ?></h3>
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap; margin: 20px 0;">
+                        <div style="background: #f0f0f1; padding: 20px; border-radius: 5px; min-width: 180px;">
+                            <div style="font-weight: bold; margin-bottom: 10px;"><?php echo esc_html(help_plugin_translate('last_24_hours')); ?></div>
+                            <div id="stats-1day" style="font-size: 32px; font-weight: bold; color: #2271b1;">0</div>
+                        </div>
+                        <div style="background: #f0f0f1; padding: 20px; border-radius: 5px; min-width: 180px;">
+                            <div style="font-weight: bold; margin-bottom: 10px;"><?php echo esc_html(help_plugin_translate('last_7_days')); ?></div>
+                            <div id="stats-7days" style="font-size: 32px; font-weight: bold; color: #2271b1;">0</div>
+                        </div>
+                        <div style="background: #f0f0f1; padding: 20px; border-radius: 5px; min-width: 180px;">
+                            <div style="font-weight: bold; margin-bottom: 10px;"><?php echo esc_html(help_plugin_translate('last_month')); ?></div>
+                            <div id="stats-30days" style="font-size: 32px; font-weight: bold; color: #2271b1;">0</div>
                         </div>
                     </div>
-                    
-                    <div style="margin: 30px 0;">
-                        <h3><?php echo esc_html(help_plugin_translate('select_period')); ?></h3>
-                        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin: 15px 0;">
-                            <div>
-                                <label for="date-from" style="display: block; margin-bottom: 5px; font-weight: bold;"><?php echo esc_html(help_plugin_translate('start_date')); ?></label>
-                                <input type="date" id="date-from" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                            </div>
-                            <div>
-                                <label for="date-to" style="display: block; margin-bottom: 5px; font-weight: bold;"><?php echo esc_html(help_plugin_translate('end_date')); ?></label>
-                                <input type="date" id="date-to" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                            </div>
-                            <div style="align-self: flex-end;">
-                                <button type="button" id="load-statistics" class="button button-primary" style="padding: 8px 20px;">
-                                    <?php echo esc_html(help_plugin_translate('load_statistics')); ?>
-                                </button>
-                            </div>
+                </div>
+                
+                <!-- Date Selection -->
+                <div style="margin: 30px 0;">
+                    <h3><?php echo esc_html(help_plugin_translate('select_period')); ?></h3>
+                    <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; margin: 20px 0;">
+                        <div>
+                            <label for="date-from" style="display: block; margin-bottom: 5px; font-weight: bold;"><?php echo esc_html(help_plugin_translate('start_date')); ?></label>
+                            <input type="date" id="date-from" value="<?php echo esc_attr($today); ?>" style="padding: 8px 12px; border: 1px solid #8c8f94; border-radius: 4px; font-size: 14px;">
+                        </div>
+                        <div>
+                            <label for="date-to" style="display: block; margin-bottom: 5px; font-weight: bold;"><?php echo esc_html(help_plugin_translate('end_date')); ?></label>
+                            <input type="date" id="date-to" value="<?php echo esc_attr($today); ?>" style="padding: 8px 12px; border: 1px solid #8c8f94; border-radius: 4px; font-size: 14px;">
+                        </div>
+                        <div>
+                            <button type="button" id="load-statistics" class="button button-primary" style="padding: 8px 20px; height: 38px;">
+                                <?php echo esc_html(help_plugin_translate('load_statistics')); ?>
+                            </button>
                         </div>
                     </div>
-                    
-                    <div style="margin: 30px 0;">
-                        <h3><?php echo esc_html(help_plugin_translate('interactions_chart')); ?></h3>
-                        <div style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
-                            <canvas id="interactions-chart" style="max-height: 400px;"></canvas>
+                </div>
+                
+                <!-- Chart -->
+                <div style="margin: 30px 0;">
+                    <h3><?php echo esc_html(help_plugin_translate('interactions_chart')); ?></h3>
+                    <div style="background: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-radius: 5px; margin-top: 15px;">
+                        <canvas id="interactions-chart" style="max-height: 400px;"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Calendar Heatmap -->
+                <div style="margin: 30px 0;">
+                    <h3><?php echo esc_html(help_plugin_translate('calendar_heatmap', 'Interaction Calendar')); ?></h3>
+                    <p style="margin-bottom: 15px; color: #646970;"><?php echo esc_html(help_plugin_translate('calendar_description', 'Visualize user interactions over the past year. Darker colors indicate more interactions.')); ?></p>
+                    <div id="calendar-heatmap" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 5px; overflow-x: auto;">
+                        <div id="calendar-container"></div>
+                        <div style="margin-top: 15px; display: flex; align-items: center; gap: 10px; font-size: 12px; color: #646970;">
+                            <span><?php echo esc_html(help_plugin_translate('less', 'Less')); ?></span>
+                            <div style="display: flex; gap: 3px;">
+                                <div style="width: 12px; height: 12px; background: #ebedf0; border: 1px solid #ddd; border-radius: 2px;"></div>
+                                <div style="width: 12px; height: 12px; background: #c6e48b; border: 1px solid #ddd; border-radius: 2px;"></div>
+                                <div style="width: 12px; height: 12px; background: #7bc96f; border: 1px solid #ddd; border-radius: 2px;"></div>
+                                <div style="width: 12px; height: 12px; background: #239a3b; border: 1px solid #ddd; border-radius: 2px;"></div>
+                                <div style="width: 12px; height: 12px; background: #196127; border: 1px solid #ddd; border-radius: 2px;"></div>
+                            </div>
+                            <span><?php echo esc_html(help_plugin_translate('more', 'More')); ?></span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <script type="text/javascript">
+        var helpPluginStats = {
+            ajaxUrl: <?php echo json_encode($ajax_url); ?>,
+            nonce: <?php echo json_encode($nonce); ?>,
+            loadStatisticsText: <?php echo json_encode(help_plugin_translate('load_statistics')); ?>,
+            loadingText: <?php echo json_encode(help_plugin_translate('loading', 'Loading...')); ?>,
+            selectDatesText: <?php echo json_encode(help_plugin_translate('select_dates', 'Please select start and end dates.')); ?>,
+            invalidDateRangeText: <?php echo json_encode(help_plugin_translate('invalid_date_range', 'Start date must be before end date.')); ?>,
+            errorLoadingText: <?php echo json_encode(help_plugin_translate('error_loading_statistics', 'Error loading statistics: ')); ?>,
+            errorConnectingText: <?php echo json_encode(help_plugin_translate('error_connecting_server', 'Error connecting to server. Please try again.')); ?>
+        };
+        </script>
         <?php
     }
     
@@ -1356,37 +1524,37 @@ class Help_Plugin {
      * AJAX handler to get statistics
      */
     public function ajax_get_statistics() {
-        // Check permissions
         if (!current_user_can('manage_options')) {
             wp_send_json_error(array('message' => help_plugin_translate('no_permission', 'No permission.')));
             return;
         }
         
-        // Verify nonce
         check_ajax_referer('help-plugin-statistics', 'nonce');
         
         global $wpdb;
         $table_name = $wpdb->prefix . 'help_plugin_interactions';
         
-        // Ensure table exists
         $this->create_interactions_table();
         
-        $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : '';
-        $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : '';
+        $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : current_time('Y-m-d');
+        $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : current_time('Y-m-d');
         
-        // If no dates, use default period
-        if (empty($date_from) || empty($date_to)) {
-            $date_to = current_time('Y-m-d');
-            $date_from = date('Y-m-d', strtotime('-30 days'));
-        }
+        // Debug log
+        error_log("Help Plugin: ajax_get_statistics called - date_from: {$date_from}, date_to: {$date_to}");
         
-        // Get statistics by period
+        // Get statistics
         $stats_1day = $this->get_interactions_count(1);
         $stats_7days = $this->get_interactions_count(7);
         $stats_30days = $this->get_interactions_count(30);
         
-        // Get detailed data for chart
+        // Get chart data
         $chart_data = $this->get_chart_data($date_from, $date_to);
+        
+        // Get calendar data
+        $calendar_data = $this->get_calendar_data();
+        
+        // Debug log response
+        error_log("Help Plugin: Sending response - 1day: {$stats_1day}, 7days: {$stats_7days}, 30days: {$stats_30days}, chart_labels: " . count($chart_data['labels']));
         
         wp_send_json_success(array(
             'summary' => array(
@@ -1394,25 +1562,37 @@ class Help_Plugin {
                 '7days' => $stats_7days,
                 '30days' => $stats_30days
             ),
-            'chart' => $chart_data
+            'chart' => $chart_data,
+            'calendar' => $calendar_data
         ));
     }
     
     /**
-     * Get interaction count by days
+     * Get interaction count by days (unique sessions)
      */
     private function get_interactions_count($days) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'help_plugin_interactions';
         
-        $date = date('Y-m-d H:i:s', strtotime("-{$days} days"));
+        $this->create_interactions_table();
         
-        $count = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(DISTINCT session_id) FROM $table_name WHERE interaction_date >= %s",
-            $date
-        ));
+        // Calculate date from (X days ago at 00:00:00)
+        $date_from = date('Y-m-d 00:00:00', strtotime("-{$days} days", current_time('timestamp')));
         
-        return intval($count);
+        // Use esc_sql for table name
+        $table_name_escaped = esc_sql($table_name);
+        
+        $query = $wpdb->prepare(
+            "SELECT COUNT(DISTINCT session_id) FROM `{$table_name_escaped}` WHERE interaction_date >= %s",
+            $date_from
+        );
+        
+        $count = $wpdb->get_var($query);
+        
+        // Debug log
+        error_log("Help Plugin: get_interactions_count({$days}) - date_from: {$date_from}, count: " . ($count ? $count : 0));
+        
+        return intval($count ? $count : 0);
     }
     
     /**
@@ -1422,42 +1602,104 @@ class Help_Plugin {
         global $wpdb;
         $table_name = $wpdb->prefix . 'help_plugin_interactions';
         
-        $results = $wpdb->get_results($wpdb->prepare(
+        $this->create_interactions_table();
+        
+        $date_from_formatted = date('Y-m-d', strtotime($date_from));
+        $date_to_formatted = date('Y-m-d', strtotime($date_to));
+        $date_from_start = $date_from_formatted . ' 00:00:00';
+        $date_to_end = $date_to_formatted . ' 23:59:59';
+        
+        // Use esc_sql for table name
+        $table_name_escaped = esc_sql($table_name);
+        
+        $query = $wpdb->prepare(
             "SELECT DATE(interaction_date) as date, COUNT(DISTINCT session_id) as count 
-            FROM $table_name 
-            WHERE DATE(interaction_date) >= %s AND DATE(interaction_date) <= %s 
+            FROM `{$table_name_escaped}` 
+            WHERE interaction_date >= %s AND interaction_date <= %s 
             GROUP BY DATE(interaction_date) 
             ORDER BY date ASC",
-            $date_from,
-            $date_to
-        ));
+            $date_from_start,
+            $date_to_end
+        );
+        
+        $results = $wpdb->get_results($query);
+        
+        // Debug log
+        error_log("Help Plugin: get_chart_data - date_from: {$date_from_start}, date_to: {$date_to_end}, results: " . (is_array($results) ? count($results) : 0));
         
         $labels = array();
         $data = array();
         
-        // Create complete array of dates in period
-        $start = new DateTime($date_from);
-        $end = new DateTime($date_to);
-        $interval = new DateInterval('P1D');
-        $period = new DatePeriod($start, $interval, $end->modify('+1 day'));
-        
-        // Create results map
+        // Create map of results
         $results_map = array();
-        foreach ($results as $result) {
-            $results_map[$result->date] = intval($result->count);
+        if ($results && is_array($results)) {
+            foreach ($results as $result) {
+                if (isset($result->date) && isset($result->count)) {
+                    $results_map[$result->date] = intval($result->count);
+                    error_log("Help Plugin: Chart data - date: {$result->date}, count: {$result->count}");
+                }
+            }
         }
         
-        // Fill labels and data
-        foreach ($period as $date) {
-            $date_str = $date->format('Y-m-d');
-            $labels[] = $date->format('d/m');
-            $data[] = isset($results_map[$date_str]) ? $results_map[$date_str] : 0;
+        // Fill all dates in period
+        try {
+            $start = new DateTime($date_from_formatted);
+            $end = new DateTime($date_to_formatted);
+            $interval = new DateInterval('P1D');
+            $end->modify('+1 day');
+            $period = new DatePeriod($start, $interval, $end);
+            
+            foreach ($period as $date) {
+                $date_str = $date->format('Y-m-d');
+                $labels[] = $date->format('d/m');
+                $data[] = isset($results_map[$date_str]) ? $results_map[$date_str] : 0;
+            }
+        } catch (Exception $e) {
+            error_log("Help Plugin: Error in get_chart_data - " . $e->getMessage());
+            return array('labels' => array(), 'data' => array());
         }
         
-        return array(
-            'labels' => $labels,
-            'data' => $data
+        return array('labels' => $labels, 'data' => $data);
+    }
+    
+    /**
+     * Get calendar heatmap data (last 365 days)
+     */
+    private function get_calendar_data() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'help_plugin_interactions';
+        
+        $this->create_interactions_table();
+        
+        $date_from = date('Y-m-d 00:00:00', strtotime('-365 days', current_time('timestamp')));
+        
+        // Use esc_sql for table name
+        $table_name_escaped = esc_sql($table_name);
+        
+        $query = $wpdb->prepare(
+            "SELECT DATE(interaction_date) as date, COUNT(DISTINCT session_id) as count 
+            FROM `{$table_name_escaped}` 
+            WHERE interaction_date >= %s 
+            GROUP BY DATE(interaction_date) 
+            ORDER BY date ASC",
+            $date_from
         );
+        
+        $results = $wpdb->get_results($query);
+        
+        // Debug log
+        error_log("Help Plugin: get_calendar_data - date_from: {$date_from}, results: " . (is_array($results) ? count($results) : 0));
+        
+        $calendar_map = array();
+        if ($results && is_array($results)) {
+            foreach ($results as $result) {
+                if (isset($result->date) && isset($result->count)) {
+                    $calendar_map[$result->date] = intval($result->count);
+                }
+            }
+        }
+        
+        return $calendar_map;
     }
 }
 
@@ -1468,9 +1710,10 @@ function help_plugin_init() {
     return Help_Plugin::get_instance();
 }
 
-// Register activation and deactivation hooks
+// Register activation, deactivation and uninstall hooks
 register_activation_hook(__FILE__, array('Help_Plugin', 'activate'));
 register_deactivation_hook(__FILE__, array('Help_Plugin', 'deactivate'));
+register_uninstall_hook(__FILE__, array('Help_Plugin', 'uninstall'));
 
 // Initialize the plugin
 help_plugin_init();
