@@ -48,7 +48,7 @@ class BooChat_Connect_License {
      *
      * @var string
      */
-    private $api_url = 'https://boopixel.com/api/boochat-connect/license/';
+    private $api_url = 'https://chat.boopixel.com/api/v1/license/';
     
     /**
      * API key option name
@@ -97,7 +97,8 @@ class BooChat_Connect_License {
         $status = get_option($this->license_status_option, 'invalid');
         $expires = get_option($this->license_expires_option, 0);
         
-        // Verifica se está ativa e não expirada
+        // Check if status is valid (not invalid, expired, or pending)
+        // Pending means license key received but not yet activated
         if ($status === 'valid' && $expires > time()) {
             return true;
         }
@@ -126,6 +127,9 @@ class BooChat_Connect_License {
     /**
      * Activate license
      *
+     * Endpoint: POST /api/v1/license/activate (Public)
+     * No API Key required - validated by license_key + site_url.
+     *
      * @param string $license_key License key to activate.
      * @return array Response array with success status and message.
      */
@@ -137,17 +141,35 @@ class BooChat_Connect_License {
             );
         }
         
-        $response = wp_remote_post($this->get_api_url() . 'activate', array(
+        $api_url = $this->get_api_url() . 'activate';
+        $request_body = array(
+            'license_key' => sanitize_text_field($license_key),
+            'site_url' => esc_url_raw(home_url()),
+            'plugin_version' => BOOCHAT_CONNECT_VERSION
+        );
+        
+        // No API Key required - endpoint validates by license_key + site_url
+        $headers = array(
+            'Content-Type' => 'application/json'
+            // No X-API-Key header - endpoint is public
+        );
+        
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [activate] Request URL: ' . $api_url);
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [activate] Request Body: ' . wp_json_encode($request_body));
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [activate] Headers: ' . wp_json_encode($headers));
+        
+        $response = wp_remote_post($api_url, array(
             'timeout' => 30,
-            'headers' => $this->get_api_headers(),
-            'body' => wp_json_encode(array(
-                'license_key' => sanitize_text_field($license_key),
-                'site_url' => esc_url_raw(home_url()),
-                'plugin_version' => BOOCHAT_CONNECT_VERSION
-            ))
+            'headers' => $headers,
+            'body' => wp_json_encode($request_body)
         ));
         
         if (is_wp_error($response)) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+            error_log('[BooChat Connect] [activate] WP Error: ' . $response->get_error_message());
             return array(
                 'success' => false,
                 'message' => esc_html__('Connection error. Please try again later.', 'boochat-connect')
@@ -155,20 +177,38 @@ class BooChat_Connect_License {
         }
         
         $response_code = wp_remote_retrieve_response_code($response);
+        $response_body = wp_remote_retrieve_body($response);
+        $data = json_decode($response_body, true);
+        
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [activate] Response Code: ' . $response_code);
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [activate] Response Body: ' . $response_body);
+        
         if ($response_code !== 200) {
+            $error_message = esc_html__('Server error. Please try again later.', 'boochat-connect');
+            if (isset($data['detail'])) {
+                $error_message = esc_html($data['detail']);
+            } elseif (isset($data['message'])) {
+                $error_message = esc_html($data['message']);
+            }
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+            error_log('[BooChat Connect] [activate] Error: ' . $error_message);
             return array(
                 'success' => false,
-                'message' => esc_html__('Server error. Please try again later.', 'boochat-connect')
+                'message' => $error_message
             );
         }
         
-        $data = json_decode(wp_remote_retrieve_body($response), true);
-        
         if (isset($data['success']) && $data['success'] === true) {
+            // Save license data
             update_option($this->license_key_option, sanitize_text_field($license_key));
             update_option($this->license_status_option, 'valid');
             update_option($this->license_expires_option, isset($data['expires']) ? intval($data['expires']) : (time() + YEAR_IN_SECONDS));
             update_option($this->license_last_check_option, time());
+            
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+            error_log('[BooChat Connect] [activate] Success: License activated');
             
             return array(
                 'success' => true,
@@ -176,6 +216,8 @@ class BooChat_Connect_License {
             );
         }
         
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [activate] Error: Invalid response - success not true');
         return array(
             'success' => false,
             'message' => isset($data['message']) ? esc_html($data['message']) : esc_html__('Invalid license key.', 'boochat-connect')
@@ -184,6 +226,9 @@ class BooChat_Connect_License {
     
     /**
      * Verify license periodically
+     *
+     * Endpoint: POST /api/v1/license/verify (Public)
+     * No API Key required - validated by license_key + site_url.
      *
      * @return bool True if license is valid.
      */
@@ -195,7 +240,10 @@ class BooChat_Connect_License {
         
         $response = wp_remote_post($this->get_api_url() . 'verify', array(
             'timeout' => 30,
-            'headers' => $this->get_api_headers(),
+            'headers' => array(
+                'Content-Type' => 'application/json'
+                // No X-API-Key header - endpoint is public
+            ),
             'body' => wp_json_encode(array(
                 'license_key' => sanitize_text_field($license_key),
                 'site_url' => esc_url_raw(home_url())
@@ -229,6 +277,9 @@ class BooChat_Connect_License {
     /**
      * Deactivate license
      *
+     * Endpoint: POST /api/v1/license/deactivate (Public)
+     * No API Key required - validated by license_key + site_url.
+     *
      * @return array Response array with success status and message.
      */
     public function deactivate_license() {
@@ -242,25 +293,36 @@ class BooChat_Connect_License {
         
         $response = wp_remote_post($this->get_api_url() . 'deactivate', array(
             'timeout' => 30,
-            'headers' => $this->get_api_headers(),
+            'headers' => array(
+                'Content-Type' => 'application/json'
+                // No X-API-Key header - endpoint is public
+            ),
             'body' => wp_json_encode(array(
                 'license_key' => sanitize_text_field($license_key),
                 'site_url' => esc_url_raw(home_url())
             ))
         ));
         
-        if (is_wp_error($response)) {
-            return array(
-                'success' => false,
-                'message' => esc_html__('Connection error. Please try again later.', 'boochat-connect')
-            );
-        }
-        
         // Remove license data regardless of API response
         delete_option($this->license_key_option);
         delete_option($this->license_status_option);
         delete_option($this->license_expires_option);
         delete_option($this->license_last_check_option);
+        
+        if (is_wp_error($response)) {
+            return array(
+                'success' => true,
+                'message' => esc_html__('License deactivated locally. API connection error.', 'boochat-connect')
+            );
+        }
+        
+        $response_code = wp_remote_retrieve_response_code($response);
+        if ($response_code !== 200) {
+            return array(
+                'success' => true,
+                'message' => esc_html__('License deactivated locally.', 'boochat-connect')
+            );
+        }
         
         return array(
             'success' => true,
@@ -271,33 +333,43 @@ class BooChat_Connect_License {
     /**
      * Request checkout URL from API
      *
+     * Endpoint: POST /api/v1/license/create-checkout (Public)
+     * Creates a Stripe checkout session. No authentication required.
      * The API will create the Stripe checkout session using its own credentials.
-     * This endpoint is public (no authentication required) to allow users to
-     * initiate checkout before having a license token.
      *
      * @return array Response with checkout URL and session ID.
      */
     public function request_checkout_url() {
+        $api_url = $this->get_api_url() . 'create-checkout';
         $return_url = admin_url('admin.php?page=boochat-connect-pro&payment=success&session_id={CHECKOUT_SESSION_ID}');
         $cancel_url = admin_url('admin.php?page=boochat-connect-pro&payment=cancel');
         
-        // Checkout endpoint is public - no API key required
+        $request_body = array(
+            'site_url' => esc_url_raw(home_url()),
+            'plugin_version' => BOOCHAT_CONNECT_VERSION,
+            'return_url' => $return_url,
+            'cancel_url' => $cancel_url
+        );
+        
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [create-checkout] Request URL: ' . $api_url);
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [create-checkout] Request Body: ' . wp_json_encode($request_body));
+        
+        // Endpoint is public - no API key required
         // This allows users to pay before receiving their license token
-        $response = wp_remote_post($this->get_api_url() . 'create-checkout', array(
+        $response = wp_remote_post($api_url, array(
             'timeout' => 30,
             'headers' => array(
                 'Content-Type' => 'application/json'
                 // No X-API-Key header - endpoint is public
             ),
-            'body' => wp_json_encode(array(
-                'site_url' => esc_url_raw(home_url()),
-                'plugin_version' => BOOCHAT_CONNECT_VERSION,
-                'return_url' => $return_url,
-                'cancel_url' => $cancel_url
-            ))
+            'body' => wp_json_encode($request_body)
         ));
         
         if (is_wp_error($response)) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+            error_log('[BooChat Connect] [create-checkout] WP Error: ' . $response->get_error_message());
             return array(
                 'success' => false,
                 'message' => esc_html__('Connection error. Please try again later.', 'boochat-connect')
@@ -305,18 +377,32 @@ class BooChat_Connect_License {
         }
         
         $response_code = wp_remote_retrieve_response_code($response);
+        $response_body = wp_remote_retrieve_body($response);
+        $data = json_decode($response_body, true);
+        
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [create-checkout] Response Code: ' . $response_code);
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [create-checkout] Response Body: ' . $response_body);
+        
         if ($response_code !== 200) {
-            $error_data = json_decode(wp_remote_retrieve_body($response), true);
-            $error_message = isset($error_data['detail']) ? $error_data['detail'] : esc_html__('Server error. Please try again later.', 'boochat-connect');
+            $error_message = esc_html__('Server error. Please try again later.', 'boochat-connect');
+            if (isset($data['detail'])) {
+                $error_message = esc_html($data['detail']);
+            } elseif (isset($data['message'])) {
+                $error_message = esc_html($data['message']);
+            }
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+            error_log('[BooChat Connect] [create-checkout] Error: ' . $error_message);
             return array(
                 'success' => false,
                 'message' => $error_message
             );
         }
         
-        $data = json_decode(wp_remote_retrieve_body($response), true);
-        
         if (isset($data['checkout_url']) && isset($data['session_id'])) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+            error_log('[BooChat Connect] [create-checkout] Success: Checkout URL received');
             return array(
                 'success' => true,
                 'checkout_url' => esc_url_raw($data['checkout_url']),
@@ -324,6 +410,8 @@ class BooChat_Connect_License {
             );
         }
         
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [create-checkout] Error: Invalid response structure');
         return array(
             'success' => false,
             'message' => esc_html__('Invalid response from server.', 'boochat-connect')
@@ -333,12 +421,13 @@ class BooChat_Connect_License {
     /**
      * Verify payment and activate license after checkout
      *
-     * This is called when user returns from checkout.
-     * The API handles the Stripe webhook and generates the license automatically.
-     * This method just checks if license was generated and activates it.
-     * 
-     * This endpoint validates by session_id + site_url (no token required)
-     * since user may not have received their token yet.
+     * Endpoint: POST /api/v1/license/check-payment (Public)
+     * Checks payment status and retrieves license_key if payment was successful.
+     * Then activates the license using /api/v1/license/activate (Authenticated).
+     *
+     * Flow:
+     * 1. Call check-payment to get license_key
+     * 2. If license_key is returned, call activate with X-API-Key
      *
      * @param string $session_id Stripe checkout session ID.
      * @return array Response with success status and license key.
@@ -351,21 +440,31 @@ class BooChat_Connect_License {
             );
         }
         
-        // Check payment status with API
-        // Endpoint validates by session_id + site_url (public endpoint)
-        $response = wp_remote_post($this->get_api_url() . 'check-payment', array(
+        // Step 1: Check payment status (public endpoint)
+        // Endpoint validates by session_id + site_url (no API key required)
+        $api_url = $this->get_api_url() . 'check-payment';
+        $request_body = array(
+            'session_id' => sanitize_text_field($session_id),
+            'site_url' => esc_url_raw(home_url())
+        );
+        
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [check-payment] Request URL: ' . $api_url);
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [check-payment] Request Body: ' . wp_json_encode($request_body));
+        
+        $response = wp_remote_post($api_url, array(
             'timeout' => 30,
             'headers' => array(
                 'Content-Type' => 'application/json'
                 // No X-API-Key - validated by session_id + site_url
             ),
-            'body' => wp_json_encode(array(
-                'session_id' => sanitize_text_field($session_id),
-                'site_url' => esc_url_raw(home_url())
-            ))
+            'body' => wp_json_encode($request_body)
         ));
         
         if (is_wp_error($response)) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+            error_log('[BooChat Connect] [check-payment] WP Error: ' . $response->get_error_message());
             return array(
                 'success' => false,
                 'message' => esc_html__('Connection error. Please try again later.', 'boochat-connect')
@@ -373,30 +472,31 @@ class BooChat_Connect_License {
         }
         
         $response_code = wp_remote_retrieve_response_code($response);
+        $response_body = wp_remote_retrieve_body($response);
+        $data = json_decode($response_body, true);
+        
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [check-payment] Response Code: ' . $response_code);
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [check-payment] Response Body: ' . $response_body);
+        
+        // Handle non-200 responses
         if ($response_code !== 200) {
+            $error_message = esc_html__('Payment verification failed.', 'boochat-connect');
+            if (isset($data['detail'])) {
+                $error_message = esc_html($data['detail']);
+            } elseif (isset($data['message'])) {
+                $error_message = esc_html($data['message']);
+            }
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+            error_log('[BooChat Connect] [check-payment] Error: ' . $error_message);
             return array(
                 'success' => false,
-                'message' => esc_html__('Payment verification failed.', 'boochat-connect')
+                'message' => $error_message
             );
         }
         
-        $data = json_decode(wp_remote_retrieve_body($response), true);
-        
-        // If payment is successful and license was generated
-        if (isset($data['success']) && $data['success'] === true && isset($data['license_key'])) {
-            // Auto-activate the license
-            $activation = $this->activate_license($data['license_key']);
-            if ($activation['success']) {
-                return array(
-                    'success' => true,
-                    'license_key' => $data['license_key'],
-                    'message' => esc_html__('Payment successful! License activated automatically.', 'boochat-connect')
-                );
-            }
-            return $activation;
-        }
-        
-        // Payment might still be processing
+        // Check if payment is still processing
         if (isset($data['status']) && $data['status'] === 'processing') {
             return array(
                 'success' => false,
@@ -404,10 +504,66 @@ class BooChat_Connect_License {
             );
         }
         
+        // Check if payment failed
+        if (isset($data['status']) && $data['status'] === 'failed') {
+            $error_message = isset($data['message']) ? esc_html($data['message']) : esc_html__('Payment was not completed.', 'boochat-connect');
+            return array(
+                'success' => false,
+                'message' => $error_message
+            );
+        }
+        
+        // Step 2: If payment successful and license_key is returned, activate it automatically
+        if (isset($data['success']) && $data['success'] === true && isset($data['license_key'])) {
+            $license_key = sanitize_text_field($data['license_key']);
+            
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+            error_log('[BooChat Connect] [check-payment] License key received: ' . $license_key);
+            
+            // Save license key first (even if activation fails)
+            update_option($this->license_key_option, $license_key);
+            
+            // Save basic status info even before activation attempt
+            // This ensures we have the license key stored even if activation fails
+            update_option($this->license_last_check_option, time());
+            
+            // Always try to activate automatically (even if API key is not configured)
+            // This ensures we attempt activation immediately upon return from Stripe
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+            error_log('[BooChat Connect] [verify_payment_and_activate] Attempting to activate license...');
+            $activation = $this->activate_license($license_key);
+            
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+            error_log('[BooChat Connect] [verify_payment_and_activate] Activation result: ' . wp_json_encode($activation));
+            
+            if ($activation['success']) {
+                // Activation successful - status and expires are already saved by activate_license()
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+                error_log('[BooChat Connect] [verify_payment_and_activate] License activated successfully');
+                return array(
+                    'success' => true,
+                    'license_key' => $license_key,
+                    'message' => esc_html__('Payment successful! License activated automatically.', 'boochat-connect')
+                );
+            }
+            
+            // Activation failed (but license_key is already saved)
+            // Set status to invalid if activation failed
+            update_option($this->license_status_option, 'invalid');
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+            error_log('[BooChat Connect] [verify_payment_and_activate] Activation failed - status set to invalid');
+            return $activation;
+        }
+        
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [check-payment] No license_key in response');
+        
+        // No license_key in response
         return array(
             'success' => false,
-            'message' => isset($data['message']) ? esc_html($data['message']) : esc_html__('Payment was not completed.', 'boochat-connect')
+            'message' => isset($data['message']) ? esc_html($data['message']) : esc_html__('License key not found. Payment may still be processing.', 'boochat-connect')
         );
     }
 }
+
 
