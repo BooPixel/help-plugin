@@ -270,7 +270,15 @@ This table is automatically created on first use.
 
 ## Version
 
-Current version: **1.0.42**
+Current version: **1.0.45**
+
+### Recent Updates (1.0.45)
+- Code refactoring and optimization
+- Improved admin panel design with better information structure
+- Enhanced statistics dashboard
+- Better code organization and modular structure
+- WordPress coding standards compliance
+- Performance improvements
 
 ## Support
 
