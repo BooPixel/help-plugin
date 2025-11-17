@@ -18,8 +18,23 @@
     background: #fff;
     border: 1px solid #ccd0d4;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    padding: 24px;
+    margin-bottom: 0;
+    border-radius: 8px;
+    transition: box-shadow 0.2s ease;
+}
+
+.boochat-connect-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.boochat-connect-card-hero {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 1px solid #dcdcde;
+}
+
+.boochat-connect-status-card {
     padding: 20px;
-    margin-bottom: 20px;
 }
 
 .boochat-connect-card h2 {
