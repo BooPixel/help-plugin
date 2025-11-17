@@ -49,6 +49,13 @@ class BooChat_Connect_Statistics {
      * Render statistics page
      */
     public function render_page() {
+        // Check PRO license before rendering
+        $license = new BooChat_Connect_License();
+        if (!$license->is_pro()) {
+            wp_safe_redirect(admin_url('admin.php?page=boochat-connect-pro'));
+            exit;
+        }
+        
         $ajax_url = admin_url('admin-ajax.php');
         $nonce = wp_create_nonce('boochat-connect-statistics');
         $today = current_time('Y-m-d');
