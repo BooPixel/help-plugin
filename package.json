@@ -1,6 +1,6 @@
 {
   "name": "boochat-connect",
-  "version": "1.0.83",
+  "version": "1.0.137",
   "description": "AI Chatbot with n8n Automation - Connect your WordPress site to n8n workflows for intelligent customer service chat automation.",
   "scripts": {
     "build": "./build.sh",
