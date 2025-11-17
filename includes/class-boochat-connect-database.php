@@ -227,6 +227,209 @@ class BooChat_Connect_Database {
     }
     
     /**
+     * Get conversation history
+     *
+     * @param string $date_from Start date (Y-m-d).
+     * @param string $date_to   End date (Y-m-d).
+     * @param int    $limit     Number of conversations to return.
+     * @param int    $offset    Offset for pagination.
+     * @return array Conversations grouped by session_id.
+     */
+    public function get_conversations($date_from = '', $date_to = '', $limit = 50, $offset = 0) {
+        global $wpdb;
+        
+        $table_name = $this->get_table_name();
+        $this->create_table();
+        
+        $table_name_escaped = esc_sql($table_name);
+        
+        // Build WHERE clause
+        $where_clauses = array();
+        $where_values = array();
+        
+        if (!empty($date_from)) {
+            $where_clauses[] = "interaction_date >= %s";
+            $where_values[] = $date_from . ' 00:00:00';
+        }
+        
+        if (!empty($date_to)) {
+            $where_clauses[] = "interaction_date <= %s";
+            $where_values[] = $date_to . ' 23:59:59';
+        }
+        
+        $where_sql = !empty($where_clauses) ? 'WHERE ' . implode(' AND ', $where_clauses) : '';
+        
+        // Get unique sessions with message count
+        $sessions_query = "SELECT 
+                session_id,
+                MIN(interaction_date) as first_interaction,
+                MAX(interaction_date) as last_interaction,
+                COUNT(*) as message_count
+            FROM `{$table_name_escaped}`
+            {$where_sql}
+            GROUP BY session_id
+            ORDER BY last_interaction DESC
+            LIMIT %d OFFSET %d";
+        
+        // Prepare query with proper placeholders
+        $query_params = $where_values;
+        $query_params[] = $limit;
+        $query_params[] = $offset;
+        
+        $sessions_query_prepared = $wpdb->prepare($sessions_query, $query_params);
+        
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics
+        $sessions = $wpdb->get_results($sessions_query_prepared);
+        
+        if (empty($sessions)) {
+            return array();
+        }
+        
+        // Get session IDs
+        $session_ids = array_map(function($s) {
+            return $s->session_id;
+        }, $sessions);
+        
+        // Get all messages for these sessions
+        if (empty($session_ids)) {
+            return array();
+        }
+        
+        $session_ids_escaped = array_map('esc_sql', $session_ids);
+        $session_ids_placeholders = "'" . implode("','", $session_ids_escaped) . "'";
+        $messages_query = "SELECT 
+                id,
+                session_id,
+                message,
+                message_type,
+                interaction_date
+            FROM `{$table_name_escaped}`
+            WHERE session_id IN ({$session_ids_placeholders})
+            ORDER BY interaction_date ASC";
+        
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics, session IDs are escaped
+        $messages = $wpdb->get_results($messages_query);
+        
+        // Group messages by session
+        $conversations = array();
+        foreach ($sessions as $session) {
+            $conversations[] = array(
+                'session_id' => $session->session_id,
+                'first_interaction' => $session->first_interaction,
+                'last_interaction' => $session->last_interaction,
+                'message_count' => intval($session->message_count),
+                'messages' => array()
+            );
+        }
+        
+        // Add messages to conversations
+        foreach ($messages as $message) {
+            foreach ($conversations as &$conversation) {
+                if ($conversation['session_id'] === $message->session_id) {
+                    $conversation['messages'][] = array(
+                        'id' => intval($message->id),
+                        'message' => $message->message,
+                        'message_type' => $message->message_type,
+                        'interaction_date' => $message->interaction_date
+                    );
+                    break;
+                }
+            }
+        }
+        
+        return $conversations;
+    }
+    
+    /**
+     * Get total conversations count
+     *
+     * @param string $date_from Start date (Y-m-d).
+     * @param string $date_to   End date (Y-m-d).
+     * @return int Total count.
+     */
+    public function get_conversations_count($date_from = '', $date_to = '') {
+        global $wpdb;
+        
+        $table_name = $this->get_table_name();
+        $this->create_table();
+        
+        $table_name_escaped = esc_sql($table_name);
+        
+        // Build WHERE clause
+        $where_clauses = array();
+        $where_values = array();
+        
+        if (!empty($date_from)) {
+            $where_clauses[] = "interaction_date >= %s";
+            $where_values[] = $date_from . ' 00:00:00';
+        }
+        
+        if (!empty($date_to)) {
+            $where_clauses[] = "interaction_date <= %s";
+            $where_values[] = $date_to . ' 23:59:59';
+        }
+        
+        $where_sql = !empty($where_clauses) ? 'WHERE ' . implode(' AND ', $where_clauses) : '';
+        
+        $query = "SELECT COUNT(DISTINCT session_id) as total 
+            FROM `{$table_name_escaped}`
+            {$where_sql}";
+        
+        if (!empty($where_values)) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics
+            $result = $wpdb->get_var($wpdb->prepare($query, $where_values));
+        } else {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics
+            $result = $wpdb->get_var($query);
+        }
+        
+        return intval($result);
+    }
+    
+    /**
+     * Get messages for a specific session
+     *
+     * @param string $session_id Session ID.
+     * @return array Messages array.
+     */
+    public function get_session_messages($session_id) {
+        global $wpdb;
+        
+        $table_name = $this->get_table_name();
+        $this->create_table();
+        
+        $table_name_escaped = esc_sql($table_name);
+        $session_id_escaped = esc_sql($session_id);
+        
+        $query = "SELECT 
+                id,
+                session_id,
+                message,
+                message_type,
+                interaction_date
+            FROM `{$table_name_escaped}`
+            WHERE session_id = %s
+            ORDER BY interaction_date ASC";
+        
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics
+        $messages = $wpdb->get_results($wpdb->prepare($query, $session_id_escaped));
+        
+        $result = array();
+        if ($messages && is_array($messages)) {
+            foreach ($messages as $message) {
+                $result[] = array(
+                    'id' => intval($message->id),
+                    'message' => $message->message,
+                    'message_type' => $message->message_type,
+                    'interaction_date' => $message->interaction_date
+                );
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
      * Drop table (for uninstall)
      */
     public function drop_table() {
