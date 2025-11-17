@@ -4,8 +4,8 @@
     let chart = null;
     
     function initStatistics() {
-        if (typeof helpPluginStats === 'undefined') {
-            console.error('helpPluginStats is not defined');
+        if (typeof boochatConnectStats === 'undefined') {
+            console.error('Statistics configuration not found');
             return;
         }
         
@@ -25,7 +25,7 @@
     }
     
     function loadStatistics() {
-        if (typeof helpPluginStats === 'undefined') {
+        if (typeof boochatConnectStats === 'undefined') {
             alert('Error: Statistics configuration not loaded. Please refresh the page.');
             return;
         }
@@ -34,24 +34,24 @@
         const dateTo = $('#date-to').val();
         
         if (!dateFrom || !dateTo) {
-            alert(helpPluginStats.selectDatesText || 'Please select start and end dates.');
+            alert(boochatConnectStats.selectDatesText || 'Please select start and end dates.');
             return;
         }
         
         if (new Date(dateFrom) > new Date(dateTo)) {
-            alert(helpPluginStats.invalidDateRangeText || 'Start date must be before end date.');
+            alert(boochatConnectStats.invalidDateRangeText || 'Start date must be before end date.');
             return;
         }
         
         const $button = $('#load-statistics');
-        $button.prop('disabled', true).text(helpPluginStats.loadingText || 'Loading...');
+        $button.prop('disabled', true).text(boochatConnectStats.loadingText || 'Loading...');
         
         $.ajax({
-            url: helpPluginStats.ajaxUrl,
+            url: boochatConnectStats.ajaxUrl,
             type: 'POST',
             data: {
-                action: 'help_plugin_get_statistics',
-                nonce: helpPluginStats.nonce,
+                action: 'boochat_connect_get_statistics',
+                nonce: boochatConnectStats.nonce,
                 date_from: dateFrom,
                 date_to: dateTo
             },
@@ -72,14 +72,14 @@
                         updateCalendar(response.data.calendar);
                     }
                 } else {
-                    alert(helpPluginStats.errorLoadingText + (response.data.message || ''));
+                    alert(boochatConnectStats.errorLoadingText + (response.data.message || ''));
                 }
             },
             error: function() {
-                alert(helpPluginStats.errorConnectingText);
+                alert(boochatConnectStats.errorConnectingText);
             },
             complete: function() {
-                $button.prop('disabled', false).text(helpPluginStats.loadStatisticsText);
+                $button.prop('disabled', false).text(boochatConnectStats.loadStatisticsText);
             }
         });
     }
@@ -249,7 +249,7 @@
             return;
         }
         
-        if (typeof helpPluginStats === 'undefined') {
+        if (typeof boochatConnectStats === 'undefined') {
             setTimeout(waitForChartAndInit, 100);
             return;
         }

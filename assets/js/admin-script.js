@@ -1,5 +1,5 @@
 /**
- * Scripts for Help Plugin admin page
+ * Scripts for BooChat Connect admin page
  */
 
 (function($) {
@@ -8,10 +8,10 @@
     $(document).ready(function() {
         
         // Action button
-        $('#help-plugin-action-btn').on('click', function(e) {
+        $('#boochat-connect-action-btn').on('click', function(e) {
             e.preventDefault();
             
-            var $message = $('#help-plugin-message');
+            var $message = $('#boochat-connect-message');
             
             // Toggle message visibility
             $message.fadeIn();
@@ -25,4 +25,3 @@
     });
     
 })(jQuery);
-

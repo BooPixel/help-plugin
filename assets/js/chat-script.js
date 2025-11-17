@@ -6,17 +6,17 @@
     'use strict';
     
     $(document).ready(function() {
-        const $popup = $('#help-plugin-popup');
-        const $chatWindow = $('#help-plugin-chat-window');
-        const $chatForm = $('#help-plugin-chat-form');
-        const $chatInput = $('#help-plugin-chat-input');
-        const $chatMessages = $('#help-plugin-chat-messages');
-        const $popupClose = $('.help-plugin-popup-close');
-        const $chatClose = $('.help-plugin-chat-close');
-        const $chatSend = $('.help-plugin-chat-send');
+        const $popup = $('#boochat-connect-popup');
+        const $chatWindow = $('#boochat-connect-chat-window');
+        const $chatForm = $('#boochat-connect-chat-form');
+        const $chatInput = $('#boochat-connect-chat-input');
+        const $chatMessages = $('#boochat-connect-chat-messages');
+        const $popupClose = $('.boochat-connect-popup-close');
+        const $chatClose = $('.boochat-connect-chat-close');
+        const $chatSend = $('.boochat-connect-chat-send');
         
         // Session ID storage key
-        const SESSION_ID_KEY = 'help_plugin_session_id';
+        const SESSION_ID_KEY = 'boochat_connect_session_id';
         
         /**
          * Get or create session ID
@@ -47,7 +47,7 @@
         // Open chat when clicking popup
         $popup.on('click', function(e) {
             // Don't close if clicking the close button
-            if ($(e.target).closest('.help-plugin-popup-close').length) {
+            if ($(e.target).closest('.boochat-connect-popup-close').length) {
                 return;
             }
             
@@ -143,13 +143,17 @@
             
             // Add loading indicator
             const loadingId = 'loading-' + Date.now();
-            addMessage(helpPluginAjax.loadingText, 'system', loadingId);
+            if (typeof boochatConnectAjax !== 'undefined') {
+                addMessage(boochatConnectAjax.loadingText, 'system', loadingId);
+            } else {
+                addMessage('Aguardando resposta...', 'system', loadingId);
+            }
             
             // Get session ID
             const sessionId = getSessionId();
             
-            // Check if helpPluginAjax is defined
-            if (typeof helpPluginAjax === 'undefined') {
+            // Check if AJAX object is defined
+            if (typeof boochatConnectAjax === 'undefined') {
                 $('#' + loadingId).remove();
                 addMessage('Erro: Configuração do plugin não encontrada. Recarregue a página.', 'system');
                 setFormDisabled(false);
@@ -158,11 +162,11 @@
             
             // Send AJAX request to WordPress, which will call the API
             $.ajax({
-                url: helpPluginAjax.ajaxUrl,
+                url: boochatConnectAjax.ajaxUrl,
                 type: 'POST',
                 data: {
-                    action: 'help_plugin_send_message',
-                    nonce: helpPluginAjax.nonce,
+                    action: 'boochat_connect_send_message',
+                    nonce: boochatConnectAjax.nonce,
                     sessionId: sessionId,
                     chatInput: userMessage
                 },
@@ -183,7 +187,7 @@
                         // Show error message
                         const errorMsg = response.data && response.data.message 
                             ? response.data.message 
-                            : helpPluginAjax.errorText;
+                            : (boochatConnectAjax.errorText || 'Erro ao enviar mensagem');
                         addMessage(errorMsg, 'system');
                     }
                 },
@@ -192,7 +196,7 @@
                     $('#' + loadingId).remove();
                     
                     // Show error message
-                    let errorMsg = helpPluginAjax.errorText;
+                    let errorMsg = boochatConnectAjax.errorText || 'Erro ao enviar mensagem';
                     if (xhr.responseText) {
                         try {
                             const errorResponse = JSON.parse(xhr.responseText);
@@ -231,10 +235,10 @@
          * Add message to chat
          */
         function addMessage(text, type, id) {
-            const messageClass = 'help-plugin-chat-message-' + type;
+            const messageClass = 'boochat-connect-chat-message-' + type;
             const idAttr = id ? ' id="' + escapeHtml(id) + '"' : '';
             const formattedText = formatMessage(text);
-            const messageHTML = '<div class="help-plugin-chat-message ' + messageClass + '"' + idAttr + '><p>' + formattedText + '</p></div>';
+            const messageHTML = '<div class="boochat-connect-chat-message ' + messageClass + '"' + idAttr + '><p>' + formattedText + '</p></div>';
             $chatMessages.append(messageHTML);
             scrollToBottom();
         }
@@ -258,7 +262,7 @@
             formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
             
             // Convert bullet points (* item) to list items
-            formatted = formatted.replace(/^\* (.+?)$/gm, '<span class="help-plugin-bullet">• $1</span>');
+            formatted = formatted.replace(/^\* (.+?)$/gm, '<span class="boochat-connect-bullet">• $1</span>');
             
             return formatted;
         }
@@ -267,7 +271,7 @@
          * Scroll to bottom of chat
          */
         function scrollToBottom() {
-            const $chatBody = $('.help-plugin-chat-body');
+            const $chatBody = $('.boochat-connect-chat-body');
             $chatBody.scrollTop($chatBody[0].scrollHeight);
         }
         
@@ -288,8 +292,8 @@
         // Close chat when clicking outside (optional)
         $(document).on('click', function(e) {
             if ($chatWindow.hasClass('open') && 
-                !$(e.target).closest('#help-plugin-chat-window').length &&
-                !$(e.target).closest('#help-plugin-popup').length) {
+                !$(e.target).closest('#boochat-connect-chat-window').length &&
+                !$(e.target).closest('#boochat-connect-popup').length) {
                 // Uncomment below if you want chat to close when clicking outside
                 // closeChat();
             }
