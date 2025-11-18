@@ -3,7 +3,7 @@
  * Plugin Name: BooChat Connect
  * Plugin URI: https://boopixel.com/boochat-connect
  * Description: AI Chatbot & n8n Automation - Modern, lightweight chatbot popup that integrates seamlessly with n8n. Automate workflows, respond in real-time, collect leads, and connect to any AI model or external service. Perfect for 24/7 AI support, sales automation, and smart customer interactions.
- * Version: 1.0.137
+ * Version: 1.0.217
  * Author: BooPixel
  * Author URI: https://boopixel.com
  * License: GPLv2 or later
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define constants
-define('BOOCHAT_CONNECT_VERSION', '1.0.137');
+define('BOOCHAT_CONNECT_VERSION', '1.0.217');
 define('BOOCHAT_CONNECT_DIR', plugin_dir_path(__FILE__));
 define('BOOCHAT_CONNECT_URL', plugin_dir_url(__FILE__));
 
