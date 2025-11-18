@@ -1,4 +1,5 @@
 *.zip
 .DS_Store
 __MACOSX/
-.pro
+.pro*.mo
+messages.mo
