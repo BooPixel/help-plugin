@@ -6,6 +6,11 @@
 
 .boochat-connect-header {
     margin-bottom: 30px;
+    position: relative;
+}
+
+.boochat-connect-header .boochat-connect-status-icon {
+    display: none !important;
 }
 
 .boochat-connect-header h1 {
@@ -76,37 +81,58 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
+    position: relative;
+    isolation: isolate;
 }
 
 .boochat-connect-status-card {
     padding: 20px;
+    position: relative;
+    overflow: visible;
+    isolation: isolate;
 }
 
-.boochat-connect-status-card > div:first-child {
+.boochat-connect-status-card-content {
     display: flex;
     align-items: center;
     gap: 12px;
+    width: 100%;
+    position: relative;
 }
 
 .boochat-connect-status-card.has-button {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
 }
 
-.boochat-connect-status-card.has-button > div:first-child {
-    margin-bottom: 10px;
+.boochat-connect-status-card.has-button .boochat-connect-status-card-content {
+    width: 100%;
+    margin-bottom: 0;
 }
 
 .boochat-connect-status-icon {
-    width: 40px;
-    height: 40px;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
     border-radius: 8px;
-    display: flex;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
     color: white;
     font-size: 20px;
+    flex-shrink: 0;
+    position: relative !important;
+    line-height: 1;
+    vertical-align: middle;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    float: none !important;
 }
 
 .boochat-connect-status-icon.success {
@@ -173,6 +199,17 @@
     color: #1d2327;
 }
 
+.boochat-connect-getting-started-content h3 a {
+    color: #1d2327;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.boochat-connect-getting-started-content h3 a:hover {
+    color: #2271b1;
+    text-decoration: underline;
+}
+
 .boochat-connect-getting-started-content p {
     margin: 0;
     color: #646970;
@@ -222,6 +259,17 @@
     color: #1d2327;
     font-size: 14px;
     line-height: 1.6;
+}
+
+.boochat-connect-doc-link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: rgba(0, 0, 0, 0.3);
+    transition: text-decoration-color 0.2s ease;
+}
+
+.boochat-connect-doc-link:hover {
+    text-decoration-color: rgba(0, 0, 0, 0.6);
 }
 
 .boochat-connect-sidebar {

@@ -16,8 +16,8 @@ if (!defined('ABSPATH')) {
     <div class="boochat-connect-header">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
         <p>
-            <?php echo esc_html__('Version', 'boochat-connect'); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
-            <?php echo esc_html__('AI Chatbot & n8n Automation', 'boochat-connect'); ?>
+            <?php echo esc_html(boochat_connect_translate('version', 'Version')); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
+            <?php echo esc_html(boochat_connect_translate('ai_chatbot_automation', 'AI Chatbot & n8n Automation')); ?>
         </p>
     </div>
     
@@ -44,10 +44,12 @@ if (!defined('ABSPATH')) {
             <!-- Quick Status Cards -->
             <div class="boochat-connect-status-cards">
                 <div class="boochat-connect-card boochat-connect-status-card <?php echo !$api_configured ? 'has-button' : ''; ?>">
-                    <div class="boochat-connect-status-card">
-                        <div class="boochat-connect-status-icon <?php echo $api_configured ? 'success' : 'error'; ?>">
-                            <?php echo $api_configured ? '✓' : '✗'; ?>
-                        </div>
+                    <div class="boochat-connect-status-card-content">
+                        <?php if ($api_configured): ?>
+                            <div class="boochat-connect-status-icon success">
+                                ✓
+                            </div>
+                        <?php endif; ?>
                         <div class="boochat-connect-status-info">
                             <h3><?php echo esc_html__('API Status', 'boochat-connect'); ?></h3>
                             <p>
@@ -63,7 +65,7 @@ if (!defined('ABSPATH')) {
                 </div>
                 
                 <div class="boochat-connect-card boochat-connect-status-card">
-                    <div class="boochat-connect-status-card">
+                    <div class="boochat-connect-status-card-content">
                         <div class="boochat-connect-status-icon success">
                             ✓
                         </div>
@@ -84,7 +86,11 @@ if (!defined('ABSPATH')) {
                     <div class="boochat-connect-getting-started-item">
                         <div class="boochat-connect-getting-started-number">1</div>
                         <div class="boochat-connect-getting-started-content">
-                            <h3><?php echo esc_html__('Configure API URL', 'boochat-connect'); ?></h3>
+                            <h3>
+                                <a href="<?php echo esc_url(admin_url('admin.php?page=boochat-connect-settings')); ?>">
+                                    <?php echo esc_html__('Configure API URL', 'boochat-connect'); ?>
+                                </a>
+                            </h3>
                             <p>
                                 <?php echo esc_html__('Go to Settings and configure your n8n webhook URL or external API endpoint.', 'boochat-connect'); ?>
                             </p>
@@ -93,7 +99,11 @@ if (!defined('ABSPATH')) {
                     <div class="boochat-connect-getting-started-item">
                         <div class="boochat-connect-getting-started-number">2</div>
                         <div class="boochat-connect-getting-started-content">
-                            <h3><?php echo esc_html__('Customize Appearance', 'boochat-connect'); ?></h3>
+                            <h3>
+                                <a href="<?php echo esc_url(admin_url('admin.php?page=boochat-connect-customization')); ?>">
+                                    <?php echo esc_html__('Customize Appearance', 'boochat-connect'); ?>
+                                </a>
+                            </h3>
                             <p>
                                 <?php echo esc_html__('Personalize colors, fonts, welcome message, and chat name to match your brand.', 'boochat-connect'); ?>
                             </p>
@@ -102,7 +112,11 @@ if (!defined('ABSPATH')) {
                     <div class="boochat-connect-getting-started-item">
                         <div class="boochat-connect-getting-started-number">3</div>
                         <div class="boochat-connect-getting-started-content">
-                            <h3><?php echo esc_html__('Test the Chat', 'boochat-connect'); ?></h3>
+                            <h3>
+                                <a href="<?php echo esc_url(home_url()); ?>" target="_blank" rel="noopener noreferrer">
+                                    <?php echo esc_html__('Test the Chat', 'boochat-connect'); ?>
+                                </a>
+                            </h3>
                             <p>
                                 <?php echo esc_html__('Visit your website frontend and test the chat integration.', 'boochat-connect'); ?>
                             </p>
@@ -111,7 +125,11 @@ if (!defined('ABSPATH')) {
                     <div class="boochat-connect-getting-started-item">
                         <div class="boochat-connect-getting-started-number">4</div>
                         <div class="boochat-connect-getting-started-content">
-                            <h3><?php echo esc_html__('Monitor Statistics', 'boochat-connect'); ?></h3>
+                            <h3>
+                                <a href="<?php echo esc_url(admin_url('admin.php?page=boochat-connect-statistics')); ?>">
+                                    <?php echo esc_html__('Monitor Statistics', 'boochat-connect'); ?>
+                                </a>
+                            </h3>
                             <p>
                                 <?php echo esc_html__('Track user interactions and analyze chat usage over time.', 'boochat-connect'); ?>
                             </p>
@@ -146,7 +164,18 @@ if (!defined('ABSPATH')) {
                 <div class="boochat-connect-info-box">
                     <p>
                         <strong><?php echo esc_html__('n8n Integration:', 'boochat-connect'); ?></strong>
-                        <?php echo esc_html__('Create a webhook node in n8n and use the webhook URL as your API URL. The webhook will receive chat messages for processing in your n8n workflow.', 'boochat-connect'); ?>
+                        <?php
+                        $boochat_connect_link_url = 'https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-langchain.chattrigger/';
+                        $boochat_connect_link_text = esc_html__('chat trigger node', 'boochat-connect');
+                        $boochat_connect_link_open = '<a href="' . esc_url($boochat_connect_link_url) . '" target="_blank" rel="noopener noreferrer" class="boochat-connect-doc-link">';
+                        $boochat_connect_link_close = '</a>';
+                        printf(
+                            /* translators: %1$s: opening link tag, %2$s: closing link tag */
+                            esc_html__('Create a %1$schat trigger node%2$s in n8n and use the webhook URL as your API URL. The webhook will receive chat messages for processing in your n8n workflow.', 'boochat-connect'),
+                            wp_kses_post($boochat_connect_link_open),
+                            wp_kses_post($boochat_connect_link_close)
+                        );
+                        ?>
                     </p>
                 </div>
             </div>
