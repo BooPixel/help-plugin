@@ -52,8 +52,8 @@ class BooChat_Connect_Settings {
         return array(
             'chat_name' => get_option('boochat_connect_chat_name', boochat_connect_translate('chat_name_default')),
             'welcome_message' => get_option('boochat_connect_welcome_message', boochat_connect_translate('welcome_message_default')),
-            'primary_color' => get_option('boochat_connect_primary_color', '#667eea'),
-            'secondary_color' => get_option('boochat_connect_secondary_color', '#764ba2'),
+            'primary_color' => get_option('boochat_connect_primary_color', '#1B8EF0'),
+            'secondary_color' => get_option('boochat_connect_secondary_color', '#1B5D98'),
             'chat_bg_color' => get_option('boochat_connect_chat_bg_color', '#ffffff'),
             'text_color' => get_option('boochat_connect_text_color', '#333333'),
             'font_family' => get_option('boochat_connect_font_family', 'Arial, sans-serif'),
