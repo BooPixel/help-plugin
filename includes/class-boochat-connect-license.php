@@ -91,19 +91,33 @@ class BooChat_Connect_License {
     /**
      * Check if user has PRO license
      *
+     * Always validates with API (with cache to avoid excessive requests).
+     *
+     * @param bool $force_check Force API check even if cache is valid.
      * @return bool True if PRO license is active and valid.
      */
-    public function is_pro() {
-        $status = get_option($this->license_status_option, 'invalid');
-        $expires = get_option($this->license_expires_option, 0);
-        
-        // Check if status is valid (not invalid, expired, or pending)
-        // Pending means license key received but not yet activated
-        if ($status === 'valid' && $expires > time()) {
-            return true;
+    public function is_pro($force_check = false) {
+        $license_key = get_option($this->license_key_option, '');
+        if (empty($license_key)) {
+            return false;
         }
         
-        return false;
+        // Use transient cache to avoid excessive API calls (cache for 1 hour)
+        $cache_key = 'boochat_connect_pro_status';
+        $cached_status = get_transient($cache_key);
+        
+        // If we have a valid cache and not forcing check, return cached value
+        if (!$force_check && $cached_status !== false) {
+            return (bool) $cached_status;
+        }
+        
+        // Verify license with API
+        $is_valid = $this->verify_license();
+        
+        // Cache the result for 1 hour
+        set_transient($cache_key, $is_valid ? 1 : 0, HOUR_IN_SECONDS);
+        
+        return $is_valid;
     }
     
     /**
@@ -207,6 +221,9 @@ class BooChat_Connect_License {
             update_option($this->license_expires_option, isset($data['expires']) ? intval($data['expires']) : (time() + YEAR_IN_SECONDS));
             update_option($this->license_last_check_option, time());
             
+            // Clear cache to force fresh API check on next is_pro() call
+            delete_transient('boochat_connect_pro_status');
+            
             // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
             error_log('[BooChat Connect] [activate] Success: License activated');
             
@@ -225,7 +242,7 @@ class BooChat_Connect_License {
     }
     
     /**
-     * Verify license periodically
+     * Verify license with API
      *
      * Endpoint: POST /api/v1/license/verify (Public)
      * No API Key required - validated by license_key + site_url.
@@ -235,43 +252,81 @@ class BooChat_Connect_License {
     public function verify_license() {
         $license_key = get_option($this->license_key_option);
         if (empty($license_key)) {
+            // Clear status if no license key
+            update_option($this->license_status_option, 'invalid');
             return false;
         }
         
-        $response = wp_remote_post($this->get_api_url() . 'verify', array(
-            'timeout' => 30,
+        $api_url = $this->get_api_url() . 'verify';
+        $request_body = array(
+            'license_key' => sanitize_text_field($license_key),
+            'site_url' => esc_url_raw(home_url())
+        );
+        
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [verify] Request URL: ' . $api_url);
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [verify] Request Body: ' . wp_json_encode($request_body));
+        
+        $response = wp_remote_post($api_url, array(
+            'timeout' => 15,
             'headers' => array(
                 'Content-Type' => 'application/json'
                 // No X-API-Key header - endpoint is public
             ),
-            'body' => wp_json_encode(array(
-                'license_key' => sanitize_text_field($license_key),
-                'site_url' => esc_url_raw(home_url())
-            ))
+            'body' => wp_json_encode($request_body)
         ));
         
         if (is_wp_error($response)) {
-            return false;
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+            error_log('[BooChat Connect] [verify] WP Error: ' . $response->get_error_message());
+            // On connection error, return cached status if available, otherwise false
+            $cached_status = get_option($this->license_status_option, 'invalid');
+            return ($cached_status === 'valid' && get_option($this->license_expires_option, 0) > time());
         }
         
         $response_code = wp_remote_retrieve_response_code($response);
+        $response_body = wp_remote_retrieve_body($response);
+        $data = json_decode($response_body, true);
+        
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [verify] Response Code: ' . $response_code);
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [verify] Response Body: ' . $response_body);
+        
         if ($response_code !== 200) {
-            return false;
+            // On API error, return cached status if available, otherwise false
+            $cached_status = get_option($this->license_status_option, 'invalid');
+            return ($cached_status === 'valid' && get_option($this->license_expires_option, 0) > time());
         }
         
-        $data = json_decode(wp_remote_retrieve_body($response), true);
-        
         if (isset($data['status'])) {
-            update_option($this->license_status_option, sanitize_text_field($data['status']));
+            $status = sanitize_text_field($data['status']);
+            update_option($this->license_status_option, $status);
+            
             if (isset($data['expires'])) {
                 update_option($this->license_expires_option, intval($data['expires']));
             }
+            
             update_option($this->license_last_check_option, time());
             
-            return $data['status'] === 'valid';
+            $is_valid = ($status === 'valid' && get_option($this->license_expires_option, 0) > time());
+            
+            // Update cache with new status
+            set_transient('boochat_connect_pro_status', $is_valid ? 1 : 0, HOUR_IN_SECONDS);
+            
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+            error_log('[BooChat Connect] [verify] License status: ' . $status . ' (valid: ' . ($is_valid ? 'yes' : 'no') . ')');
+            
+            return $is_valid;
         }
         
-        return false;
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for API requests
+        error_log('[BooChat Connect] [verify] Invalid response - no status field');
+        
+        // On invalid response, return cached status if available, otherwise false
+        $cached_status = get_option($this->license_status_option, 'invalid');
+        return ($cached_status === 'valid' && get_option($this->license_expires_option, 0) > time());
     }
     
     /**
@@ -308,6 +363,9 @@ class BooChat_Connect_License {
         delete_option($this->license_status_option);
         delete_option($this->license_expires_option);
         delete_option($this->license_last_check_option);
+        
+        // Clear cache
+        delete_transient('boochat_connect_pro_status');
         
         if (is_wp_error($response)) {
             return array(
@@ -526,6 +584,9 @@ class BooChat_Connect_License {
             // Save basic status info even before activation attempt
             // This ensures we have the license key stored even if activation fails
             update_option($this->license_last_check_option, time());
+            
+            // Clear cache to force fresh API check
+            delete_transient('boochat_connect_pro_status');
             
             // Always try to activate automatically (even if API key is not configured)
             // This ensures we attempt activation immediately upon return from Stripe
