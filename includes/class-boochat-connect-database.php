@@ -241,9 +241,10 @@ class BooChat_Connect_Database {
         $query_params[] = $limit;
         $query_params[] = $offset;
         
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Table name cannot be a placeholder, but query is prepared with placeholders for all user input
         $sessions_query_prepared = $wpdb->prepare($sessions_query, $query_params);
         
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Query is already prepared with $wpdb->prepare() above, all user input is sanitized and escaped, required for custom plugin table statistics
         $sessions = $wpdb->get_results($sessions_query_prepared);
         
         if (empty($sessions)) {
@@ -272,7 +273,7 @@ class BooChat_Connect_Database {
             WHERE session_id IN ({$session_ids_placeholders})
             ORDER BY interaction_date ASC";
         
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics, session IDs are escaped
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Required for custom plugin table statistics, session IDs are escaped with esc_sql(), table name is escaped
         $messages = $wpdb->get_results($messages_query);
         
         // Group messages by session
@@ -341,10 +342,10 @@ class BooChat_Connect_Database {
             {$where_sql}";
         
         if (!empty($where_values)) {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Query is prepared with $wpdb->prepare() and placeholders, all user input is sanitized, required for custom plugin table statistics
             $result = $wpdb->get_var($wpdb->prepare($query, $where_values));
         } else {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- No user input in query, table name is escaped, required for custom plugin table statistics
             $result = $wpdb->get_var($query);
         }
         

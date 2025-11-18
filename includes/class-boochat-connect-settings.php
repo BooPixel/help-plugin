@@ -50,6 +50,7 @@ class BooChat_Connect_Settings {
         $language = $this->get_effective_language();
         
         return array(
+            'chat_icon' => get_option('boochat_connect_chat_icon', ''),
             'chat_name' => get_option('boochat_connect_chat_name', boochat_connect_translate('chat_name_default')),
             'welcome_message' => get_option('boochat_connect_welcome_message', boochat_connect_translate('welcome_message_default')),
             'primary_color' => get_option('boochat_connect_primary_color', '#1B8EF0'),

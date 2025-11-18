@@ -55,6 +55,7 @@ class BooChat_Connect_Ajax {
         add_action('wp_ajax_boochat_connect_get_session_messages', array($this, 'ajax_get_session_messages'));
         add_action('wp_ajax_boochat_connect_get_sessions', array($this, 'ajax_get_sessions'));
         add_action('wp_ajax_boochat_connect_get_session_details', array($this, 'ajax_get_session_details'));
+        add_action('wp_ajax_boochat_connect_export_session', array($this, 'ajax_export_session'));
     }
     
     /**
@@ -296,6 +297,95 @@ class BooChat_Connect_Ajax {
         wp_send_json_success(array(
             'messages' => $messages,
             'session_id' => $session_id
+        ));
+    }
+    
+    /**
+     * Export session data in JSON or CSV format
+     */
+    public function ajax_export_session() {
+        check_ajax_referer('boochat-connect-sessions', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'boochat-connect')));
+            return;
+        }
+        
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        $session_id = isset($_POST['session_id']) ? sanitize_text_field(wp_unslash($_POST['session_id'])) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        $format = isset($_POST['format']) ? sanitize_text_field(wp_unslash($_POST['format'])) : 'json';
+        
+        if (empty($session_id)) {
+            wp_send_json_error(array('message' => esc_html__('Session ID is required.', 'boochat-connect')));
+            return;
+        }
+        
+        if (!in_array($format, array('json', 'csv'), true)) {
+            wp_send_json_error(array('message' => esc_html__('Invalid format.', 'boochat-connect')));
+            return;
+        }
+        
+        $messages = $this->database->get_session_messages($session_id);
+        
+        if (empty($messages)) {
+            wp_send_json_error(array('message' => esc_html__('No messages found for this session.', 'boochat-connect')));
+            return;
+        }
+        
+        // Prepare session data
+        $session_data = array(
+            'session_id' => $session_id,
+            'export_date' => current_time('mysql'),
+            'total_messages' => count($messages),
+            'messages' => $messages
+        );
+        
+        if ($format === 'json') {
+            $content = wp_json_encode($session_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            $filename = 'session-' . substr($session_id, 0, 20) . '-' . gmdate('Y-m-d') . '.json';
+            $mime_type = 'application/json';
+        } else {
+            // CSV format
+            $csv_content = array();
+            
+            // Add header
+            $csv_content[] = array('Session ID', 'Message ID', 'Type', 'Message', 'Date');
+            
+            // Add messages
+            foreach ($messages as $message) {
+                $csv_content[] = array(
+                    $session_id,
+                    $message['id'],
+                    $message['message_type'],
+                    $message['message'],
+                    $message['interaction_date']
+                );
+            }
+            
+            // Convert to CSV string
+            $content = '';
+            foreach ($csv_content as $row) {
+                $escaped_row = array();
+                foreach ($row as $field) {
+                    // Escape quotes and wrap in quotes if contains comma, newline, or quote
+                    $field = str_replace('"', '""', $field);
+                    if (strpos($field, ',') !== false || strpos($field, "\n") !== false || strpos($field, '"') !== false) {
+                        $field = '"' . $field . '"';
+                    }
+                    $escaped_row[] = $field;
+                }
+                $content .= implode(',', $escaped_row) . "\n";
+            }
+            
+            $filename = 'session-' . substr($session_id, 0, 20) . '-' . gmdate('Y-m-d') . '.csv';
+            $mime_type = 'text/csv';
+        }
+        
+        wp_send_json_success(array(
+            'content' => $content,
+            'filename' => $filename,
+            'mime_type' => $mime_type
         ));
     }
 }

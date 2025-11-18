@@ -58,6 +58,9 @@ class BooChat_Connect_Admin {
         
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
+        add_filter('locale', array($this, 'force_plugin_locale'), 999);
+        add_action('admin_init', array($this, 'reload_textdomain'), 1);
+        add_filter('plugin_action_links_' . plugin_basename(BOOCHAT_CONNECT_DIR . 'boochat-connect.php'), array($this, 'add_plugin_action_links'));
         add_action('admin_post_boochat_connect_save_settings', array($this, 'save_settings'));
         add_action('admin_post_boochat_connect_save_customization', array($this, 'save_customization'));
         add_action('admin_post_boochat_connect_activate_license', array($this, 'handle_activate_license'));
@@ -128,21 +131,31 @@ class BooChat_Connect_Admin {
             $statistics_callback
         );
         
-        // Add Sessions page
+        // Add Sessions menu with PRO badge if not licensed
+        $sessions_title = boochat_connect_translate('sessions', 'Sessions');
+        $sessions_menu_title = $sessions_title;
+        $sessions_callback = array($this, 'render_sessions_page');
+        
+        if (!$this->license->is_pro()) {
+            $sessions_menu_title = $sessions_title . ' <span class="boochat-connect-pro-badge">PRO</span>';
+            // Change callback to redirect to PRO page
+            $sessions_callback = array($this, 'redirect_to_pro_page');
+        }
+        
         add_submenu_page(
             'boochat-connect',
-            esc_html__('Sessions', 'boochat-connect'),
-            esc_html__('Sessions', 'boochat-connect'),
+            $sessions_title,
+            $sessions_menu_title,
             'manage_options',
             'boochat-connect-sessions',
-            array($this, 'render_sessions_page')
+            $sessions_callback
         );
         
         // Add PRO upgrade page
         add_submenu_page(
             'boochat-connect',
-            esc_html__('Upgrade to PRO', 'boochat-connect'),
-            esc_html__('Upgrade to PRO', 'boochat-connect'),
+            boochat_connect_translate('upgrade_to_pro', 'Upgrade to PRO'),
+            boochat_connect_translate('upgrade_to_pro', 'Upgrade to PRO'),
             'manage_options',
             'boochat-connect-pro',
             array($this, 'render_pro_upgrade_page')
@@ -224,6 +237,25 @@ class BooChat_Connect_Admin {
                 array('boochat-connect-admin-style'),
                 BOOCHAT_CONNECT_VERSION
             );
+            
+            // Enqueue WordPress media uploader
+            wp_enqueue_media();
+            
+            // Enqueue customization script
+            wp_enqueue_script(
+                'boochat-connect-customization-script',
+                BOOCHAT_CONNECT_URL . 'assets/js/admin-customization.js',
+                array('jquery'),
+                BOOCHAT_CONNECT_VERSION,
+                true
+            );
+            
+            // Localize customization script with translations
+            wp_localize_script('boochat-connect-customization-script', 'boochatConnectCustomization', array(
+                'chooseIcon' => esc_html__('Choose Chat Icon', 'boochat-connect'),
+                'useIcon' => esc_html__('Use this icon', 'boochat-connect'),
+                'removeIcon' => esc_html__('Remove Icon', 'boochat-connect'),
+            ));
         }
         
         // PRO page styles
@@ -248,6 +280,10 @@ class BooChat_Connect_Admin {
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('boochat-connect-stripe'),
                 'proPageUrl' => admin_url('admin.php?page=boochat-connect-pro'),
+                'configurationError' => esc_html__('Configuration Error', 'boochat-connect'),
+                'loading' => esc_html__('Loading...', 'boochat-connect'),
+                'failedCheckout' => esc_html__('Failed to create checkout session. Please try again.', 'boochat-connect'),
+                'errorConnecting' => esc_html__('Error connecting to server. Please try again.', 'boochat-connect'),
             ));
         }
         
@@ -304,12 +340,12 @@ class BooChat_Connect_Admin {
      */
     private function verify_request($nonce_action, $nonce_field) {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('You do not have permission to access this page.', 'boochat-connect'));
+            wp_die(esc_html(boochat_connect_translate('no_permission_page', 'You do not have permission to access this page.')));
             return false;
         }
         
         if (!isset($_POST[$nonce_field]) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST[$nonce_field])), $nonce_action)) {
-            wp_die(esc_html__('Security error. Please try again.', 'boochat-connect'));
+            wp_die(esc_html(boochat_connect_translate('security_error_try_again', 'Security error. Please try again.')));
             return false;
         }
         
@@ -325,6 +361,9 @@ class BooChat_Connect_Admin {
         }
         
         // Save customization settings
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
+        $chat_icon = isset($_POST['chat_icon']) ? esc_url_raw(wp_unslash($_POST['chat_icon'])) : '';
+        update_option('boochat_connect_chat_icon', $chat_icon);
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
         update_option('boochat_connect_chat_name', sanitize_text_field(wp_unslash($_POST['chat_name'] ?? boochat_connect_translate('chat_name_default'))));
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
@@ -393,6 +432,131 @@ class BooChat_Connect_Admin {
     }
     
     /**
+     * Check if current page is a plugin admin page
+     * 
+     * @param bool $check_screen Whether to check current screen (only in admin_init+).
+     * @return bool True if on plugin admin page
+     */
+    private function is_plugin_admin_page($check_screen = true) {
+        if (!is_admin()) {
+            return false;
+        }
+        
+        // Check GET parameter (available early)
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just checking page parameter
+        $current_page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
+        
+        if (!empty($current_page) && strpos($current_page, 'boochat-connect') !== false) {
+            return true;
+        }
+        
+        // Check if we're in an AJAX request for the plugin
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just checking action parameter
+        $ajax_action = isset($_REQUEST['action']) ? sanitize_text_field(wp_unslash($_REQUEST['action'])) : '';
+        if (!empty($ajax_action) && strpos($ajax_action, 'boochat_connect') !== false) {
+            return true;
+        }
+        
+        // Check current screen (only if function exists and check_screen is true)
+        if ($check_screen && function_exists('get_current_screen')) {
+            $screen = get_current_screen();
+            if ($screen && strpos($screen->id, 'boochat-connect') !== false) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Get target locale based on plugin settings
+     * 
+     * @param string $default_locale Default WordPress locale.
+     * @return string Target locale
+     */
+    private function get_target_locale($default_locale = '') {
+        if (empty($default_locale)) {
+            $default_locale = get_locale();
+        }
+        
+        $target_locale = null;
+        
+        // Get configured language from plugin settings
+        $configured_language = get_option('boochat_connect_language', '');
+        
+        if (!empty($configured_language)) {
+            // Use plugin configured language
+            $locale_map = array(
+                'en' => 'en_US',
+                'pt' => 'pt_BR',
+                'es' => 'es_ES',
+            );
+            
+            if (isset($locale_map[$configured_language])) {
+                $target_locale = $locale_map[$configured_language];
+            }
+        } else {
+            // Use WordPress locale, but map to supported locales
+            $language_code = boochat_connect_get_language_from_locale($default_locale);
+            
+            $locale_map = array(
+                'en' => 'en_US',
+                'pt' => 'pt_BR',
+                'es' => 'es_ES',
+            );
+            
+            if (isset($locale_map[$language_code])) {
+                $target_locale = $locale_map[$language_code];
+            } else {
+                // Default to English if locale not supported
+                $target_locale = 'en_US';
+            }
+        }
+        
+        return $target_locale ? $target_locale : $default_locale;
+    }
+    
+    /**
+     * Force plugin locale based on plugin settings or WordPress locale
+     * 
+     * @param string $locale Current WordPress locale.
+     * @return string Modified locale for plugin admin pages.
+     */
+    public function force_plugin_locale($locale) {
+        // Only on plugin admin pages (don't check screen in locale filter - too early)
+        if (!$this->is_plugin_admin_page(false)) {
+            return $locale;
+        }
+        
+        return $this->get_target_locale($locale);
+    }
+    
+    /**
+     * Reload text domain after locale switch
+     */
+    public function reload_textdomain() {
+        if (!$this->is_plugin_admin_page()) {
+            return;
+        }
+        
+        $target_locale = $this->get_target_locale();
+        $current_locale = get_locale();
+        
+        // If locale changed, reload text domain
+        if ($target_locale !== $current_locale && function_exists('switch_to_locale')) {
+            switch_to_locale($target_locale);
+            // Reload text domain with new locale
+            unload_textdomain('boochat-connect');
+            // phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- Required for non-WordPress.org plugins and locale switching
+            load_plugin_textdomain(
+                'boochat-connect',
+                false,
+                dirname(plugin_basename(BOOCHAT_CONNECT_DIR . 'boochat-connect.php')) . '/languages'
+            );
+        }
+    }
+    
+    /**
      * Render admin page (main panel)
      */
     public function render_admin_page() {
@@ -422,11 +586,13 @@ class BooChat_Connect_Admin {
         );
         
         wp_localize_script('boochat-connect-sessions', 'boochatConnectSessions', array(
+            'exportJsonText' => esc_html__('Export JSON', 'boochat-connect'),
+            'exportCsvText' => esc_html__('Export CSV', 'boochat-connect'),
             'ajax_url' => $ajax_url,
             'nonce' => $nonce,
-            'loadingText' => esc_html__('Loading sessions...', 'boochat-connect'),
-            'errorLoadingText' => esc_html__('Error loading sessions: ', 'boochat-connect'),
-            'noSessionsText' => esc_html__('No sessions found.', 'boochat-connect')
+            'loadingText' => boochat_connect_translate('loading_sessions', 'Loading sessions...'),
+            'errorLoadingText' => boochat_connect_translate('error_loading_sessions', 'Error loading sessions: '),
+            'noSessionsText' => boochat_connect_translate('no_sessions_found', 'No sessions found.')
         ));
         
         include BOOCHAT_CONNECT_DIR . 'includes/views/admin-sessions.php';
@@ -566,12 +732,12 @@ class BooChat_Connect_Admin {
     public function ajax_create_stripe_session() {
         // Verify nonce
         if (!isset($_POST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'boochat-connect-stripe')) {
-            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'boochat-connect')));
+            wp_send_json_error(array('message' => boochat_connect_translate('security_check_failed', 'Security check failed.')));
             return;
         }
         
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => esc_html__('No permission.', 'boochat-connect')));
+            wp_send_json_error(array('message' => boochat_connect_translate('no_permission', 'No permission.')));
             return;
         }
         
@@ -584,7 +750,7 @@ class BooChat_Connect_Admin {
             ));
         } else {
             wp_send_json_error(array(
-                'message' => isset($result['message']) ? $result['message'] : esc_html__('Failed to create checkout session.', 'boochat-connect')
+                'message' => isset($result['message']) ? $result['message'] : boochat_connect_translate('failed_checkout_session', 'Failed to create checkout session.')
             ));
         }
     }
@@ -663,6 +829,18 @@ class BooChat_Connect_Admin {
             }
         }
         exit;
+    }
+    
+    /**
+     * Add Settings action link to plugins page
+     *
+     * @param array $links Existing action links.
+     * @return array Modified action links.
+     */
+    public function add_plugin_action_links($links) {
+        $settings_link = '<a href="' . esc_url(admin_url('admin.php?page=boochat-connect-settings')) . '">' . esc_html__('Settings', 'boochat-connect') . '</a>';
+        array_unshift($links, $settings_link);
+        return $links;
     }
 }
 

@@ -59,7 +59,7 @@ class BooChat_Connect_Statistics {
         $ajax_url = admin_url('admin-ajax.php');
         $nonce = wp_create_nonce('boochat-connect-statistics');
         $today = current_time('Y-m-d');
-        $seven_days_ago = date('Y-m-d', strtotime('-7 days', current_time('timestamp')));
+        $seven_days_ago = gmdate('Y-m-d', strtotime('-7 days', current_time('timestamp')));
         
         $this->load_view('admin-statistics', array(
             'ajax_url' => $ajax_url,
