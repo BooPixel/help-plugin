@@ -190,41 +190,6 @@ class BooChat_Connect_Database {
         return array('labels' => $labels, 'data' => $data);
     }
     
-    /**
-     * Get calendar heatmap data (last 365 days)
-     *
-     * @return array Calendar data map
-     */
-    public function get_calendar_data() {
-        global $wpdb;
-        
-        $table_name = $this->get_table_name();
-        $this->create_table();
-        
-        $date_from = gmdate('Y-m-d 00:00:00', strtotime('-365 days', current_time('timestamp')));
-        
-        // Use esc_sql for table name - cannot use prepare() with table names
-        $table_name_escaped = esc_sql($table_name);
-        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is escaped with esc_sql()
-        $query = "SELECT DATE(interaction_date) as date, COUNT(DISTINCT session_id) as count 
-            FROM `{$table_name_escaped}` 
-            WHERE interaction_date >= %s 
-            GROUP BY DATE(interaction_date) 
-            ORDER BY date ASC";
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics, values are prepared correctly
-        $results = $wpdb->get_results($wpdb->prepare($query, $date_from));
-        
-        $calendar_map = array();
-        if ($results && is_array($results)) {
-            foreach ($results as $result) {
-                if (isset($result->date) && isset($result->count)) {
-                    $calendar_map[$result->date] = intval($result->count);
-                }
-            }
-        }
-        
-        return $calendar_map;
-    }
     
     /**
      * Get conversation history
@@ -382,6 +347,74 @@ class BooChat_Connect_Database {
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics
             $result = $wpdb->get_var($query);
         }
+        
+        return intval($result);
+    }
+    
+    /**
+     * Get all sessions with summary information
+     *
+     * @param int $limit  Number of sessions to return.
+     * @param int $offset Offset for pagination.
+     * @return array Sessions array with summary data.
+     */
+    public function get_all_sessions($limit = 50, $offset = 0) {
+        global $wpdb;
+        
+        $table_name = $this->get_table_name();
+        $this->create_table();
+        
+        $table_name_escaped = esc_sql($table_name);
+        
+        $query = "SELECT 
+                session_id,
+                MIN(interaction_date) as first_interaction,
+                MAX(interaction_date) as last_interaction,
+                COUNT(*) as message_count,
+                COUNT(DISTINCT CASE WHEN message_type = 'user' THEN id END) as user_messages,
+                COUNT(DISTINCT CASE WHEN message_type = 'robot' THEN id END) as robot_messages
+            FROM `{$table_name_escaped}`
+            GROUP BY session_id
+            ORDER BY last_interaction DESC
+            LIMIT %d OFFSET %d";
+        
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics
+        $sessions = $wpdb->get_results($wpdb->prepare($query, $limit, $offset));
+        
+        if (empty($sessions)) {
+            return array();
+        }
+        
+        return array_map(function($session) {
+            return array(
+                'session_id' => $session->session_id,
+                'first_interaction' => $session->first_interaction,
+                'last_interaction' => $session->last_interaction,
+                'message_count' => intval($session->message_count),
+                'user_messages' => intval($session->user_messages),
+                'robot_messages' => intval($session->robot_messages)
+            );
+        }, $sessions);
+    }
+    
+    /**
+     * Get total count of sessions
+     *
+     * @return int Total number of sessions.
+     */
+    public function get_sessions_count() {
+        global $wpdb;
+        
+        $table_name = $this->get_table_name();
+        $this->create_table();
+        
+        $table_name_escaped = esc_sql($table_name);
+        
+        $query = "SELECT COUNT(DISTINCT session_id) as total 
+            FROM `{$table_name_escaped}`";
+        
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Required for custom plugin table statistics
+        $result = $wpdb->get_var($query);
         
         return intval($result);
     }

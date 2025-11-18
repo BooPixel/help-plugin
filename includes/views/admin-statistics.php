@@ -3,9 +3,10 @@
  * Admin statistics page template
  *
  * @package BooChat_Connect
- * @var string $ajax_url AJAX URL.
- * @var string $nonce    Nonce for AJAX requests.
- * @var string $today    Today's date in Y-m-d format.
+ * @var string $ajax_url      AJAX URL.
+ * @var string $nonce         Nonce for AJAX requests.
+ * @var string $today         Today's date in Y-m-d format.
+ * @var string $seven_days_ago Date 7 days ago in Y-m-d format.
  */
 
 // Prevent direct access
@@ -25,8 +26,14 @@ if (!$license->is_pro()) {
     exit;
 }
 ?>
-<div class="wrap">
-    <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+<div class="wrap boochat-connect-wrap">
+    <div class="boochat-connect-header">
+        <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+        <p>
+            <?php echo esc_html__('Version', 'boochat-connect'); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
+            <?php echo esc_html__('AI Chatbot & n8n Automation', 'boochat-connect'); ?>
+        </p>
+    </div>
     
     <div class="boochat-connect-statistics-layout">
         <!-- Left Column: Charts and Statistics -->
@@ -62,7 +69,7 @@ if (!$license->is_pro()) {
                     <div class="boochat-connect-statistics-filters">
                         <div class="boochat-connect-statistics-filter-group">
                             <label for="date-from"><?php echo esc_html(boochat_connect_translate('start_date')); ?></label>
-                            <input type="date" id="date-from" value="<?php echo esc_attr($today); ?>">
+                            <input type="date" id="date-from" value="<?php echo esc_attr($seven_days_ago); ?>">
                         </div>
                         <div class="boochat-connect-statistics-filter-group">
                             <label for="date-to"><?php echo esc_html(boochat_connect_translate('end_date')); ?></label>
@@ -84,55 +91,6 @@ if (!$license->is_pro()) {
                     </div>
                 </div>
                 
-                <!-- Calendar Heatmap -->
-                <div class="boochat-connect-statistics-section">
-                    <h3><?php echo esc_html(boochat_connect_translate('calendar_heatmap', 'Interaction Calendar')); ?></h3>
-                    <p class="boochat-connect-calendar-description"><?php echo esc_html(boochat_connect_translate('calendar_description', 'Visualize user interactions over the past year. Darker colors indicate more interactions.')); ?></p>
-                    <div id="calendar-heatmap" class="boochat-connect-calendar-heatmap">
-                        <div id="calendar-container"></div>
-                        <div class="boochat-connect-calendar-legend">
-                            <span><?php echo esc_html(boochat_connect_translate('less', 'Less')); ?></span>
-                            <div class="boochat-connect-calendar-legend-colors">
-                                <div class="boochat-connect-calendar-legend-color level-0"></div>
-                                <div class="boochat-connect-calendar-legend-color level-1"></div>
-                                <div class="boochat-connect-calendar-legend-color level-2"></div>
-                                <div class="boochat-connect-calendar-legend-color level-3"></div>
-                                <div class="boochat-connect-calendar-legend-color level-4"></div>
-                            </div>
-                            <span><?php echo esc_html(boochat_connect_translate('more', 'More')); ?></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Right Column: Conversation History -->
-        <div class="boochat-connect-statistics-right">
-            <div class="boochat-connect-card boochat-connect-statistics-card">
-                <h2><?php echo esc_html(boochat_connect_translate('conversation_history', 'Conversation History')); ?></h2>
-                <p><?php echo esc_html(boochat_connect_translate('conversation_history_description', 'View detailed conversation history between users and the bot.')); ?></p>
-                
-                <!-- Filter for number of users -->
-                <div class="boochat-connect-conversations-filter">
-                    <label for="conversations-per-page" class="boochat-connect-filter-label">
-                        <?php echo esc_html(boochat_connect_translate('show_users', 'Show users:')); ?>
-                    </label>
-                    <select id="conversations-per-page" class="boochat-connect-filter-select">
-                        <option value="5">5</option>
-                        <option value="10" selected>10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                </div>
-                
-                <div id="conversations-container" class="boochat-connect-conversations-container" style="margin-top: 20px;">
-                    <p style="text-align: center; color: #646970; padding: 20px;">
-                        <span class="spinner is-active" style="float: none; margin: 0 10px 0 0;"></span>
-                        <?php echo esc_html(boochat_connect_translate('loading_conversations', 'Loading conversations...')); ?>
-                    </p>
-                </div>
-                
-                <div id="conversations-pagination" class="boochat-connect-conversations-pagination" style="margin-top: 20px; display: none;"></div>
             </div>
         </div>
     </div>

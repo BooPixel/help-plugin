@@ -6,21 +6,16 @@
 
 .boochat-connect-statistics-layout {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 20px;
     margin-top: 20px;
-}
-
-@media (max-width: 1200px) {
-    .boochat-connect-statistics-layout {
-        grid-template-columns: 1fr;
-    }
 }
 
 .boochat-connect-statistics-left {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    width: 100%;
 }
 
 .boochat-connect-statistics-right {
@@ -76,6 +71,11 @@
     margin: 20px 0;
 }
 
+.boochat-connect-statistics-filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
 .boochat-connect-statistics-filter-group label {
     display: block;
     margin-bottom: 5px;
@@ -87,11 +87,14 @@
     border: 1px solid #8c8f94;
     border-radius: 4px;
     font-size: 14px;
+    height: 38px;
+    box-sizing: border-box;
 }
 
 .boochat-connect-statistics-filter-group .button {
     padding: 8px 20px;
     height: 38px;
+    margin-top: 22px;
 }
 
 .boochat-connect-statistics-chart-container {
@@ -106,54 +109,6 @@
     max-height: 400px;
 }
 
-.boochat-connect-calendar-heatmap {
-    background: #fff;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    overflow-x: auto;
-}
-
-.boochat-connect-calendar-legend {
-    margin-top: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 12px;
-    color: #646970;
-}
-
-.boochat-connect-calendar-legend-colors {
-    display: flex;
-    gap: 3px;
-}
-
-.boochat-connect-calendar-legend-color {
-    width: 12px;
-    height: 12px;
-    border: 1px solid #ddd;
-    border-radius: 2px;
-}
-
-.boochat-connect-calendar-legend-color.level-0 {
-    background: #ebedf0;
-}
-
-.boochat-connect-calendar-legend-color.level-1 {
-    background: #c6e48b;
-}
-
-.boochat-connect-calendar-legend-color.level-2 {
-    background: #7bc96f;
-}
-
-.boochat-connect-calendar-legend-color.level-3 {
-    background: #239a3b;
-}
-
-.boochat-connect-calendar-legend-color.level-4 {
-    background: #196127;
-}
 
 /* Conversation History Styles */
 .boochat-connect-conversations-filter {
@@ -378,10 +333,6 @@
     border-radius: 5px;
 }
 
-.boochat-connect-calendar-description {
-    margin-bottom: 15px;
-    color: #646970;
-}
 
 .boochat-connect-statistics-message {
     margin: 15px 0;
