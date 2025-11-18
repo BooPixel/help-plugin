@@ -3,12 +3,15 @@
  * Plugin Name: BooChat Connect
  * Plugin URI: https://boopixel.com/boochat-connect
  * Description: AI Chatbot & n8n Automation - Modern, lightweight chatbot popup that integrates seamlessly with n8n. Automate workflows, respond in real-time, collect leads, and connect to any AI model or external service. Perfect for 24/7 AI support, sales automation, and smart customer interactions.
- * Version: 1.0.217
+ * Version: 1.0.288
  * Author: BooPixel
  * Author URI: https://boopixel.com
+ * Developer: BooPixel
+ * Developer URI: https://boopixel.com
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: boochat-connect
+ * Domain Path: /languages
  * Requires at least: 5.0
  * Tested up to: 6.8
  * Requires PHP: 7.2
@@ -20,7 +23,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define constants
-define('BOOCHAT_CONNECT_VERSION', '1.0.217');
+define('BOOCHAT_CONNECT_VERSION', '1.0.288');
 define('BOOCHAT_CONNECT_DIR', plugin_dir_path(__FILE__));
 define('BOOCHAT_CONNECT_URL', plugin_dir_url(__FILE__));
 
@@ -205,6 +208,19 @@ class BooChat_Connect {
         $this->frontend = new BooChat_Connect_Frontend($this->settings);
     }
 }
+
+/**
+ * Load plugin text domain for translations
+ */
+function boochat_connect_load_textdomain() {
+    // phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- Required for non-WordPress.org plugins
+    load_plugin_textdomain(
+        'boochat-connect',
+        false,
+        dirname(plugin_basename(__FILE__)) . '/languages'
+    );
+}
+add_action('plugins_loaded', 'boochat_connect_load_textdomain');
 
 /**
  * Initialize the plugin

@@ -21,5 +21,5 @@ if (!defined('DB_NAME')) {
 }
 
 // Load plugin
-require_once dirname(__DIR__) . '/help-plugin.php';
+require_once dirname(__DIR__) . '/boochat-connect.php';
 

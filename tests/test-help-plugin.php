@@ -342,7 +342,7 @@ class BooChat_Connect_Test extends TestCase {
         
         // Load plugin file
         if (!class_exists('BooChat_Connect')) {
-            require_once dirname(__DIR__) . '/help-plugin.php';
+            require_once dirname(__DIR__) . '/boochat-connect.php';
         }
         
         // Reset singleton instance

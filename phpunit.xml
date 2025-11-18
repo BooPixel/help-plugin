@@ -15,7 +15,7 @@
     
     <coverage>
         <include>
-            <file>help-plugin.php</file>
+            <file>boochat-connect.php</file>
             <directory>includes</directory>
         </include>
         <exclude>
