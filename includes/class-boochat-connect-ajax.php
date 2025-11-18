@@ -53,6 +53,8 @@ class BooChat_Connect_Ajax {
         add_action('wp_ajax_boochat_connect_get_statistics', array($this, 'get_statistics'));
         add_action('wp_ajax_boochat_connect_get_conversations', array($this, 'ajax_get_conversations'));
         add_action('wp_ajax_boochat_connect_get_session_messages', array($this, 'ajax_get_session_messages'));
+        add_action('wp_ajax_boochat_connect_get_sessions', array($this, 'ajax_get_sessions'));
+        add_action('wp_ajax_boochat_connect_get_session_details', array($this, 'ajax_get_session_details'));
     }
     
     /**
@@ -153,10 +155,42 @@ class BooChat_Connect_Ajax {
             'summary' => array(
                 '1day' => $this->database->get_interactions_count(1),
                 '7days' => $this->database->get_interactions_count(7),
-                '30days' => $this->database->get_interactions_count(30)
+                '30days' => $this->database->get_interactions_count(30),
+                '365days' => $this->database->get_interactions_count(365)
             ),
-            'chart' => $this->database->get_chart_data($date_from, $date_to),
-            'calendar' => $this->database->get_calendar_data()
+            'chart' => $this->database->get_chart_data($date_from, $date_to)
+        ));
+    }
+    
+    /**
+     * Get sessions list AJAX handler
+     *
+     * @return void
+     */
+    public function ajax_get_sessions() {
+        check_ajax_referer('boochat-connect-sessions', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'boochat-connect')));
+            return;
+        }
+        
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        $per_page = isset($_POST['per_page']) ? intval($_POST['per_page']) : 20;
+        
+        $offset = ($page - 1) * $per_page;
+        
+        $sessions = $this->database->get_all_sessions($per_page, $offset);
+        $total = $this->database->get_sessions_count();
+        
+        wp_send_json_success(array(
+            'sessions' => $sessions,
+            'total' => $total,
+            'page' => $page,
+            'per_page' => $per_page,
+            'total_pages' => ceil($total / $per_page)
         ));
     }
     
@@ -233,6 +267,35 @@ class BooChat_Connect_Ajax {
         
         wp_send_json_success(array(
             'messages' => $messages
+        ));
+    }
+    
+    /**
+     * Get session details (messages) for sessions page AJAX handler
+     *
+     * @return void
+     */
+    public function ajax_get_session_details() {
+        check_ajax_referer('boochat-connect-sessions', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'boochat-connect')));
+            return;
+        }
+        
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        $session_id = isset($_POST['session_id']) ? sanitize_text_field(wp_unslash($_POST['session_id'])) : '';
+        
+        if (empty($session_id)) {
+            wp_send_json_error(array('message' => esc_html__('Session ID is required.', 'boochat-connect')));
+            return;
+        }
+        
+        $messages = $this->database->get_session_messages($session_id);
+        
+        wp_send_json_success(array(
+            'messages' => $messages,
+            'session_id' => $session_id
         ));
     }
 }
