@@ -16,8 +16,8 @@ if (!defined('ABSPATH')) {
     <div class="boochat-connect-header">
         <h1><?php echo esc_html(boochat_connect_translate('chat_customization')); ?></h1>
         <p>
-            <?php echo esc_html__('Version', 'boochat-connect'); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
-            <?php echo esc_html__('AI Chatbot & n8n Automation', 'boochat-connect'); ?>
+            <?php echo esc_html(boochat_connect_translate('version', 'Version')); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
+            <?php echo esc_html(boochat_connect_translate('ai_chatbot_automation', 'AI Chatbot & n8n Automation')); ?>
         </p>
     </div>
     
@@ -40,6 +40,43 @@ if (!defined('ABSPATH')) {
                 
                 <table class="form-table">
                     <tbody>
+                        <tr>
+                            <th scope="row">
+                                <label for="chat_icon"><?php echo esc_html(boochat_connect_translate('chat_icon', 'Chat Icon')); ?></label>
+                            </th>
+                            <td>
+                                <?php
+                                $boochat_connect_current_icon = get_option('boochat_connect_chat_icon', '');
+                                ?>
+                                <div class="boochat-connect-icon-upload">
+                                    <input 
+                                        type="hidden" 
+                                        id="chat_icon" 
+                                        name="chat_icon" 
+                                        value="<?php echo esc_attr($boochat_connect_current_icon); ?>"
+                                    >
+                                    <div class="boochat-connect-icon-preview" style="margin-bottom: 10px;">
+                                        <?php if (!empty($boochat_connect_current_icon)): ?>
+                                            <img src="<?php echo esc_url($boochat_connect_current_icon); ?>" alt="<?php echo esc_attr(boochat_connect_translate('chat_icon', 'Chat Icon')); ?>" style="max-width: 48px; max-height: 48px; display: block; margin-bottom: 10px;">
+                                        <?php else: ?>
+                                            <span style="display: block; margin-bottom: 10px; font-size: 24px;">💬</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <button type="button" class="button boochat-connect-upload-icon-button">
+                                        <?php echo esc_html(boochat_connect_translate('upload_icon', 'Upload Icon')); ?>
+                                    </button>
+                                    <?php if (!empty($boochat_connect_current_icon)): ?>
+                                        <button type="button" class="button boochat-connect-remove-icon-button" style="margin-left: 10px;">
+                                            <?php echo esc_html(boochat_connect_translate('remove_icon', 'Remove Icon')); ?>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                                <p class="description">
+                                    <?php echo esc_html(boochat_connect_translate('icon_displayed_header', 'Icon displayed in the chat header. Recommended size: 48x48 pixels.')); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        
                         <tr>
                             <th scope="row">
                                 <label for="chat_name"><?php echo esc_html(boochat_connect_translate('chat_name')); ?></label>

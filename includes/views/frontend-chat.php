@@ -24,7 +24,11 @@ if (!defined('ABSPATH')) {
 <div id="boochat-connect-chat-window" class="boochat-connect-chat-window">
     <div class="boochat-connect-chat-header">
         <div class="boochat-connect-chat-title">
+            <?php if (!empty($settings['chat_icon'])): ?>
+                <img src="<?php echo esc_url($settings['chat_icon']); ?>" alt="<?php echo esc_attr(boochat_connect_translate('chat_icon', 'Chat Icon')); ?>" class="boochat-connect-chat-icon-image">
+            <?php else: ?>
             <span class="boochat-connect-chat-icon">💬</span>
+            <?php endif; ?>
             <span><?php echo esc_html($settings['chat_name']); ?></span>
         </div>
         <button class="boochat-connect-chat-close" aria-label="<?php echo esc_attr(boochat_connect_translate('close_chat')); ?>">&times;</button>
