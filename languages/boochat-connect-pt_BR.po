@@ -1,0 +1,619 @@
+# Copyright (C) 2024 BooPixel
+# This file is distributed under the same license as the BooChat Connect plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: BooChat Connect 1.0.225\n"
+"Report-Msgid-Bugs-To: https://boopixel.com\n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: BooPixel <support@boopixel.com>\n"
+"Language-Team: \n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Main Panel"
+msgstr "Painel Principal"
+
+msgid "Customization"
+msgstr "Customização"
+
+msgid "Settings"
+msgstr "Configurações"
+
+msgid "Statistics"
+msgstr "Estatísticas"
+
+msgid "Close"
+msgstr "Fechar"
+
+msgid "Loading..."
+msgstr "Carregando..."
+
+msgid "Small"
+msgstr "Pequeno"
+
+msgid "Normal"
+msgstr "Normal"
+
+msgid "Medium"
+msgstr "Médio"
+
+msgid "Large"
+msgstr "Grande"
+
+msgid "Extra Large"
+msgstr "Extra Grande"
+
+msgid "Less"
+msgstr "Menos"
+
+msgid "More"
+msgstr "Mais"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Information"
+msgstr "Informações"
+
+msgid "Language"
+msgstr "Idioma"
+
+msgid "Select the plugin language."
+msgstr "Selecione o idioma do plugin."
+
+msgid "Auto (WordPress Language)"
+msgstr "Automático (Idioma do WordPress)"
+
+msgid "Default Settings"
+msgstr "Configurações Padrão"
+
+msgid "Version"
+msgstr "Versão"
+
+msgid "AI Chatbot & n8n Automation"
+msgstr "Chatbot de IA & Automação n8n"
+
+msgid "Support"
+msgstr "Atendimento"
+
+msgid "Hello! How can we help you today?"
+msgstr "Olá! Como podemos ajudar você hoje?"
+
+msgid "Need help?"
+msgstr "Precisa de ajuda?"
+
+msgid "Close chat"
+msgstr "Fechar chat"
+
+msgid "Type your message..."
+msgstr "Digite sua mensagem..."
+
+msgid "Send"
+msgstr "Enviar"
+
+msgid "Waiting for response..."
+msgstr "Aguardando resposta..."
+
+msgid "Error sending message. Please try again."
+msgstr "Erro ao enviar mensagem. Tente novamente."
+
+msgid "API URL not configured. Configure in Help Plugin > Settings."
+msgstr "URL da API não configurada. Configure em Help Plugin > Configurações."
+
+msgid "HTTP %d: %s"
+msgstr "HTTP %d: %s"
+
+msgid "Empty message."
+msgstr "Mensagem vazia."
+
+msgid "Error connecting to the service. Please try again."
+msgstr "Erro ao conectar com o serviço de atendimento. Tente novamente."
+
+msgid "Error processing server response."
+msgstr "Erro ao processar resposta do servidor."
+
+msgid "Customizations saved successfully!"
+msgstr "Customizações salvas com sucesso!"
+
+msgid "Chat Customization"
+msgstr "Customização do Chat"
+
+msgid "Customize colors and typography of the support chat."
+msgstr "Personalize as cores e tipografia do chat de atendimento."
+
+msgid "Save Customizations"
+msgstr "Salvar Customizações"
+
+msgid "Chat Icon"
+msgstr "Ícone do Chat"
+
+msgid "Upload Icon"
+msgstr "Enviar Ícone"
+
+msgid "Remove Icon"
+msgstr "Remover Ícone"
+
+msgid "Icon displayed in the chat header. Recommended size: 48x48 pixels."
+msgstr "Ícone exibido no cabeçalho do chat. Tamanho recomendado: 48x48 pixels."
+
+msgid "Name displayed in chat header."
+msgstr "Nome exibido no header do chat."
+
+msgid "Welcome message displayed when chat is opened."
+msgstr "Mensagem de boas-vindas exibida quando o chat é aberto."
+
+msgid "Primary gradient color (header and buttons)."
+msgstr "Cor principal do gradiente (header e botões)."
+
+msgid "Secondary gradient color."
+msgstr "Cor secundária do gradiente."
+
+msgid "Chat window background color."
+msgstr "Cor de fundo da janela do chat."
+
+msgid "Message text color."
+msgstr "Cor do texto das mensagens."
+
+msgid "Font family for the chat."
+msgstr "Família de fonte para o chat."
+
+msgid "Font size for messages."
+msgstr "Tamanho da fonte das mensagens."
+
+msgid "Text Customization"
+msgstr "Personalização de Texto"
+
+msgid "Color Customization"
+msgstr "Personalização de Cores"
+
+msgid "Customize text and typography settings."
+msgstr "Personalize as configurações de texto e tipografia."
+
+msgid "Customize color and appearance settings."
+msgstr "Personalize as configurações de cores e aparência."
+
+msgid "Chat Name"
+msgstr "Nome do Chat"
+
+msgid "Welcome Message"
+msgstr "Mensagem Inicial"
+
+msgid "Primary Color"
+msgstr "Cor Primária"
+
+msgid "Secondary Color"
+msgstr "Cor Secundária"
+
+msgid "Chat Background Color"
+msgstr "Cor de Fundo do Chat"
+
+msgid "Text Color"
+msgstr "Cor do Texto"
+
+msgid "Font"
+msgstr "Fonte"
+
+msgid "Font Size"
+msgstr "Tamanho da Fonte"
+
+msgid "Settings saved successfully!"
+msgstr "Configurações salvas com sucesso!"
+
+msgid "API Settings"
+msgstr "Configurações da API"
+
+msgid "Configure the customer service API URL."
+msgstr "Configure a URL da API de atendimento ao cliente."
+
+msgid "Save Settings"
+msgstr "Salvar Configurações"
+
+msgid "Complete webhook URL for customer service API."
+msgstr "URL completa do webhook da API de atendimento."
+
+msgid "Configured"
+msgstr "Configurada"
+
+msgid "Not configured"
+msgstr "Não configurada"
+
+msgid "The API URL will be used to process all support chat messages."
+msgstr "A URL da API será usada para processar todas as mensagens do chat de atendimento."
+
+msgid "API URL"
+msgstr "URL da API"
+
+msgid "Interaction Statistics"
+msgstr "Estatísticas de Interações"
+
+msgid "View chat interactions by period."
+msgstr "Visualize as interações do chat por período."
+
+msgid "Quick Summary"
+msgstr "Resumo Rápido"
+
+msgid "Last 24 hours"
+msgstr "Últimas 24 horas"
+
+msgid "Last 7 days"
+msgstr "Últimos 7 dias"
+
+msgid "Last month"
+msgstr "Último mês"
+
+msgid "Last year"
+msgstr "Último ano"
+
+msgid "Select Period"
+msgstr "Selecionar Período"
+
+msgid "Start Date:"
+msgstr "Data Inicial:"
+
+msgid "End Date:"
+msgstr "Data Final:"
+
+msgid "Load Statistics"
+msgstr "Carregar Estatísticas"
+
+msgid "Please select start and end dates."
+msgstr "Por favor, selecione as datas inicial e final."
+
+msgid "Start date must be before end date."
+msgstr "A data inicial deve ser anterior à data final."
+
+msgid "Error loading statistics: "
+msgstr "Erro ao carregar estatísticas: "
+
+msgid "Error connecting to server. Please try again."
+msgstr "Erro ao conectar ao servidor. Tente novamente."
+
+msgid "Interactions Chart"
+msgstr "Gráfico de Interações"
+
+msgid "Interaction Calendar"
+msgstr "Calendário de Interações"
+
+msgid "Visualize user interactions over the past year. Darker colors indicate more interactions."
+msgstr "Visualize as interações dos usuários ao longo do último ano. Cores mais escuras indicam mais interações."
+
+msgid "Conversation History"
+msgstr "Histórico de Conversas"
+
+msgid "View detailed conversation history between users and the bot."
+msgstr "Visualize o histórico detalhado de conversas entre usuários e o bot."
+
+msgid "Show users:"
+msgstr "Mostrar usuários:"
+
+msgid "Load Conversations"
+msgstr "Carregar Conversas"
+
+msgid "Select date range and click \"Load Conversations\" to view conversation history."
+msgstr "Selecione o período e clique em \"Carregar Conversas\" para visualizar o histórico de conversas."
+
+msgid "Loading conversations..."
+msgstr "Carregando conversas..."
+
+msgid "No permission."
+msgstr "Sem permissão."
+
+msgid "Security error. Please reload the page."
+msgstr "Erro de segurança. Recarregue a página."
+
+msgid "You do not have permission to access this page."
+msgstr "Você não tem permissão para acessar esta página."
+
+msgid "Security check failed."
+msgstr "Verificação de segurança falhou."
+
+msgid "Security error. Please try again."
+msgstr "Erro de segurança. Tente novamente."
+
+msgid "Sessions"
+msgstr "Sessões"
+
+msgid "User Sessions"
+msgstr "Sessões de Usuários"
+
+msgid "Upgrade to PRO"
+msgstr "Atualizar para PRO"
+
+msgid "Loading sessions..."
+msgstr "Carregando sessões..."
+
+msgid "Error loading sessions: "
+msgstr "Erro ao carregar sessões: "
+
+msgid "No sessions found."
+msgstr "Nenhuma sessão encontrada."
+
+msgid "Failed to create checkout session."
+msgstr "Falha ao criar sessão de checkout."
+
+msgid "View all user chat sessions and their details."
+msgstr "Visualize todas as sessões de chat dos usuários e seus detalhes."
+
+msgid "Show:"
+msgstr "Mostrar:"
+
+msgid "Refresh"
+msgstr "Atualizar"
+
+msgid "Welcome to BooChat Connect"
+msgstr "Bem-vindo ao BooChat Connect"
+
+msgid "Modern, lightweight chatbot popup that integrates seamlessly with n8n. Automate workflows, respond in real-time, collect leads, and connect to any AI model or external service."
+msgstr "Popup de chatbot moderno e leve que se integra perfeitamente com n8n. Automatize fluxos de trabalho, responda em tempo real, colete leads e conecte-se a qualquer modelo de IA ou serviço externo."
+
+msgid "API Status"
+msgstr "Status da API"
+
+msgid "Not Configured"
+msgstr "Não Configurada"
+
+msgid "Configure Now"
+msgstr "Configurar Agora"
+
+msgid "Chat Widget"
+msgstr "Widget de Chat"
+
+msgid "Active"
+msgstr "Ativo"
+
+msgid "Getting Started"
+msgstr "Começando"
+
+msgid "Configure API URL"
+msgstr "Configurar URL da API"
+
+msgid "Go to Settings and configure your n8n webhook URL or external API endpoint."
+msgstr "Vá para Configurações e configure sua URL de webhook n8n ou endpoint de API externa."
+
+msgid "Customize Appearance"
+msgstr "Personalizar Aparência"
+
+msgid "Personalize colors, fonts, welcome message, and chat name to match your brand."
+msgstr "Personalize cores, fontes, mensagem de boas-vindas e nome do chat para corresponder à sua marca."
+
+msgid "Test the Chat"
+msgstr "Testar o Chat"
+
+msgid "Visit your website frontend and test the chat integration."
+msgstr "Visite o frontend do seu site e teste a integração do chat."
+
+msgid "Monitor Statistics"
+msgstr "Monitorar Estatísticas"
+
+msgid "Track user interactions and analyze chat usage over time."
+msgstr "Acompanhe as interações dos usuários e analise o uso do chat ao longo do tempo."
+
+msgid "API Integration Guide"
+msgstr "Guia de Integração da API"
+
+msgid "Your API endpoint should accept POST requests with the following JSON format:"
+msgstr "Seu endpoint de API deve aceitar requisições POST com o seguinte formato JSON:"
+
+msgid "The API should respond with JSON in this format:"
+msgstr "A API deve responder com JSON neste formato:"
+
+msgid "n8n Integration:"
+msgstr "Integração n8n:"
+
+msgid "Create a %1$schat trigger node%2$s in n8n and use the webhook URL as your API URL. The webhook will receive chat messages for processing in your n8n workflow."
+msgstr "Crie um %1$snó de chat trigger%2$s no n8n e use a URL do webhook como sua URL da API. O webhook receberá mensagens do chat para processamento em seu fluxo de trabalho n8n."
+
+msgid "Quick Links"
+msgstr "Links Rápidos"
+
+msgid "Features"
+msgstr "Recursos"
+
+msgid "Modern responsive design"
+msgstr "Design responsivo moderno"
+
+msgid "Full customization options"
+msgstr "Opções completas de personalização"
+
+msgid "n8n & API integration"
+msgstr "Integração n8n e API"
+
+msgid "Session management"
+msgstr "Gerenciamento de sessões"
+
+msgid "Statistics & analytics"
+msgstr "Estatísticas e análises"
+
+msgid "Multi-language support"
+msgstr "Suporte multilíngue"
+
+msgid "Lightweight & fast"
+msgstr "Leve e rápido"
+
+msgid "Mobile-friendly"
+msgstr "Compatível com dispositivos móveis"
+
+msgid "Support & Contact"
+msgstr "Suporte e Contato"
+
+msgid "Company"
+msgstr "Empresa"
+
+msgid "Website"
+msgstr "Site"
+
+msgid "Documentation"
+msgstr "Documentação"
+
+msgid "View Docs →"
+msgstr "Ver Documentação →"
+
+msgid "Licensed under"
+msgstr "Licenciado sob"
+
+msgid "Payment Successful!"
+msgstr "Pagamento Bem-sucedido!"
+
+msgid "Your PRO license has been activated automatically. You can now access all premium features!"
+msgstr "Sua licença PRO foi ativada automaticamente. Agora você pode acessar todos os recursos premium!"
+
+msgid "Your license key has been received. To activate your PRO license, please configure your API Key in"
+msgstr "Sua chave de licença foi recebida. Para ativar sua licença PRO, configure sua Chave de API em"
+
+msgid "The license will be activated automatically once the API Key is configured."
+msgstr "A licença será ativada automaticamente assim que a Chave de API for configurada."
+
+msgid "Payment received. Processing license activation..."
+msgstr "Pagamento recebido. Processando ativação da licença..."
+
+msgid "Payment was cancelled."
+msgstr "O pagamento foi cancelado."
+
+msgid "Payment Error"
+msgstr "Erro no Pagamento"
+
+msgid "PRO License Active"
+msgstr "Licença PRO Ativa"
+
+msgid "You have an active PRO license. All premium features are unlocked!"
+msgstr "Você tem uma licença PRO ativa. Todos os recursos premium estão desbloqueados!"
+
+msgid "License Status"
+msgstr "Status da Licença"
+
+msgid "License Key"
+msgstr "Chave de Licença"
+
+msgid "Deactivate License"
+msgstr "Desativar Licença"
+
+msgid "PRO Features"
+msgstr "Recursos PRO"
+
+msgid "Unlock advanced features with BooChat Connect PRO."
+msgstr "Desbloqueie recursos avançados com BooChat Connect PRO."
+
+msgid "Advanced Statistics Dashboard"
+msgstr "Painel de Estatísticas Avançado"
+
+msgid "Interactive Charts & Graphs"
+msgstr "Gráficos e Tabelas Interativas"
+
+msgid "User Sessions & Conversation History"
+msgstr "Sessões de Usuários e Histórico de Conversas"
+
+msgid "Make data-driven decisions with powerful analytics at your fingertips. Instantly see your chat performance with quick summaries (24h, 7 days, 30 days) and dive deep into any time period. Discover when your users are most active, identify peak engagement times, and optimize your chat strategy based on real data—not guesswork."
+msgstr "Tome decisões baseadas em dados com análises poderosas na ponta dos dedos. Veja instantaneamente o desempenho do seu chat com resumos rápidos (24h, 7 dias, 30 dias) e mergulhe fundo em qualquer período. Descubra quando seus usuários estão mais ativos, identifique horários de maior engajamento e otimize sua estratégia de chat com base em dados reais—não em suposições."
+
+msgid "See your chat growth story unfold with stunning visual charts. Spot trends instantly, compare performance across different periods, and share beautiful reports with your team. Every click reveals new insights—no complex setup required."
+msgstr "Veja a história de crescimento do seu chat se desenrolar com gráficos visuais impressionantes. Identifique tendências instantaneamente, compare o desempenho em diferentes períodos e compartilhe relatórios lindos com sua equipe. Cada clique revela novos insights—sem configuração complexa necessária."
+
+msgid "Never lose a conversation again. Access every chat session in one place, review complete transcripts, and understand your customers better. Export everything to JSON or CSV for advanced analysis, compliance, or team training. Turn conversations into actionable business intelligence."
+msgstr "Nunca perca uma conversa novamente. Acesse cada sessão de chat em um só lugar, revise transcrições completas e entenda melhor seus clientes. Exporte tudo para JSON ou CSV para análise avançada, conformidade ou treinamento da equipe. Transforme conversas em inteligência de negócios acionável."
+
+msgid "Discover when your users are most active"
+msgstr "Descubra quando seus usuários estão mais ativos"
+
+msgid "Identify peak engagement times"
+msgstr "Identifique horários de maior engajamento"
+
+msgid "Optimize your chat strategy based on real data—not guesswork"
+msgstr "Otimize sua estratégia de chat com base em dados reais—não em suposições"
+
+msgid "Spot trends instantly with visual insights"
+msgstr "Identifique tendências instantaneamente com insights visuais"
+
+msgid "Compare performance across different periods"
+msgstr "Compare o desempenho em diferentes períodos"
+
+msgid "Share beautiful reports with your team"
+msgstr "Compartilhe relatórios lindos com sua equipe"
+
+msgid "Every click reveals new insights—no complex setup required"
+msgstr "Cada clique revela novos insights—sem configuração complexa necessária"
+
+msgid "Access every chat session in one place"
+msgstr "Acesse cada sessão de chat em um só lugar"
+
+msgid "Review complete conversation transcripts"
+msgstr "Revise transcrições completas das conversas"
+
+msgid "Export to JSON or CSV for advanced analysis"
+msgstr "Exporte para JSON ou CSV para análise avançada"
+
+msgid "Perfect for compliance, team training, and business intelligence"
+msgstr "Perfeito para conformidade, treinamento da equipe e inteligência de negócios"
+
+msgid "Export Data (CSV/JSON)"
+msgstr "Exportar Dados (CSV/JSON)"
+
+msgid "Email Reports"
+msgstr "Relatórios por E-mail"
+
+msgid "Priority Support"
+msgstr "Suporte Prioritário"
+
+msgid "Future PRO Features"
+msgstr "Recursos PRO Futuros"
+
+msgid "Already have a license?"
+msgstr "Já tem uma licença?"
+
+msgid "Enter your license key below to activate PRO features."
+msgstr "Digite sua chave de licença abaixo para ativar os recursos PRO."
+
+msgid "License activated successfully!"
+msgstr "Licença ativada com sucesso!"
+
+msgid "Failed to activate license. Please check your license key."
+msgstr "Falha ao ativar licença. Verifique sua chave de licença."
+
+msgid "Enter your license key"
+msgstr "Digite sua chave de licença"
+
+msgid "Enter your PRO license key to activate."
+msgstr "Digite sua chave de licença PRO para ativar."
+
+msgid "Activate License"
+msgstr "Ativar Licença"
+
+msgid "Pricing"
+msgstr "Preços"
+
+msgid "One year of PRO features and updates"
+msgstr "Um ano de recursos PRO e atualizações"
+
+msgid "Buy Now"
+msgstr "Comprar Agora"
+
+msgid "Choose Chat Icon"
+msgstr "Escolher Ícone do Chat"
+
+msgid "Use this icon"
+msgstr "Usar este ícone"
+
+msgid "Configuration Error"
+msgstr "Erro de Configuração"
+
+msgid "Failed to create checkout session. Please try again."
+msgstr "Falha ao criar sessão de checkout. Tente novamente."
+
+msgid "English"
+msgstr "Inglês"
+
+msgid "Português"
+msgstr "Português"
+
+msgid "Español"
+msgstr "Espanhol"
+
+msgid "Export JSON"
+msgstr "Exportar JSON"
+
+msgid "Export CSV"
+msgstr "Exportar CSV"
+

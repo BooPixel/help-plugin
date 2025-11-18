@@ -26,8 +26,8 @@ $boochat_connect_needs_api_key = isset($_GET['needs_api_key']) && sanitize_text_
     <div class="boochat-connect-header">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
         <p>
-            <?php echo esc_html__('Version', 'boochat-connect'); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
-            <?php echo esc_html__('AI Chatbot & n8n Automation', 'boochat-connect'); ?>
+            <?php echo esc_html(boochat_connect_translate('version', 'Version')); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
+            <?php echo esc_html(boochat_connect_translate('ai_chatbot_automation', 'AI Chatbot & n8n Automation')); ?>
         </p>
     </div>
     
@@ -63,6 +63,7 @@ $boochat_connect_needs_api_key = isset($_GET['needs_api_key']) && sanitize_text_
                     <?php
                     // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET parameter from external redirect (Stripe), display only
                     if (isset($_GET['message'])) {
+                        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET parameter from external redirect (Stripe), sanitized and escaped
                         echo ' - ' . esc_html(urldecode(sanitize_text_field(wp_unslash($_GET['message']))));
                     }
                     ?>
@@ -114,16 +115,48 @@ $boochat_connect_needs_api_key = isset($_GET['needs_api_key']) && sanitize_text_
                     <div class="boochat-connect-card">
                         <h2><?php echo esc_html__('PRO Features', 'boochat-connect'); ?></h2>
                         <p><?php echo esc_html__('Unlock advanced features with BooChat Connect PRO.', 'boochat-connect'); ?></p>
-                        <ul class="feature-list">
-                            <li><?php echo esc_html__('Advanced Statistics Dashboard', 'boochat-connect'); ?></li>
-                            <li><?php echo esc_html__('Interactive Charts & Graphs', 'boochat-connect'); ?></li>
-                            <li><?php echo esc_html__('Calendar Heatmap Visualization', 'boochat-connect'); ?></li>
-                            <li><?php echo esc_html__('Conversation History & Analytics', 'boochat-connect'); ?></li>
-                            <li><?php echo esc_html__('Export Data (CSV/JSON)', 'boochat-connect'); ?></li>
-                            <li><?php echo esc_html__('Email Reports', 'boochat-connect'); ?></li>
-                            <li><?php echo esc_html__('Priority Support', 'boochat-connect'); ?></li>
-                            <li><?php echo esc_html__('Future PRO Features', 'boochat-connect'); ?></li>
-                        </ul>
+                        <div class="boochat-connect-pro-features">
+                            <div class="boochat-connect-pro-feature-item">
+                                <div class="boochat-connect-pro-feature-icon">📊</div>
+                                <div class="boochat-connect-pro-feature-content">
+                                    <h3><?php echo esc_html__('Advanced Statistics Dashboard', 'boochat-connect'); ?></h3>
+                                    <p><?php echo esc_html__('Make data-driven decisions with powerful analytics at your fingertips. Instantly see your chat performance with quick summaries (24h, 7 days, 30 days) and dive deep into any time period. Discover when your users are most active, identify peak engagement times, and optimize your chat strategy based on real data—not guesswork.', 'boochat-connect'); ?></p>
+                                    <ul class="boochat-connect-pro-feature-benefits">
+                                        <li><?php echo esc_html__('Discover when your users are most active', 'boochat-connect'); ?></li>
+                                        <li><?php echo esc_html__('Identify peak engagement times', 'boochat-connect'); ?></li>
+                                        <li><?php echo esc_html__('Optimize your chat strategy based on real data—not guesswork', 'boochat-connect'); ?></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="boochat-connect-pro-feature-item">
+                                <div class="boochat-connect-pro-feature-icon">📈</div>
+                                <div class="boochat-connect-pro-feature-content">
+                                    <h3><?php echo esc_html__('Interactive Charts & Graphs', 'boochat-connect'); ?></h3>
+                                    <p><?php echo esc_html__('See your chat growth story unfold with stunning visual charts. Spot trends instantly, compare performance across different periods, and share beautiful reports with your team. Every click reveals new insights—no complex setup required.', 'boochat-connect'); ?></p>
+                                    <ul class="boochat-connect-pro-feature-benefits">
+                                        <li><?php echo esc_html__('Spot trends instantly with visual insights', 'boochat-connect'); ?></li>
+                                        <li><?php echo esc_html__('Compare performance across different periods', 'boochat-connect'); ?></li>
+                                        <li><?php echo esc_html__('Share beautiful reports with your team', 'boochat-connect'); ?></li>
+                                        <li><?php echo esc_html__('Every click reveals new insights—no complex setup required', 'boochat-connect'); ?></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="boochat-connect-pro-feature-item">
+                                <div class="boochat-connect-pro-feature-icon">💬</div>
+                                <div class="boochat-connect-pro-feature-content">
+                                    <h3><?php echo esc_html__('User Sessions & Conversation History', 'boochat-connect'); ?></h3>
+                                    <p><?php echo esc_html__('Never lose a conversation again. Access every chat session in one place, review complete transcripts, and understand your customers better. Export everything to JSON or CSV for advanced analysis, compliance, or team training. Turn conversations into actionable business intelligence.', 'boochat-connect'); ?></p>
+                                    <ul class="boochat-connect-pro-feature-benefits">
+                                        <li><?php echo esc_html__('Access every chat session in one place', 'boochat-connect'); ?></li>
+                                        <li><?php echo esc_html__('Review complete conversation transcripts', 'boochat-connect'); ?></li>
+                                        <li><?php echo esc_html__('Export to JSON or CSV for advanced analysis', 'boochat-connect'); ?></li>
+                                        <li><?php echo esc_html__('Perfect for compliance, team training, and business intelligence', 'boochat-connect'); ?></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- License Activation Card -->
