@@ -12,20 +12,39 @@ Perfect for businesses that want to automate customer support, boost conversions
 
 ## Key Features
 
-- **Fully customizable chat popup** (colors, icons, texts)
-- **Direct n8n Webhook integration**
-- **AI-ready**: Connect to ChatGPT, Claude, Gemini, Llama, and more (via n8n)
-- **Lightweight, fast, and compatible** with all WordPress themes
-- **Optional conversation logs** inside the WordPress dashboard
-- **Multilingual interface** and future Dark Mode support
-- **Statistics Dashboard**: 
+### Free Version
+- ✅ **Fully customizable chat popup** (colors, icons, texts)
+- ✅ **Direct n8n Webhook integration**
+- ✅ **AI-ready**: Connect to ChatGPT, Claude, Gemini, Llama, and more (via n8n)
+- ✅ **Lightweight, fast, and compatible** with all WordPress themes
+- ✅ **Custom Chat Icon**: Upload your own icon for the chat header
+- ✅ **Multilingual interface**: English, Portuguese, and Spanish
+- ✅ **Settings Management**: Configure API URL and chat settings
+- ✅ **Responsive Design**: Mobile-friendly chat interface
+- ✅ **Session Management**: Automatic session tracking
+- ✅ **Real-time Messaging**: Send and receive messages instantly
+
+### PRO Version (Additional Features)
+- 💎 **Advanced Statistics Dashboard**: 
   - Track interactions (1 day, 7 days, 30 days)
   - Interactive charts with date range selection
-  - Message content logging
-- **Settings Management**: Configure API URL and chat settings
-- **Responsive Design**: Mobile-friendly chat interface
+  - Custom date range filtering
+- 💎 **Session Management**: 
+  - View all user chat sessions
+  - Complete conversation history
+  - Session details and analytics
+- 💎 **Export Options**: 
+  - Export session messages as JSON
+  - Export session messages as CSV
+- 💎 **License Management**: 
+  - License activation via key or Stripe checkout
+  - License status tracking
+
+### Technical Features
 - **Clean Architecture**: Separated HTML templates and CSS files for better maintainability
 - **WordPress Standards**: Full compliance with WordPress coding standards and security best practices
+- **Comprehensive Unit Tests**: 60+ test cases covering core functionality
+- **Complete Translations**: All strings translated in English, Portuguese, and Spanish (376 strings each)
 
 ## What You Can Automate
 
@@ -131,20 +150,49 @@ Your n8n workflow should:
 
 ## Usage
 
-### Frontend Chat
+### Frontend Chat Flow
 
-Once activated, a chat popup will appear on the frontend of your website (bottom-right corner). Users can:
-- Click the popup to open the chat window
-- Send messages that are processed by your configured API
-- View responses from the API in real-time
+1. **Plugin Activation**: Once activated, the chat popup automatically appears on your website (bottom-right corner, after 1 second delay)
 
-### Statistics
+2. **User Interaction**:
+   - User clicks the chat popup to open the chat window
+   - Welcome message is displayed
+   - User types a message and clicks "Send"
+
+3. **Message Processing**:
+   - JavaScript generates/retrieves session ID (stored in localStorage)
+   - AJAX request sent to WordPress with message and session ID
+   - WordPress forwards message to your n8n webhook URL
+   - n8n workflow processes the message (AI, database, API calls, etc.)
+   - n8n returns response
+   - WordPress receives response and displays it in the chat
+   - If PRO: Message is saved to database for statistics
+
+4. **Response Display**:
+   - Bot response appears in chat window
+   - User can continue conversation
+   - Session persists throughout the conversation
+
+### Statistics (PRO Only)
 
 View interaction statistics:
 1. Navigate to **BooChat Connect > Statistics** in WordPress admin
-2. View quick summary (1 day, 7 days, 30 days)
+2. View quick summary boxes (1 day, 7 days, 30 days)
 3. Select a date range using the calendar picker
 4. View interactive chart showing interactions over time
+5. Analyze chat performance and user engagement
+
+### Session Management (PRO Only)
+
+View and manage user sessions:
+1. Navigate to **BooChat Connect > Sessions** in WordPress admin
+2. View all chat sessions with:
+   - Session ID
+   - First and last interaction timestamps
+   - Message count per session
+   - User vs Bot message counts
+3. Click "View" to see complete conversation history
+4. Export sessions as JSON or CSV for analysis
 
 ## Development
 
@@ -152,7 +200,7 @@ View interaction statistics:
 
 ```
 boochat-connect/
-├── help-plugin.php              # Main plugin file
+├── boochat-connect.php          # Main plugin file
 ├── LICENSE                      # GPLv2 license
 ├── README.txt                   # WordPress.org format documentation
 ├── banner-772x250.png           # Plugin banner (772x250px)
