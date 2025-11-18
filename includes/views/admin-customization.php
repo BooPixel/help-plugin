@@ -13,7 +13,13 @@ if (!defined('ABSPATH')) {
 }
 ?>
 <div class="wrap boochat-connect-wrap">
-    <h1><?php echo esc_html(boochat_connect_translate('chat_customization')); ?></h1>
+    <div class="boochat-connect-header">
+        <h1><?php echo esc_html(boochat_connect_translate('chat_customization')); ?></h1>
+        <p>
+            <?php echo esc_html__('Version', 'boochat-connect'); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
+            <?php echo esc_html__('AI Chatbot & n8n Automation', 'boochat-connect'); ?>
+        </p>
+    </div>
     
     <?php if ($customization_updated): ?>
         <div class="notice notice-success is-dismissible">
@@ -21,14 +27,16 @@ if (!defined('ABSPATH')) {
         </div>
     <?php endif; ?>
     
-    <div class="boochat-connect-content">
-        <div class="boochat-connect-card">
-            <h2><?php echo esc_html(boochat_connect_translate('chat_customization')); ?></h2>
-            <p><?php echo esc_html(boochat_connect_translate('customize_colors_typography')); ?></p>
-            
-            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-                <?php wp_nonce_field('boochat_connect_save_customization', 'boochat_connect_customization_nonce'); ?>
-                <input type="hidden" name="action" value="boochat_connect_save_customization">
+    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" id="boochat-connect-customization-form">
+    <?php wp_nonce_field('boochat_connect_save_customization', 'boochat_connect_customization_nonce'); ?>
+    <input type="hidden" name="action" value="boochat_connect_save_customization">
+    
+    <div class="boochat-connect-content boochat-connect-customization-layout">
+        <!-- Text Customization Card -->
+        <div class="boochat-connect-customization-text">
+            <div class="boochat-connect-card">
+                <h2><?php echo esc_html(boochat_connect_translate('text_customization', 'Text Customization')); ?></h2>
+                <p><?php echo esc_html(boochat_connect_translate('customize_text_settings', 'Customize text and typography settings.')); ?></p>
                 
                 <table class="form-table">
                     <tbody>
@@ -69,6 +77,58 @@ if (!defined('ABSPATH')) {
                             </td>
                         </tr>
                         
+                        <tr>
+                            <th scope="row">
+                                <label for="font_family"><?php echo esc_html(boochat_connect_translate('font_family')); ?></label>
+                            </th>
+                            <td>
+                                <select id="font_family" name="font_family" class="regular-text">
+                                    <option value="Arial, sans-serif" <?php selected($settings['font_family'], 'Arial, sans-serif'); ?>>Arial</option>
+                                    <option value="'Helvetica Neue', Helvetica, sans-serif" <?php selected($settings['font_family'], "'Helvetica Neue', Helvetica, sans-serif"); ?>>Helvetica</option>
+                                    <option value="Georgia, serif" <?php selected($settings['font_family'], 'Georgia, serif'); ?>>Georgia</option>
+                                    <option value="'Times New Roman', Times, serif" <?php selected($settings['font_family'], "'Times New Roman', Times, serif"); ?>>Times New Roman</option>
+                                    <option value="'Courier New', Courier, monospace" <?php selected($settings['font_family'], "'Courier New', Courier, monospace"); ?>>Courier New</option>
+                                    <option value="Verdana, sans-serif" <?php selected($settings['font_family'], 'Verdana, sans-serif'); ?>>Verdana</option>
+                                    <option value="'Trebuchet MS', sans-serif" <?php selected($settings['font_family'], "'Trebuchet MS', sans-serif"); ?>>Trebuchet MS</option>
+                                    <option value="'Open Sans', sans-serif" <?php selected($settings['font_family'], "'Open Sans', sans-serif"); ?>>Open Sans</option>
+                                    <option value="'Roboto', sans-serif" <?php selected($settings['font_family'], "'Roboto', sans-serif"); ?>>Roboto</option>
+                                </select>
+                                <p class="description">
+                                    <?php echo esc_html(boochat_connect_translate('font_family_chat')); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="font_size"><?php echo esc_html(boochat_connect_translate('font_size')); ?></label>
+                            </th>
+                            <td>
+                                <select id="font_size" name="font_size" class="regular-text">
+                                    <option value="12px" <?php selected($settings['font_size'], '12px'); ?>>12px - <?php echo esc_html(boochat_connect_translate('small', 'Small')); ?></option>
+                                    <option value="14px" <?php selected($settings['font_size'], '14px'); ?>>14px - <?php echo esc_html(boochat_connect_translate('normal', 'Normal')); ?></option>
+                                    <option value="16px" <?php selected($settings['font_size'], '16px'); ?>>16px - <?php echo esc_html(boochat_connect_translate('medium', 'Medium')); ?></option>
+                                    <option value="18px" <?php selected($settings['font_size'], '18px'); ?>>18px - <?php echo esc_html(boochat_connect_translate('large', 'Large')); ?></option>
+                                    <option value="20px" <?php selected($settings['font_size'], '20px'); ?>>20px - <?php echo esc_html(boochat_connect_translate('extra_large', 'Extra Large')); ?></option>
+                                </select>
+                                <p class="description">
+                                    <?php echo esc_html(boochat_connect_translate('font_size_messages')); ?>
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Color Customization Card -->
+        <div class="boochat-connect-customization-colors">
+            <div class="boochat-connect-card">
+                <h2><?php echo esc_html(boochat_connect_translate('color_customization', 'Color Customization')); ?></h2>
+                <p><?php echo esc_html(boochat_connect_translate('customize_color_settings', 'Customize color and appearance settings.')); ?></p>
+                
+                <table class="form-table">
+                    <tbody>
                         <tr>
                             <th scope="row">
                                 <label for="primary_color"><?php echo esc_html(boochat_connect_translate('primary_color')); ?></label>
@@ -136,52 +196,18 @@ if (!defined('ABSPATH')) {
                                 </p>
                             </td>
                         </tr>
-                        
-                        <tr>
-                            <th scope="row">
-                                <label for="font_family"><?php echo esc_html(boochat_connect_translate('font_family')); ?></label>
-                            </th>
-                            <td>
-                                <select id="font_family" name="font_family" class="regular-text">
-                                    <option value="Arial, sans-serif" <?php selected($settings['font_family'], 'Arial, sans-serif'); ?>>Arial</option>
-                                    <option value="'Helvetica Neue', Helvetica, sans-serif" <?php selected($settings['font_family'], "'Helvetica Neue', Helvetica, sans-serif"); ?>>Helvetica</option>
-                                    <option value="Georgia, serif" <?php selected($settings['font_family'], 'Georgia, serif'); ?>>Georgia</option>
-                                    <option value="'Times New Roman', Times, serif" <?php selected($settings['font_family'], "'Times New Roman', Times, serif"); ?>>Times New Roman</option>
-                                    <option value="'Courier New', Courier, monospace" <?php selected($settings['font_family'], "'Courier New', Courier, monospace"); ?>>Courier New</option>
-                                    <option value="Verdana, sans-serif" <?php selected($settings['font_family'], 'Verdana, sans-serif'); ?>>Verdana</option>
-                                    <option value="'Trebuchet MS', sans-serif" <?php selected($settings['font_family'], "'Trebuchet MS', sans-serif"); ?>>Trebuchet MS</option>
-                                    <option value="'Open Sans', sans-serif" <?php selected($settings['font_family'], "'Open Sans', sans-serif"); ?>>Open Sans</option>
-                                    <option value="'Roboto', sans-serif" <?php selected($settings['font_family'], "'Roboto', sans-serif"); ?>>Roboto</option>
-                                </select>
-                                <p class="description">
-                                    <?php echo esc_html(boochat_connect_translate('font_family_chat')); ?>
-                                </p>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <th scope="row">
-                                <label for="font_size"><?php echo esc_html(boochat_connect_translate('font_size')); ?></label>
-                            </th>
-                            <td>
-                                <select id="font_size" name="font_size" class="regular-text">
-                                    <option value="12px" <?php selected($settings['font_size'], '12px'); ?>>12px - <?php echo esc_html(boochat_connect_translate('small', 'Small')); ?></option>
-                                    <option value="14px" <?php selected($settings['font_size'], '14px'); ?>>14px - <?php echo esc_html(boochat_connect_translate('normal', 'Normal')); ?></option>
-                                    <option value="16px" <?php selected($settings['font_size'], '16px'); ?>>16px - <?php echo esc_html(boochat_connect_translate('medium', 'Medium')); ?></option>
-                                    <option value="18px" <?php selected($settings['font_size'], '18px'); ?>>18px - <?php echo esc_html(boochat_connect_translate('large', 'Large')); ?></option>
-                                    <option value="20px" <?php selected($settings['font_size'], '20px'); ?>>20px - <?php echo esc_html(boochat_connect_translate('extra_large', 'Extra Large')); ?></option>
-                                </select>
-                                <p class="description">
-                                    <?php echo esc_html(boochat_connect_translate('font_size_messages')); ?>
-                                </p>
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
-                
-                <?php submit_button(boochat_connect_translate('save_customizations')); ?>
-            </form>
+            </div>
         </div>
     </div>
+    
+    <!-- Single Save Button Card -->
+    <div class="boochat-connect-save-button-card">
+        <div class="boochat-connect-card boochat-connect-save-card">
+            <?php submit_button(boochat_connect_translate('save_customizations'), 'primary', 'submit', false); ?>
+        </div>
+    </div>
+    </form>
 </div>
 

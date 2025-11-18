@@ -128,6 +128,16 @@ class BooChat_Connect_Admin {
             $statistics_callback
         );
         
+        // Add Sessions page
+        add_submenu_page(
+            'boochat-connect',
+            esc_html__('Sessions', 'boochat-connect'),
+            esc_html__('Sessions', 'boochat-connect'),
+            'manage_options',
+            'boochat-connect-sessions',
+            array($this, 'render_sessions_page')
+        );
+        
         // Add PRO upgrade page
         add_submenu_page(
             'boochat-connect',
@@ -152,6 +162,7 @@ class BooChat_Connect_Admin {
             $current_page === 'boochat-connect-customization' ||
             $current_page === 'boochat-connect-settings' ||
             $current_page === 'boochat-connect-statistics' ||
+            $current_page === 'boochat-connect-sessions' ||
             $current_page === 'boochat-connect-pro' ||
             strpos($hook, 'boochat-connect') !== false
         );
@@ -168,20 +179,48 @@ class BooChat_Connect_Admin {
             BOOCHAT_CONNECT_VERSION
         );
         
-        // Page-specific styles
-        if ($current_page === 'boochat-connect' || $current_page === '') {
-            wp_enqueue_style(
-                'boochat-connect-admin-main',
-                BOOCHAT_CONNECT_URL . 'assets/css/admin-main.css',
-                array('boochat-connect-admin-style'),
-                BOOCHAT_CONNECT_VERSION
-            );
-        }
+        // Admin main styles (header styles - loaded on all pages)
+        wp_enqueue_style(
+            'boochat-connect-admin-main',
+            BOOCHAT_CONNECT_URL . 'assets/css/admin-main.css',
+            array('boochat-connect-admin-style'),
+            BOOCHAT_CONNECT_VERSION
+        );
         
         if ($current_page === 'boochat-connect-statistics') {
             wp_enqueue_style(
                 'boochat-connect-admin-statistics',
                 BOOCHAT_CONNECT_URL . 'assets/css/admin-statistics.css',
+                array('boochat-connect-admin-style'),
+                BOOCHAT_CONNECT_VERSION
+            );
+        }
+        
+        // Sessions page styles
+        if ($current_page === 'boochat-connect-sessions') {
+            wp_enqueue_style(
+                'boochat-connect-admin-sessions',
+                BOOCHAT_CONNECT_URL . 'assets/css/admin-sessions.css',
+                array('boochat-connect-admin-style'),
+                BOOCHAT_CONNECT_VERSION
+            );
+        }
+        
+        // Settings page styles
+        if ($current_page === 'boochat-connect-settings') {
+            wp_enqueue_style(
+                'boochat-connect-admin-settings',
+                BOOCHAT_CONNECT_URL . 'assets/css/admin-settings.css',
+                array('boochat-connect-admin-style'),
+                BOOCHAT_CONNECT_VERSION
+            );
+        }
+        
+        // Customization page styles
+        if ($current_page === 'boochat-connect-customization') {
+            wp_enqueue_style(
+                'boochat-connect-admin-customization',
+                BOOCHAT_CONNECT_URL . 'assets/css/admin-customization.css',
                 array('boochat-connect-admin-style'),
                 BOOCHAT_CONNECT_VERSION
             );
@@ -291,9 +330,9 @@ class BooChat_Connect_Admin {
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
         update_option('boochat_connect_welcome_message', sanitize_textarea_field(wp_unslash($_POST['welcome_message'] ?? boochat_connect_translate('welcome_message_default'))));
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
-        update_option('boochat_connect_primary_color', sanitize_hex_color(wp_unslash($_POST['primary_color'] ?? '#667eea')));
+        update_option('boochat_connect_primary_color', sanitize_hex_color(wp_unslash($_POST['primary_color'] ?? '#1B8EF0')));
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
-        update_option('boochat_connect_secondary_color', sanitize_hex_color(wp_unslash($_POST['secondary_color'] ?? '#764ba2')));
+        update_option('boochat_connect_secondary_color', sanitize_hex_color(wp_unslash($_POST['secondary_color'] ?? '#1B5D98')));
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
         update_option('boochat_connect_chat_bg_color', sanitize_hex_color(wp_unslash($_POST['chat_bg_color'] ?? '#ffffff')));
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
@@ -323,10 +362,6 @@ class BooChat_Connect_Admin {
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
         $api_url = isset($_POST['api_url']) ? esc_url_raw(wp_unslash($_POST['api_url'])) : '';
         update_option('boochat_connect_api_url', $api_url);
-        
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
-        $api_key = isset($_POST['api_key']) ? sanitize_text_field(wp_unslash($_POST['api_key'])) : '';
-        update_option('boochat_connect_api_key', $api_key);
         
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
         $language = isset($_POST['language']) ? sanitize_text_field(wp_unslash($_POST['language'])) : '';
@@ -368,6 +403,33 @@ class BooChat_Connect_Admin {
             'api_configured' => $api_configured,
             'api_url' => $api_url,
         ));
+    }
+    
+    /**
+     * Render sessions page
+     */
+    public function render_sessions_page() {
+        $ajax_url = admin_url('admin-ajax.php');
+        $nonce = wp_create_nonce('boochat-connect-sessions');
+        
+        // Enqueue sessions script
+        wp_enqueue_script(
+            'boochat-connect-sessions',
+            BOOCHAT_CONNECT_URL . 'assets/js/sessions-script.js',
+            array('jquery'),
+            BOOCHAT_CONNECT_VERSION,
+            true
+        );
+        
+        wp_localize_script('boochat-connect-sessions', 'boochatConnectSessions', array(
+            'ajax_url' => $ajax_url,
+            'nonce' => $nonce,
+            'loadingText' => esc_html__('Loading sessions...', 'boochat-connect'),
+            'errorLoadingText' => esc_html__('Error loading sessions: ', 'boochat-connect'),
+            'noSessionsText' => esc_html__('No sessions found.', 'boochat-connect')
+        ));
+        
+        include BOOCHAT_CONNECT_DIR . 'includes/views/admin-sessions.php';
     }
     
     /**
