@@ -1,0 +1,259 @@
+/**
+ * Admin sessions page styles
+ *
+ * @package BooChat_Connect
+ */
+
+.boochat-connect-sessions-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    margin-top: 20px;
+}
+
+.boochat-connect-sessions-table thead th {
+    text-align: left;
+    padding: 12px;
+    background: #f9f9f9;
+    font-weight: 600;
+    border-bottom: 2px solid #f0f0f1;
+    color: #1d2327;
+}
+
+.boochat-connect-sessions-table tbody td {
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f1;
+    color: #1d2327;
+}
+
+.boochat-connect-sessions-table tbody tr:hover {
+    background: #f0f0f1;
+}
+
+.boochat-connect-session-id {
+    font-family: monospace;
+    font-size: 12px;
+    color: #646970;
+}
+
+.boochat-connect-session-meta {
+    font-size: 12px;
+    color: #646970;
+}
+
+.boochat-connect-session-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.boochat-connect-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.boochat-connect-dropdown-toggle {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    padding: 4px 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+}
+
+.boochat-connect-dropdown-toggle:hover {
+    background: #f6f7f7;
+    border-color: #8c8f94;
+}
+
+.boochat-connect-dropdown-icon {
+    font-size: 20px;
+    line-height: 1;
+    color: #50575e;
+    display: inline-block;
+    transform: rotate(90deg);
+}
+
+.boochat-connect-dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 4px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 1000;
+    min-width: 120px;
+}
+
+.boochat-connect-dropdown.active .boochat-connect-dropdown-menu {
+    display: block;
+}
+
+.boochat-connect-view-session {
+    display: block;
+    padding: 8px 12px;
+    color: #2271b1;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+
+.boochat-connect-view-session:hover {
+    background: #f6f7f7;
+    color: #135e96;
+}
+
+/* Modal Styles */
+.boochat-connect-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100000;
+}
+
+.boochat-connect-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    cursor: pointer;
+}
+
+.boochat-connect-modal-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    z-index: 100001;
+}
+
+.boochat-connect-modal-header {
+    padding: 20px 50px 20px 20px;
+    border-bottom: 1px solid #f0f0f1;
+    position: relative;
+}
+
+.boochat-connect-modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1d2327;
+    padding-right: 40px;
+}
+
+.boochat-connect-modal-session-id {
+    font-size: 14px;
+    color: #646970;
+    font-family: monospace;
+    font-weight: normal;
+    word-break: break-all;
+}
+
+.boochat-connect-modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    line-height: 1;
+    color: #646970;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.boochat-connect-modal-close:hover {
+    color: #1d2327;
+}
+
+.boochat-connect-modal-content {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+    max-height: calc(90vh - 100px);
+}
+
+.boochat-connect-messages-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.boochat-connect-message {
+    border: 1px solid #f0f0f1;
+    border-radius: 6px;
+    padding: 12px;
+    background: #fff;
+}
+
+.boochat-connect-message-user {
+    background: #f0f6fc;
+    border-color: #c7d2fe;
+}
+
+.boochat-connect-message-robot {
+    background: #f9f9f9;
+    border-color: #e0e0e0;
+}
+
+.boochat-connect-message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.boochat-connect-message-type {
+    font-weight: 600;
+    color: #2271b1;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+.boochat-connect-message-robot .boochat-connect-message-type {
+    color: #646970;
+}
+
+.boochat-connect-message-date {
+    color: #646970;
+    font-size: 11px;
+}
+
+.boochat-connect-message-content {
+    color: #1d2327;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+

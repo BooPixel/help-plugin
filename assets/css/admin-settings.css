@@ -1,0 +1,56 @@
+/**
+ * Admin settings page styles
+ *
+ * @package BooChat_Connect
+ */
+
+.boochat-connect-settings-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.boochat-connect-settings-top-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: stretch;
+}
+
+.boochat-connect-settings-api,
+.boochat-connect-settings-info,
+.boochat-connect-settings-default {
+    display: flex;
+    flex-direction: column;
+}
+
+.boochat-connect-settings-api .boochat-connect-card,
+.boochat-connect-settings-info .boochat-connect-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 1200px) {
+    .boochat-connect-settings-top-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.boochat-connect-save-button-card {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.boochat-connect-save-card {
+    border: none;
+    box-shadow: none;
+    padding: 20px;
+    background: #fff;
+}
+
+.boochat-connect-save-card .button {
+    margin: 0;
+}
+
