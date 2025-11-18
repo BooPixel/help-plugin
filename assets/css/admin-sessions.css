@@ -52,6 +52,7 @@
 .boochat-connect-dropdown {
     position: relative;
     display: inline-block;
+    z-index: 999999;
 }
 
 .boochat-connect-dropdown-toggle {
@@ -84,18 +85,51 @@
     display: none;
     position: absolute;
     right: 0;
-    top: 100%;
-    margin-top: 4px;
+    bottom: 100%;
+    margin-bottom: 4px;
     background: #fff;
     border: 1px solid #c3c4c7;
     border-radius: 3px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 1000;
-    min-width: 120px;
+    z-index: 9999999;
+    min-width: 150px;
+    overflow: hidden;
+}
+
+.boochat-connect-dropdown-menu.dropdown-below {
+    bottom: auto;
+    top: 100%;
+    margin-bottom: 0;
+    margin-top: 4px;
 }
 
 .boochat-connect-dropdown.active .boochat-connect-dropdown-menu {
     display: block;
+}
+
+.boochat-connect-dropdown-menu a {
+    display: block;
+    padding: 8px 12px;
+    color: #2271b1;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f1;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.boochat-connect-dropdown-menu a:last-child {
+    border-bottom: none;
+}
+
+.boochat-connect-dropdown-menu a:hover {
+    background: #f6f7f7;
+    color: #135e96;
+    margin: 0;
 }
 
 .boochat-connect-view-session {
@@ -108,11 +142,36 @@
     background: none;
     width: 100%;
     text-align: left;
+    box-sizing: border-box;
+    margin: 0;
 }
 
 .boochat-connect-view-session:hover {
     background: #f6f7f7;
     color: #135e96;
+    margin: 0;
+}
+
+.boochat-connect-export-json,
+.boochat-connect-export-csv {
+    display: block;
+    padding: 8px 12px;
+    color: #2271b1;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.boochat-connect-export-json:hover,
+.boochat-connect-export-csv:hover {
+    background: #f6f7f7;
+    color: #135e96;
+    margin: 0;
 }
 
 /* Modal Styles */

@@ -94,6 +94,8 @@
             html += '</button>';
             html += '<div class="boochat-connect-dropdown-menu">';
             html += '<a href="#" class="boochat-connect-view-session" data-session-id="' + escapeHtml(session.session_id) + '">' + 'View' + '</a>';
+            html += '<a href="#" class="boochat-connect-export-json" data-session-id="' + escapeHtml(session.session_id) + '">' + (boochatConnectSessions.exportJsonText || 'Export JSON') + '</a>';
+            html += '<a href="#" class="boochat-connect-export-csv" data-session-id="' + escapeHtml(session.session_id) + '">' + (boochatConnectSessions.exportCsvText || 'Export CSV') + '</a>';
             html += '</div>';
             html += '</div>';
             html += '</td>';
@@ -110,8 +112,26 @@
             e.preventDefault();
             e.stopPropagation();
             const dropdown = $(this).closest('.boochat-connect-dropdown');
+            const menu = dropdown.find('.boochat-connect-dropdown-menu');
+            
             // Close other dropdowns
             $('.boochat-connect-dropdown').not(dropdown).removeClass('active');
+            
+            // Check if dropdown should appear below instead of above
+            const toggleButton = $(this);
+            const buttonOffset = toggleButton.offset();
+            const buttonHeight = toggleButton.outerHeight();
+            const menuHeight = menu.outerHeight();
+            const windowScrollTop = $(window).scrollTop();
+            const spaceAbove = buttonOffset.top - windowScrollTop;
+            
+            // If not enough space above, show below
+            if (spaceAbove < menuHeight + 10) {
+                menu.addClass('dropdown-below');
+            } else {
+                menu.removeClass('dropdown-below');
+            }
+            
             // Toggle current dropdown
             dropdown.toggleClass('active');
         });
@@ -130,6 +150,24 @@
             const sessionId = $(this).data('session-id');
             $('.boochat-connect-dropdown').removeClass('active');
             viewSession(sessionId);
+        });
+        
+        // Add click handler for export JSON
+        $('.boochat-connect-export-json').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const sessionId = $(this).data('session-id');
+            $('.boochat-connect-dropdown').removeClass('active');
+            exportSession(sessionId, 'json');
+        });
+        
+        // Add click handler for export CSV
+        $('.boochat-connect-export-csv').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const sessionId = $(this).data('session-id');
+            $('.boochat-connect-dropdown').removeClass('active');
+            exportSession(sessionId, 'csv');
         });
     }
     
@@ -297,6 +335,48 @@
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
         return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
+    }
+    
+    function exportSession(sessionId, format) {
+        // Fetch session messages via AJAX
+        $.ajax({
+            url: boochatConnectSessions.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'boochat_connect_export_session',
+                nonce: boochatConnectSessions.nonce,
+                session_id: sessionId,
+                format: format
+            },
+            success: function(response) {
+                if (response.success) {
+                    downloadFile(response.data.content, response.data.filename, response.data.mime_type);
+                } else {
+                    alert(response.data.message || 'Error exporting session.');
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Error exporting session: ' + error);
+            }
+        });
+    }
+    
+    function downloadFile(content, filename, mimeType) {
+        // Create a blob with the content
+        const blob = new Blob([content], { type: mimeType });
+        
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = filename;
+        
+        // Append to body, click, and remove
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up the URL object
+        window.URL.revokeObjectURL(link.href);
     }
     
     function escapeHtml(text) {

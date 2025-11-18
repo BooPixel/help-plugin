@@ -18,21 +18,21 @@ $boochat_connect_wp_language = boochat_connect_get_language_from_locale($boochat
 $boochat_connect_wp_language_name = '';
 switch ($boochat_connect_wp_language) {
     case 'pt':
-        $boochat_connect_wp_language_name = 'Português';
+        $boochat_connect_wp_language_name = esc_html__('Português', 'boochat-connect');
         break;
     case 'es':
-        $boochat_connect_wp_language_name = 'Español';
+        $boochat_connect_wp_language_name = esc_html__('Español', 'boochat-connect');
         break;
     default:
-        $boochat_connect_wp_language_name = 'English';
+        $boochat_connect_wp_language_name = esc_html__('English', 'boochat-connect');
 }
 ?>
 <div class="wrap boochat-connect-wrap">
     <div class="boochat-connect-header">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
         <p>
-            <?php echo esc_html__('Version', 'boochat-connect'); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
-            <?php echo esc_html__('AI Chatbot & n8n Automation', 'boochat-connect'); ?>
+            <?php echo esc_html(boochat_connect_translate('version', 'Version')); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
+            <?php echo esc_html(boochat_connect_translate('ai_chatbot_automation', 'AI Chatbot & n8n Automation')); ?>
         </p>
     </div>
     
@@ -112,9 +112,9 @@ switch ($boochat_connect_wp_language) {
                             <td>
                                 <select id="language" name="language" class="regular-text">
                                     <option value="" <?php selected($current_language, '', true); ?>><?php echo esc_html(boochat_connect_translate('language_auto', 'Auto (WordPress Language)')); ?> (<?php echo esc_html($boochat_connect_wp_language_name); ?>)</option>
-                                    <option value="en" <?php selected($current_language, 'en'); ?>>English</option>
-                                    <option value="pt" <?php selected($current_language, 'pt'); ?>>Português</option>
-                                    <option value="es" <?php selected($current_language, 'es'); ?>>Español</option>
+                                    <option value="en" <?php selected($current_language, 'en'); ?>><?php echo esc_html__('English', 'boochat-connect'); ?></option>
+                                    <option value="pt" <?php selected($current_language, 'pt'); ?>><?php echo esc_html__('Português', 'boochat-connect'); ?></option>
+                                    <option value="es" <?php selected($current_language, 'es'); ?>><?php echo esc_html__('Español', 'boochat-connect'); ?></option>
                                 </select>
                                 <p class="description">
                                     <?php echo esc_html(boochat_connect_translate('language_description')); ?>

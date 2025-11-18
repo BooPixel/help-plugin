@@ -14,7 +14,8 @@
             
             const $button = $(this);
             const originalText = $button.text();
-            $button.prop('disabled', true).text('Loading...');
+            const loadingText = (boochatConnectStripe.loading) ? boochatConnectStripe.loading : 'Loading...';
+            $button.prop('disabled', true).text(loadingText);
             
             $.ajax({
                 url: boochatConnectStripe.ajaxUrl,
@@ -31,7 +32,7 @@
                     } else {
                         const errorMsg = (response && response.data && response.data.message) 
                             ? response.data.message 
-                            : 'Failed to create checkout session. Please try again.';
+                            : (boochatConnectStripe.failedCheckout ? boochatConnectStripe.failedCheckout : 'Failed to create checkout session. Please try again.');
                         alert(errorMsg);
                         $button.prop('disabled', false).text(originalText);
                     }
@@ -39,7 +40,7 @@
                 error: function(xhr, status, error) {
                     console.error('AJAX Error:', status, error);
                     console.error('Response:', xhr.responseText);
-                    let errorMsg = 'Error connecting to server. Please try again.';
+                    let errorMsg = (boochatConnectStripe.errorConnecting) ? boochatConnectStripe.errorConnecting : 'Error connecting to server. Please try again.';
                     
                     if (xhr.responseText) {
                         try {
