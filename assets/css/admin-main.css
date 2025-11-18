@@ -26,6 +26,18 @@
     gap: 20px;
 }
 
+/* Single column layout for pages without sidebar */
+.boochat-connect-content:has(.boochat-connect-content-left:only-child) {
+    grid-template-columns: 1fr;
+}
+
+/* Responsive: stack columns on smaller screens */
+@media (max-width: 960px) {
+    .boochat-connect-content {
+        grid-template-columns: 1fr;
+    }
+}
+
 .boochat-connect-content-left {
     display: flex;
     flex-direction: column;
@@ -302,9 +314,9 @@
     font-size: 13px;
     line-height: 1.6;
 }
-
 .boochat-connect-license-card a {
     color: #2271b1;
     text-decoration: none;
 }
+
 

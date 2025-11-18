@@ -19,6 +19,16 @@
 
 .boochat-connect-wrap {
     margin: 20px 20px 0 0;
+    padding-right: 40px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 782px) {
+    .boochat-connect-wrap {
+        margin: 10px 10px 0 0;
+        padding-right: 20px;
+    }
 }
 
 .boochat-connect-wrap h1 {
@@ -28,6 +38,8 @@
 .boochat-connect-content {
     margin-top: 20px;
 }
+
+/* Settings and Customization pages use same layout as Main Panel */
 
 .boochat-connect-card {
     background: #fff;
@@ -93,60 +105,46 @@
     color: red;
 }
 
-/* PRO Upgrade Page Styles */
-.boochat-connect-pro-upgrade {
-    max-width: 900px;
-}
+/* PRO Upgrade Page Styles - Using Main Panel Layout */
 
-.boochat-connect-pro-upgrade .intro-text {
-    font-size: 16px;
-    color: #50575e;
-    margin-bottom: 30px;
-}
-
-.pro-features {
-    margin: 30px 0;
-    padding: 20px;
-    background: #f0f6fc;
-    border-left: 4px solid #2271b1;
-    border-radius: 4px;
-}
-
-.pro-features h2 {
-    margin-top: 0;
-    color: #1d2327;
-}
+/* Features List */
 
 .feature-list {
     list-style: none;
     padding: 0;
-    margin: 15px 0;
+    margin: 0;
+    display: block;
 }
 
 .feature-list li {
     padding: 10px 0;
     font-size: 15px;
     color: #50575e;
-    line-height: 1.6;
+    line-height: 1.5;
+    border-bottom: 1px solid #f0f0f1;
 }
 
-.pricing-section {
-    margin: 40px 0;
+.feature-list li:last-child {
+    border-bottom: none;
+}
+
+/* Pricing Card in Sidebar */
+
+.price-card {
+    background: #f8f9fa;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 24px;
+    max-width: 100%;
+    width: 100%;
+    margin: 16px 0 0 0;
+    box-sizing: border-box;
     text-align: center;
 }
 
-.pricing-section h2 {
-    margin-bottom: 20px;
-}
-
-.price-card {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    border: 2px solid #2271b1;
-    border-radius: 12px;
-    padding: 40px;
-    max-width: 400px;
-    margin: 0 auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+/* Price styling in sidebar */
+.boochat-connect-sidebar .price-card {
+    margin-top: 0;
 }
 
 .price-card h3 {
@@ -156,50 +154,35 @@
 }
 
 .price {
-    margin: 30px 0;
-    font-size: 48px;
-    font-weight: bold;
-    color: #2271b1;
+    margin: 20px 0;
+    font-size: 42px;
+    font-weight: 600;
+    color: #1d2327;
     line-height: 1;
 }
 
 .price .currency {
-    font-size: 32px;
+    font-size: 24px;
     vertical-align: top;
 }
 
 .price .amount {
-    font-size: 64px;
+    font-size: 48px;
 }
 
 .price .period {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: normal;
     color: #646970;
-    margin-left: 5px;
+    margin-left: 4px;
 }
 
 .price-description {
     color: #646970;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
     font-size: 14px;
 }
 
-.button-hero {
-    padding: 15px 40px;
-    font-size: 16px;
-    height: auto;
-}
-
-.license-activation-section {
-    margin-top: 50px;
-    padding-top: 30px;
-    border-top: 1px solid #ccd0d4;
-}
-
-.license-activation-section h2 {
-    margin-top: 0;
-}
 
 .license-form {
     margin-top: 20px;
