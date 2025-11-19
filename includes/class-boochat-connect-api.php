@@ -34,23 +34,28 @@ class BooChat_Connect_API {
     public function send_message($session_id, $chat_input) {
         $url = $this->get_api_url();
         
-        // Check if URL is configured
         if (empty($url)) {
             return new WP_Error('no_api_url', boochat_connect_translate('api_not_configured_error', 'API URL not configured. Configure in BooChat Connect > Settings.'));
         }
         
+        $request_body = array(
+            'sessionId' => $session_id,
+            'action' => 'sendMessage',
+            'chatInput' => $chat_input
+        );
+        
+        $headers = array(
+            'Content-Type' => 'application/json',
+        );
+        
         $response = wp_remote_post($url, array(
-            'body' => json_encode(array(
-                'sessionId' => $session_id,
-                'action' => 'sendMessage',
-                'chatInput' => $chat_input
-            )),
-            'headers' => array(
-                'Content-Type' => 'application/json',
-            ),
+            'body' => json_encode($request_body),
+            'headers' => $headers,
             'timeout' => 30,
             'sslverify' => true,
         ));
+        
+        boochat_connect_log_api_request('send_message', $url, $request_body, $headers, $response);
         
         if (is_wp_error($response)) {
             return $response;
@@ -63,7 +68,6 @@ class BooChat_Connect_API {
             return new WP_Error('http_error', sprintf(boochat_connect_translate('http_error_message', 'HTTP %d: %s'), $response_code, $body));
         }
         
-        // Return response as array compatible with existing code
         return array(
             'body' => $body,
             'response' => array(

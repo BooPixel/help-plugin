@@ -204,3 +204,77 @@ if (!function_exists('boochat_connect_translate')) {
     }
 }
 
+/**
+ * Log API request and response details
+ *
+ * @param string $endpoint_name Name/identifier of the API endpoint (e.g., 'send_message', 'activate').
+ * @param string $url Full API URL.
+ * @param array  $request_body Request payload (will be JSON encoded).
+ * @param array  $headers Request headers (optional).
+ * @param array|WP_Error $response WordPress HTTP response or error.
+ * @return void
+ */
+if (!function_exists('boochat_connect_log_api_request')) {
+    function boochat_connect_log_api_request($endpoint_name, $url, $request_body = array(), $headers = array(), $response = null) {
+        $log_prefix = '[BooChat Connect] [' . $endpoint_name . ']';
+        
+        // Log request details
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- API request logging
+        error_log($log_prefix . ' Request URL: ' . $url);
+        
+        if (!empty($request_body)) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- API request logging
+            error_log($log_prefix . ' Request Body: ' . wp_json_encode($request_body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        }
+        
+        if (!empty($headers)) {
+            // Sanitize headers for logging (remove sensitive data like API keys)
+            $log_headers = $headers;
+            if (isset($log_headers['X-API-Key'])) {
+                $log_headers['X-API-Key'] = substr($log_headers['X-API-Key'], 0, 8) . '...' . substr($log_headers['X-API-Key'], -4);
+            }
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- API request logging
+            error_log($log_prefix . ' Request Headers: ' . wp_json_encode($log_headers, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        }
+        
+        // Log response details
+        if (is_wp_error($response)) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- API request logging
+            error_log($log_prefix . ' Response Error: ' . $response->get_error_message());
+            if ($response->get_error_code()) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- API request logging
+                error_log($log_prefix . ' Response Error Code: ' . $response->get_error_code());
+            }
+        } else {
+            $response_code = wp_remote_retrieve_response_code($response);
+            $response_body = wp_remote_retrieve_body($response);
+            $response_headers = wp_remote_retrieve_headers($response);
+            
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- API request logging
+            error_log($log_prefix . ' Response Code: ' . $response_code);
+            
+            // Log response body (payload)
+            if (!empty($response_body)) {
+                // Try to decode and re-encode for better formatting
+                $decoded = json_decode($response_body, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- API request logging
+                    error_log($log_prefix . ' Response Body (JSON): ' . wp_json_encode($decoded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+                } else {
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- API request logging
+                    error_log($log_prefix . ' Response Body (Raw): ' . $response_body);
+                }
+            } else {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- API request logging
+                error_log($log_prefix . ' Response Body: (empty)');
+            }
+            
+            // Log response headers if available
+            if (!empty($response_headers)) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- API request logging
+                error_log($log_prefix . ' Response Headers: ' . wp_json_encode($response_headers->getAll(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            }
+        }
+    }
+}
+
