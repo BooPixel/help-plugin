@@ -112,54 +112,54 @@ class BooChat_Connect_Admin {
         );
         
         // Add Statistics menu with PRO badge if not licensed
-        $statistics_title = boochat_connect_translate('statistics');
-        $statistics_menu_title = $statistics_title;
-        $statistics_callback = array($this, 'render_statistics_page');
-        
-        if (!$this->license->is_pro()) {
-            $statistics_menu_title = $statistics_title . ' <span class="boochat-connect-pro-badge">PRO</span>';
-            // Change callback to redirect to PRO page
-            $statistics_callback = array($this, 'redirect_to_pro_page');
-        }
-        
-        add_submenu_page(
-            'boochat-connect',
-            $statistics_title,
-            $statistics_menu_title,
-            'manage_options',
-            'boochat-connect-statistics',
-            $statistics_callback
-        );
+        // $statistics_title = boochat_connect_translate('statistics');
+        // $statistics_menu_title = $statistics_title;
+        // $statistics_callback = array($this, 'render_statistics_page');
+        //
+        // if (!$this->license->is_pro()) {
+        //     $statistics_menu_title = $statistics_title . ' <span class="boochat-connect-pro-badge">PRO</span>';
+        //     // Change callback to redirect to PRO page
+        //     $statistics_callback = array($this, 'redirect_to_pro_page');
+        // }
+        //
+        // add_submenu_page(
+        //     'boochat-connect',
+        //     $statistics_title,
+        //     $statistics_menu_title,
+        //     'manage_options',
+        //     'boochat-connect-statistics',
+        //     $statistics_callback
+        // );
         
         // Add Sessions menu with PRO badge if not licensed
-        $sessions_title = boochat_connect_translate('sessions', 'Sessions');
-        $sessions_menu_title = $sessions_title;
-        $sessions_callback = array($this, 'render_sessions_page');
-        
-        if (!$this->license->is_pro()) {
-            $sessions_menu_title = $sessions_title . ' <span class="boochat-connect-pro-badge">PRO</span>';
-            // Change callback to redirect to PRO page
-            $sessions_callback = array($this, 'redirect_to_pro_page');
-        }
-        
-        add_submenu_page(
-            'boochat-connect',
-            $sessions_title,
-            $sessions_menu_title,
-            'manage_options',
-            'boochat-connect-sessions',
-            $sessions_callback
-        );
+        // $sessions_title = boochat_connect_translate('sessions', 'Sessions');
+        // $sessions_menu_title = $sessions_title;
+        // $sessions_callback = array($this, 'render_sessions_page');
+        //
+        // if (!$this->license->is_pro()) {
+        //     $sessions_menu_title = $sessions_title . ' <span class="boochat-connect-pro-badge">PRO</span>';
+        //     // Change callback to redirect to PRO page
+        //     $sessions_callback = array($this, 'redirect_to_pro_page');
+        // }
+        //
+        // add_submenu_page(
+        //     'boochat-connect',
+        //     $sessions_title,
+        //     $sessions_menu_title,
+        //     'manage_options',
+        //     'boochat-connect-sessions',
+        //     $sessions_callback
+        // );
         
         // Add PRO upgrade page
-        add_submenu_page(
-            'boochat-connect',
-            boochat_connect_translate('upgrade_to_pro', 'Upgrade to PRO'),
-            boochat_connect_translate('upgrade_to_pro', 'Upgrade to PRO'),
-            'manage_options',
-            'boochat-connect-pro',
-            array($this, 'render_pro_upgrade_page')
-        );
+        // add_submenu_page(
+        //     'boochat-connect',
+        //     boochat_connect_translate('upgrade_to_pro', 'Upgrade to PRO'),
+        //     boochat_connect_translate('upgrade_to_pro', 'Upgrade to PRO'),
+        //     'manage_options',
+        //     'boochat-connect-pro',
+        //     array($this, 'render_pro_upgrade_page')
+        // );
     }
     
     /**

@@ -15,10 +15,6 @@ if (!defined('ABSPATH')) {
 <div class="wrap boochat-connect-wrap">
     <div class="boochat-connect-header">
         <h1><?php echo esc_html(boochat_connect_translate('chat_customization')); ?></h1>
-        <p>
-            <?php echo esc_html(boochat_connect_translate('version', 'Version')); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
-            <?php echo esc_html(boochat_connect_translate('ai_chatbot_automation', 'AI Chatbot & n8n Automation')); ?>
-        </p>
     </div>
     
     <?php if ($customization_updated): ?>

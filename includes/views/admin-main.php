@@ -13,12 +13,19 @@ if (!defined('ABSPATH')) {
 }
 ?>
 <div class="wrap boochat-connect-wrap">
+    <!-- Welcome Banner -->
+    <div class="boochat-connect-welcome-banner">
+        <h1><?php echo esc_html__('Welcome to BooChat Connect!', 'boochat-connect'); ?></h1>
+        <p>
+            <a href="https://boopixel.com/boochat-connect" target="_blank" rel="noopener noreferrer" class="boochat-connect-welcome-link">
+                <?php echo esc_html(boochat_connect_translate('version', 'Version')); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?>
+            </a>
+        </p>
+        <button type="button" class="boochat-connect-dismiss-button"><?php echo esc_html__('Dismiss', 'boochat-connect'); ?></button>
+    </div>
+    
     <div class="boochat-connect-header">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-        <p>
-            <?php echo esc_html(boochat_connect_translate('version', 'Version')); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
-            <?php echo esc_html(boochat_connect_translate('ai_chatbot_automation', 'AI Chatbot & n8n Automation')); ?>
-        </p>
     </div>
     
     <div class="boochat-connect-content">
@@ -122,7 +129,7 @@ if (!defined('ABSPATH')) {
                             </p>
                         </div>
                     </div>
-                    <div class="boochat-connect-getting-started-item">
+                    <?php /* <div class="boochat-connect-getting-started-item">
                         <div class="boochat-connect-getting-started-number">4</div>
                         <div class="boochat-connect-getting-started-content">
                             <h3>
@@ -134,7 +141,7 @@ if (!defined('ABSPATH')) {
                                 <?php echo esc_html__('Track user interactions and analyze chat usage over time.', 'boochat-connect'); ?>
                             </p>
                         </div>
-                    </div>
+                    </div> */ ?>
                 </div>
             </div>
 
@@ -195,9 +202,9 @@ if (!defined('ABSPATH')) {
                     <a href="<?php echo esc_url(admin_url('admin.php?page=boochat-connect-settings')); ?>" class="button button-primary button-large">
                         <?php echo esc_html__('Settings', 'boochat-connect'); ?>
                     </a>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=boochat-connect-statistics')); ?>" class="button button-primary button-large">
+                    <?php /* <a href="<?php echo esc_url(admin_url('admin.php?page=boochat-connect-statistics')); ?>" class="button button-primary button-large">
                         <?php echo esc_html__('Statistics', 'boochat-connect'); ?>
-                    </a>
+                    </a> */ ?>
                 </div>
             </div>
 
@@ -221,10 +228,10 @@ if (!defined('ABSPATH')) {
                         <span class="icon">✓</span>
                         <span class="text"><?php echo esc_html__('Session management', 'boochat-connect'); ?></span>
                     </li>
-                    <li>
+                    <?php /* <li>
                         <span class="icon">✓</span>
                         <span class="text"><?php echo esc_html__('Statistics & analytics', 'boochat-connect'); ?></span>
-                    </li>
+                    </li> */ ?>
                     <li>
                         <span class="icon">✓</span>
                         <span class="text"><?php echo esc_html__('Multi-language support', 'boochat-connect'); ?></span>

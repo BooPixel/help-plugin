@@ -29,10 +29,6 @@ if (!$boochat_connect_license->is_pro()) {
 <div class="wrap boochat-connect-wrap">
     <div class="boochat-connect-header">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-        <p>
-            <?php echo esc_html(boochat_connect_translate('version', 'Version')); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
-            <?php echo esc_html(boochat_connect_translate('ai_chatbot_automation', 'AI Chatbot & n8n Automation')); ?>
-        </p>
     </div>
     
     <div class="boochat-connect-statistics-layout">

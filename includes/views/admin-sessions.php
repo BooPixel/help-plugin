@@ -27,17 +27,13 @@ if (!$boochat_connect_license->is_pro()) {
 <div class="wrap boochat-connect-wrap">
     <div class="boochat-connect-header">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-        <p>
-            <?php echo esc_html(boochat_connect_translate('version', 'Version')); ?> <?php echo esc_html(BOOCHAT_CONNECT_VERSION); ?> • 
-            <?php echo esc_html(boochat_connect_translate('ai_chatbot_automation', 'AI Chatbot & n8n Automation')); ?>
-        </p>
     </div>
     
     <div class="boochat-connect-content">
         <div class="boochat-connect-content-left">
             <div class="boochat-connect-card">
-                <h2><?php echo esc_html(boochat_connect_translate('user_sessions', 'User Sessions')); ?></h2>
-                <p><?php echo esc_html(boochat_connect_translate('view_user_sessions', 'View all user chat sessions and their details.')); ?></p>
+                <h2 style="margin-top: 0; font-size: 20px; color: #1d2327; font-weight: 600; border-bottom: none; padding-bottom: 0; margin-bottom: 12px;"><?php echo esc_html(boochat_connect_translate('user_sessions', 'User Sessions')); ?></h2>
+                <p style="color: #646970; font-size: 14px; margin-bottom: 20px; line-height: 1.6;"><?php echo esc_html(boochat_connect_translate('view_user_sessions', 'View all user chat sessions and their details.')); ?></p>
                 
                 <!-- Filters -->
                 <div class="boochat-connect-sessions-filters" style="margin: 20px 0; display: flex; align-items: center; gap: 10px;">
