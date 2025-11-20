@@ -4,7 +4,7 @@ Tags: chatbot, ai, n8n, automation, customer service
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.0.292
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,8 +20,6 @@ Perfect for businesses that want to automate customer support, boost conversions
 
 = Key Features =
 
-== Free Version ==
-
 * **Fully customizable chat popup** (colors, icons, texts)
 * **Direct n8n Webhook integration**
 * **AI-ready**: connect to ChatGPT, Claude, Gemini, Llama, and more (via n8n)
@@ -32,13 +30,6 @@ Perfect for businesses that want to automate customer support, boost conversions
 * **Responsive Design**: Mobile-friendly chat interface
 * **Session Management**: Automatic session tracking
 * **Real-time Messaging**: Send and receive messages instantly
-
-== PRO Version (Additional Features) ==
-
-* **Advanced Statistics Dashboard**: Track interactions (1 day, 7 days, 30 days) with interactive charts and date range selection
-* **Session Management**: View all user chat sessions with complete conversation history
-* **Export Options**: Export session messages as JSON or CSV
-* **License Management**: License activation via key or Stripe checkout
 
 = What You Can Automate =
 
@@ -74,7 +65,6 @@ Perfect for businesses that want to automate customer support, boost conversions
    * n8n workflow processes the message (AI, database, API calls, etc.)
    * n8n returns response
    * WordPress receives response and displays it in the chat
-   * If PRO: Message is saved to database for statistics
 
 4. **Response Display**:
    * Bot response appears in chat window
@@ -119,24 +109,6 @@ Your n8n workflow should return a response in this format:
 * Font family and size
 * Language selection (auto-detects from WordPress)
 
-= Statistics & Analytics (PRO Only) =
-
-Track your chat performance with:
-* Quick summary boxes (24 hours, 7 days, 30 days)
-* Interactive charts with date range selection
-* Custom date range filtering
-* Message content logging
-* Session-based interaction tracking
-* Export capabilities (JSON/CSV)
-
-= Session Management (PRO Only) =
-
-View and manage user sessions:
-* View all chat sessions with session ID, timestamps, and message counts
-* Complete conversation history per session
-* Export sessions as JSON or CSV for analysis
-* Session details and analytics
-
 == Installation ==
 
 = Automatic Installation =
@@ -167,11 +139,7 @@ The plugin automatically detects your WordPress language and supports English, P
 
 = How are chat sessions tracked? =
 
-Each user gets a unique session ID that persists throughout their conversation. This allows for conversation continuity and accurate statistics tracking.
-
-= Can I see chat statistics? =
-
-Yes! The PRO version includes a comprehensive statistics dashboard with quick summaries and interactive charts showing chat interactions over time. The free version includes basic chat functionality without statistics tracking.
+Each user gets a unique session ID that persists throughout their conversation. This allows for conversation continuity and ensures that each conversation maintains context.
 
 == Screenshots ==
 
@@ -179,15 +147,6 @@ Yes! The PRO version includes a comprehensive statistics dashboard with quick su
 2. Main panel dashboard with information and quick links
 3. Customization panel for chat appearance settings
 4. Settings page with n8n webhook configuration
-5. Statistics dashboard with charts
-
-== Upgrade Notice ==
-
-= 1.0.45 =
-This version includes code refactoring, improved admin panel design, and enhanced performance. Update recommended for all users.
-
-= 1.0.0 =
-Initial release of BooChat Connect. Install and configure your n8n webhook to get started.
 
 == Support ==
 
