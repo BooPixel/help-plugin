@@ -22,6 +22,15 @@
             }, 5000);
         });
         
+        // Welcome banner dismiss button
+        $('.boochat-connect-dismiss-button').on('click', function(e) {
+            e.preventDefault();
+            var $banner = $('.boochat-connect-welcome-banner');
+            $banner.fadeOut(300, function() {
+                $banner.remove();
+            });
+        });
+        
     });
     
 })(jQuery);

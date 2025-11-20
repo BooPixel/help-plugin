@@ -1,5 +1,5 @@
 /**
- * Admin customization page styles
+ * Admin customization page styles - WordPress Dashboard Style
  *
  * @package BooChat_Connect
  */
@@ -25,6 +25,25 @@
     flex-direction: column;
 }
 
+.boochat-connect-customization-text .boochat-connect-card h2,
+.boochat-connect-customization-colors .boochat-connect-card h2 {
+    margin-top: 0;
+    font-size: 20px;
+    color: #1d2327;
+    font-weight: 600;
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 12px;
+}
+
+.boochat-connect-customization-text .boochat-connect-card p,
+.boochat-connect-customization-colors .boochat-connect-card p {
+    color: #646970;
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
 .boochat-connect-customization-text .boochat-connect-card table,
 .boochat-connect-customization-colors .boochat-connect-card table {
     flex: 1;
@@ -42,10 +61,11 @@
 }
 
 .boochat-connect-save-card {
-    border: none;
-    box-shadow: none;
-    padding: 20px;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    padding: 24px;
     background: #fff;
+    border-radius: 0;
 }
 
 .boochat-connect-save-card .button {

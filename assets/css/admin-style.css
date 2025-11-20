@@ -47,7 +47,7 @@
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
     padding: 24px;
     margin-bottom: 0;
-    border-radius: 8px;
+    border-radius: 0;
     transition: box-shadow 0.2s ease;
 }
 
@@ -56,8 +56,8 @@
 }
 
 .boochat-connect-card-hero {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    border: none;
+    background: #fff;
+    border: 1px solid #ccd0d4;
 }
 
 .boochat-connect-status-card {
@@ -142,9 +142,9 @@
     display: flex;
     gap: 20px;
     padding: 24px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 0;
     position: relative;
     overflow: hidden;
 }
@@ -168,9 +168,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #f0f6fc 0%, #e8f4fd 100%);
-    border-radius: 12px;
-    border: 2px solid #c7d2fe;
+    background: #1d2327;
+    border-radius: 0;
+    border: none;
+    color: #fff;
 }
 
 .boochat-connect-pro-feature-content {
@@ -187,8 +188,8 @@
 
 .boochat-connect-pro-feature-content p {
     margin: 0 0 16px 0;
-    font-size: 15px;
-    color: #50575e;
+    font-size: 14px;
+    color: #646970;
     line-height: 1.6;
 }
 
@@ -281,8 +282,25 @@
 }
 
 .boochat-connect-pro-active {
-    background: linear-gradient(135deg, #f0f6fc 0%, #ffffff 100%);
-    border: 2px solid #00a32a;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+}
+
+.boochat-connect-pro-active h2 {
+    margin-top: 0;
+    font-size: 20px;
+    color: #1d2327;
+    font-weight: 600;
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 12px;
+}
+
+.boochat-connect-pro-active p {
+    color: #646970;
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.6;
 }
 
 .license-info {
