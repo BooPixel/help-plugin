@@ -3,7 +3,7 @@
  * Plugin Name: BooPixel AI Chat Connect for n8n
  * Plugin URI: https://boopixel.com/boopixel-ai-chat-for-n8n
  * Description: AI Chatbot & n8n Automation - Modern, lightweight chatbot popup that integrates seamlessly with n8n. Automate workflows, respond in real-time, collect leads, and connect to any AI model or external service. Perfect for 24/7 AI support, sales automation, and smart customer interactions.
- * Version: 1.0.2
+ * Version: 1.0.4
  * Author: BooPixel
  * Author URI: https://boopixel.com
  * Developer: BooPixel
@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define constants
-define('BOOPIXEL_AI_CHAT_FOR_N8N_VERSION', '1.0.2');
+define('BOOPIXEL_AI_CHAT_FOR_N8N_VERSION', '1.0.4');
 define('BOOPIXEL_AI_CHAT_FOR_N8N_DIR', plugin_dir_path(__FILE__));
 define('BOOPIXEL_AI_CHAT_FOR_N8N_URL', plugin_dir_url(__FILE__));
 
