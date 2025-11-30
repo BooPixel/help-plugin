@@ -1,7 +1,7 @@
 /**
  * Admin customization page scripts
  *
- * @package BooChat_Connect
+ * @package BooPixel_AI_Chat_For_N8n
  */
 
 (function($) {
@@ -21,9 +21,9 @@
         
         // Create the media uploader
         mediaUploader = wp.media({
-            title: (typeof boochatConnectCustomization !== 'undefined' && boochatConnectCustomization.chooseIcon) ? boochatConnectCustomization.chooseIcon : 'Choose Chat Icon',
+            title: (typeof boopixelAiChatForN8nCustomization !== 'undefined' && boopixelAiChatForN8nCustomization.chooseIcon) ? boopixelAiChatForN8nCustomization.chooseIcon : 'Choose Chat Icon',
             button: {
-                text: (typeof boochatConnectCustomization !== 'undefined' && boochatConnectCustomization.useIcon) ? boochatConnectCustomization.useIcon : 'Use this icon'
+                text: (typeof boopixelAiChatForN8nCustomization !== 'undefined' && boopixelAiChatForN8nCustomization.useIcon) ? boopixelAiChatForN8nCustomization.useIcon : 'Use this icon'
             },
             multiple: false,
             library: {
@@ -45,7 +45,7 @@
             
             // Show remove button if not already visible
             if ($('.boochat-connect-remove-icon-button').length === 0) {
-                var removeIconText = (typeof boochatConnectCustomization !== 'undefined' && boochatConnectCustomization.removeIcon) ? boochatConnectCustomization.removeIcon : 'Remove Icon';
+                var removeIconText = (typeof boopixelAiChatForN8nCustomization !== 'undefined' && boopixelAiChatForN8nCustomization.removeIcon) ? boopixelAiChatForN8nCustomization.removeIcon : 'Remove Icon';
                 $('.boochat-connect-upload-icon-button').after(
                     '<button type="button" class="button boochat-connect-remove-icon-button" style="margin-left: 10px;">' + removeIconText + '</button>'
                 );

@@ -1,5 +1,5 @@
 /**
- * Scripts for BooChat Connect admin page
+ * Scripts for BooPixel AI Chat Connect for n8n admin page
  */
 
 (function($) {

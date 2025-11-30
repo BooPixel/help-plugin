@@ -3,8 +3,8 @@
     
     $(document).ready(function() {
         // Check if configuration is available
-        if (typeof boochatConnectStripe === 'undefined') {
-            console.error('BooChat Connect Stripe configuration not found');
+        if (typeof boopixelAiChatForN8nStripe === 'undefined') {
+            console.error('BooPixel AI Chat Connect for n8n Stripe configuration not found');
             $('#stripe-checkout-btn').prop('disabled', true).text('Configuration Error');
             return;
         }
@@ -14,15 +14,15 @@
             
             const $button = $(this);
             const originalText = $button.text();
-            const loadingText = (boochatConnectStripe.loading) ? boochatConnectStripe.loading : 'Loading...';
+            const loadingText = (boopixelAiChatForN8nStripe.loading) ? boopixelAiChatForN8nStripe.loading : 'Loading...';
             $button.prop('disabled', true).text(loadingText);
             
             $.ajax({
-                url: boochatConnectStripe.ajaxUrl,
+                url: boopixelAiChatForN8nStripe.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'boochat_connect_create_stripe_session',
-                    nonce: boochatConnectStripe.nonce
+                    nonce: boopixelAiChatForN8nStripe.nonce
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -32,7 +32,7 @@
                     } else {
                         const errorMsg = (response && response.data && response.data.message) 
                             ? response.data.message 
-                            : (boochatConnectStripe.failedCheckout ? boochatConnectStripe.failedCheckout : 'Failed to create checkout session. Please try again.');
+                            : (boopixelAiChatForN8nStripe.failedCheckout ? boopixelAiChatForN8nStripe.failedCheckout : 'Failed to create checkout session. Please try again.');
                         alert(errorMsg);
                         $button.prop('disabled', false).text(originalText);
                     }
@@ -40,7 +40,7 @@
                 error: function(xhr, status, error) {
                     console.error('AJAX Error:', status, error);
                     console.error('Response:', xhr.responseText);
-                    let errorMsg = (boochatConnectStripe.errorConnecting) ? boochatConnectStripe.errorConnecting : 'Error connecting to server. Please try again.';
+                    let errorMsg = (boopixelAiChatForN8nStripe.errorConnecting) ? boopixelAiChatForN8nStripe.errorConnecting : 'Error connecting to server. Please try again.';
                     
                     if (xhr.responseText) {
                         try {

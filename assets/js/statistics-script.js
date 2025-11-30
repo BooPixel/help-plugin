@@ -4,7 +4,7 @@
     let chart = null;
     
     function initStatistics() {
-        if (typeof boochatConnectStats === 'undefined') {
+        if (typeof boopixelAiChatForN8nStats === 'undefined') {
             console.error('Statistics configuration not found');
             return;
         }
@@ -50,16 +50,16 @@
     }
     
     function loadQuickSummary() {
-        if (typeof boochatConnectStats === 'undefined') {
+        if (typeof boopixelAiChatForN8nStats === 'undefined') {
             return;
         }
         
         $.ajax({
-            url: boochatConnectStats.ajaxUrl,
+            url: boopixelAiChatForN8nStats.ajaxUrl,
             type: 'POST',
             data: {
                 action: 'boochat_connect_get_statistics',
-                nonce: boochatConnectStats.nonce,
+                nonce: boopixelAiChatForN8nStats.nonce,
                 date_from: '',
                 date_to: ''
             },
@@ -103,7 +103,7 @@
     }
     
     function loadStatistics() {
-        if (typeof boochatConnectStats === 'undefined') {
+        if (typeof boopixelAiChatForN8nStats === 'undefined') {
             showMessage('Error: Statistics configuration not loaded. Please refresh the page.', 'error');
             return;
         }
@@ -112,24 +112,24 @@
         const dateTo = $('#date-to').val();
         
         if (!dateFrom || !dateTo) {
-            showMessage(boochatConnectStats.selectDatesText || 'Please select start and end dates.', 'error');
+            showMessage(boopixelAiChatForN8nStats.selectDatesText || 'Please select start and end dates.', 'error');
             return;
         }
         
         if (new Date(dateFrom) > new Date(dateTo)) {
-            showMessage(boochatConnectStats.invalidDateRangeText || 'Start date must be before end date.', 'error');
+            showMessage(boopixelAiChatForN8nStats.invalidDateRangeText || 'Start date must be before end date.', 'error');
             return;
         }
         
         const $button = $('#load-statistics');
-        $button.prop('disabled', true).text(boochatConnectStats.loadingText || 'Loading...');
+        $button.prop('disabled', true).text(boopixelAiChatForN8nStats.loadingText || 'Loading...');
         
         $.ajax({
-            url: boochatConnectStats.ajaxUrl,
+            url: boopixelAiChatForN8nStats.ajaxUrl,
             type: 'POST',
             data: {
                 action: 'boochat_connect_get_statistics',
-                nonce: boochatConnectStats.nonce,
+                nonce: boopixelAiChatForN8nStats.nonce,
                 date_from: dateFrom,
                 date_to: dateTo
             },
@@ -150,15 +150,15 @@
                         showMessage('Statistics loaded successfully.', 'success');
                     }
                 } else {
-                    let errorMessage = boochatConnectStats.errorLoadingText + (response.data.message || '');
+                    let errorMessage = boopixelAiChatForN8nStats.errorLoadingText + (response.data.message || '');
                     showMessage(errorMessage, 'error');
                 }
             },
             error: function(xhr, status, error) {
-                showMessage(boochatConnectStats.errorConnectingText || 'Error connecting to server. Please try again.', 'error');
+                showMessage(boopixelAiChatForN8nStats.errorConnectingText || 'Error connecting to server. Please try again.', 'error');
             },
             complete: function() {
-                $button.prop('disabled', false).text(boochatConnectStats.loadStatisticsText);
+                $button.prop('disabled', false).text(boopixelAiChatForN8nStats.loadStatisticsText);
             }
         });
     }
@@ -214,7 +214,7 @@
     let currentConversationPage = 1;
     
     function loadConversations(page = 1) {
-        if (typeof boochatConnectStats === 'undefined') {
+        if (typeof boopixelAiChatForN8nStats === 'undefined') {
             showMessage('Error: Statistics configuration not loaded. Please refresh the page.', 'error');
             return;
         }
@@ -228,14 +228,14 @@
         const perPage = parseInt($('#conversations-per-page').val()) || 10;
         
         // Show loading state
-        container.html('<p style="text-align: center; color: #646970; padding: 20px;"><span class="spinner is-active" style="float: none; margin: 0 10px 0 0;"></span>' + (boochatConnectStats.loadingText || 'Loading...') + '</p>');
+        container.html('<p style="text-align: center; color: #646970; padding: 20px;"><span class="spinner is-active" style="float: none; margin: 0 10px 0 0;"></span>' + (boopixelAiChatForN8nStats.loadingText || 'Loading...') + '</p>');
         
         $.ajax({
-            url: boochatConnectStats.ajaxUrl,
+            url: boopixelAiChatForN8nStats.ajaxUrl,
             type: 'POST',
             data: {
                 action: 'boochat_connect_get_conversations',
-                nonce: boochatConnectStats.nonce,
+                nonce: boopixelAiChatForN8nStats.nonce,
                 date_from: '', // Empty to get latest
                 date_to: '', // Empty to get latest
                 page: page,
@@ -246,13 +246,13 @@
                     updateConversationsDisplay(response.data);
                     currentConversationPage = page;
                 } else {
-                    const errorMsg = (response.data && response.data.message) ? response.data.message : (boochatConnectStats.errorLoadingText || 'Error loading conversations.');
+                    const errorMsg = (response.data && response.data.message) ? response.data.message : (boopixelAiChatForN8nStats.errorLoadingText || 'Error loading conversations.');
                     container.html('<p style="text-align: center; color: #d63638; padding: 20px;">' + errorMsg + '</p>');
                 }
             },
             error: function(xhr, status, error) {
                 console.error('AJAX Error:', status, error, xhr.responseText);
-                container.html('<p style="text-align: center; color: #d63638; padding: 20px;">' + (boochatConnectStats.errorConnectingText || 'Error connecting to server. Please try again.') + '</p>');
+                container.html('<p style="text-align: center; color: #d63638; padding: 20px;">' + (boopixelAiChatForN8nStats.errorConnectingText || 'Error connecting to server. Please try again.') + '</p>');
             }
         });
     }
@@ -377,7 +377,7 @@
             return;
         }
         
-        if (typeof boochatConnectStats === 'undefined') {
+        if (typeof boopixelAiChatForN8nStats === 'undefined') {
             setTimeout(waitForChartAndInit, 100);
             return;
         }

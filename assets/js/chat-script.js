@@ -143,8 +143,8 @@
             
             // Add loading indicator
             const loadingId = 'loading-' + Date.now();
-            if (typeof boochatConnectAjax !== 'undefined') {
-                addMessage(boochatConnectAjax.loadingText, 'system', loadingId);
+            if (typeof boopixelAiChatForN8nAjax !== 'undefined') {
+                addMessage(boopixelAiChatForN8nAjax.loadingText, 'system', loadingId);
             } else {
                 addMessage('Aguardando resposta...', 'system', loadingId);
             }
@@ -153,7 +153,7 @@
             const sessionId = getSessionId();
             
             // Check if AJAX object is defined
-            if (typeof boochatConnectAjax === 'undefined') {
+            if (typeof boopixelAiChatForN8nAjax === 'undefined') {
                 $('#' + loadingId).remove();
                 addMessage('Erro: Configuração do plugin não encontrada. Recarregue a página.', 'system');
                 setFormDisabled(false);
@@ -162,11 +162,11 @@
             
             // Send AJAX request to WordPress, which will call the API
             $.ajax({
-                url: boochatConnectAjax.ajaxUrl,
+                url: boopixelAiChatForN8nAjax.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'boochat_connect_send_message',
-                    nonce: boochatConnectAjax.nonce,
+                    nonce: boopixelAiChatForN8nAjax.nonce,
                     sessionId: sessionId,
                     chatInput: userMessage
                 },
@@ -187,7 +187,7 @@
                         // Show error message
                         const errorMsg = response.data && response.data.message 
                             ? response.data.message 
-                            : (boochatConnectAjax.errorText || 'Erro ao enviar mensagem');
+                            : (boopixelAiChatForN8nAjax.errorText || 'Erro ao enviar mensagem');
                         addMessage(errorMsg, 'system');
                     }
                 },
@@ -196,7 +196,7 @@
                     $('#' + loadingId).remove();
                     
                     // Show error message
-                    let errorMsg = boochatConnectAjax.errorText || 'Erro ao enviar mensagem';
+                    let errorMsg = boopixelAiChatForN8nAjax.errorText || 'Erro ao enviar mensagem';
                     if (xhr.responseText) {
                         try {
                             const errorResponse = JSON.parse(xhr.responseText);

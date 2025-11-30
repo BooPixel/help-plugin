@@ -1,7 +1,7 @@
 /**
  * Sessions page JavaScript
  *
- * @package BooChat_Connect
+ * @package BooPixel_AI_Chat_For_N8n
  */
 
 (function($) {
@@ -29,14 +29,14 @@
     
     function loadSessions() {
         const container = $('#sessions-container');
-        container.html('<p style="text-align: center; color: #646970; padding: 20px;"><span class="spinner is-active" style="float: none; margin: 0 10px 0 0;"></span>' + boochatConnectSessions.loadingText + '</p>');
+        container.html('<p style="text-align: center; color: #646970; padding: 20px;"><span class="spinner is-active" style="float: none; margin: 0 10px 0 0;"></span>' + boopixelAiChatForN8nSessions.loadingText + '</p>');
         
         $.ajax({
-            url: boochatConnectSessions.ajax_url,
+            url: boopixelAiChatForN8nSessions.ajax_url,
             type: 'POST',
             data: {
                 action: 'boochat_connect_get_sessions',
-                nonce: boochatConnectSessions.nonce,
+                nonce: boopixelAiChatForN8nSessions.nonce,
                 page: currentPage,
                 per_page: perPage
             },
@@ -45,11 +45,11 @@
                     renderSessions(response.data.sessions);
                     renderPagination(response.data);
                 } else {
-                    showError(response.data.message || boochatConnectSessions.errorLoadingText);
+                    showError(response.data.message || boopixelAiChatForN8nSessions.errorLoadingText);
                 }
             },
             error: function(xhr, status, error) {
-                showError(boochatConnectSessions.errorLoadingText + error);
+                showError(boopixelAiChatForN8nSessions.errorLoadingText + error);
             }
         });
     }
@@ -58,7 +58,7 @@
         const container = $('#sessions-container');
         
         if (!sessions || sessions.length === 0) {
-            container.html('<p style="text-align: center; color: #646970; padding: 20px;">' + boochatConnectSessions.noSessionsText + '</p>');
+            container.html('<p style="text-align: center; color: #646970; padding: 20px;">' + boopixelAiChatForN8nSessions.noSessionsText + '</p>');
             return;
         }
         
@@ -94,8 +94,8 @@
             html += '</button>';
             html += '<div class="boochat-connect-dropdown-menu">';
             html += '<a href="#" class="boochat-connect-view-session" data-session-id="' + escapeHtml(session.session_id) + '">' + 'View' + '</a>';
-            html += '<a href="#" class="boochat-connect-export-json" data-session-id="' + escapeHtml(session.session_id) + '">' + (boochatConnectSessions.exportJsonText || 'Export JSON') + '</a>';
-            html += '<a href="#" class="boochat-connect-export-csv" data-session-id="' + escapeHtml(session.session_id) + '">' + (boochatConnectSessions.exportCsvText || 'Export CSV') + '</a>';
+            html += '<a href="#" class="boochat-connect-export-json" data-session-id="' + escapeHtml(session.session_id) + '">' + (boopixelAiChatForN8nSessions.exportJsonText || 'Export JSON') + '</a>';
+            html += '<a href="#" class="boochat-connect-export-csv" data-session-id="' + escapeHtml(session.session_id) + '">' + (boopixelAiChatForN8nSessions.exportCsvText || 'Export CSV') + '</a>';
             html += '</div>';
             html += '</div>';
             html += '</td>';
@@ -224,11 +224,11 @@
         
         // Fetch session messages via AJAX
         $.ajax({
-            url: boochatConnectSessions.ajax_url,
+            url: boopixelAiChatForN8nSessions.ajax_url,
             type: 'POST',
             data: {
                 action: 'boochat_connect_get_session_details',
-                nonce: boochatConnectSessions.nonce,
+                nonce: boopixelAiChatForN8nSessions.nonce,
                 session_id: sessionId
             },
             success: function(response) {
@@ -340,11 +340,11 @@
     function exportSession(sessionId, format) {
         // Fetch session messages via AJAX
         $.ajax({
-            url: boochatConnectSessions.ajax_url,
+            url: boopixelAiChatForN8nSessions.ajax_url,
             type: 'POST',
             data: {
                 action: 'boochat_connect_export_session',
-                nonce: boochatConnectSessions.nonce,
+                nonce: boopixelAiChatForN8nSessions.nonce,
                 session_id: sessionId,
                 format: format
             },
