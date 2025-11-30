@@ -1,10 +1,10 @@
-=== BooChat Connect ===
+=== BooPixel AI Chat Connect for n8n ===
 Contributors: boopixel
 Tags: chatbot, ai, n8n, automation, customer service
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.0.0
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Connect your WordPress site to n8n workflows for intelligent AI-powered customer
 
 == Description ==
 
-BooChat Connect – AI Chatbot & n8n Automation brings intelligent customer interaction directly to your WordPress website.
+BooPixel AI Chat Connect for n8n – AI Chatbot & n8n Automation brings intelligent customer interaction directly to your WordPress website.
 
 Add a modern, lightweight chatbot popup that integrates seamlessly with n8n, allowing you to automate workflows, respond to visitors in real time, collect leads, and connect your chat interface to any external service or AI model.
 
@@ -38,7 +38,7 @@ Perfect for businesses that want to automate customer support, boost conversions
 * Integration with external APIs, databases, and web services
 * Personalized replies using AI via n8n workflows
 
-= Why Choose BooChat Connect =
+= Why Choose BooPixel AI Chat Connect for n8n =
 
 * ✔ Seamless n8n integration
 * ✔ Modern UI and smooth experience
@@ -73,7 +73,7 @@ Perfect for businesses that want to automate customer support, boost conversions
 
 == Setup Process ==
 
-1. Install and activate BooChat Connect
+1. Install and activate BooPixel AI Chat Connect for n8n
 2. Configure your n8n webhook URL in the plugin settings
 3. Customize the chat appearance to match your brand
 4. The chat widget automatically appears on your frontend
@@ -82,7 +82,7 @@ Perfect for businesses that want to automate customer support, boost conversions
 
 = n8n Integration =
 
-BooChat Connect sends messages to your n8n webhook in the following format:
+BooPixel AI Chat Connect for n8n sends messages to your n8n webhook in the following format:
 
 `json
 {
@@ -115,7 +115,7 @@ Your n8n workflow should return a response in this format:
 
 1. Log in to your WordPress admin panel
 2. Navigate to Plugins > Add New
-3. Search for "BooChat Connect"
+3. Search for "BooPixel AI Chat Connect for n8n"
 4. Click "Install Now"
 5. Click "Activate"
 
@@ -123,7 +123,7 @@ Your n8n workflow should return a response in this format:
 
 = Do I need n8n to use this plugin? =
 
-Yes, BooChat Connect requires an n8n webhook URL to function. You'll need to set up an n8n workflow that handles the chat messages and returns responses.
+Yes, BooPixel AI Chat Connect for n8n requires an n8n webhook URL to function. You'll need to set up an n8n workflow that handles the chat messages and returns responses.
 
 = Can I customize the chat appearance? =
 
