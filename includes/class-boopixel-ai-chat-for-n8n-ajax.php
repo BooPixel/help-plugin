@@ -77,7 +77,10 @@ class BooPixel_AI_Chat_For_N8n_Ajax {
      */
     public function send_message() {
         // Verify nonce for security
-        check_ajax_referer('boopixel-ai-chat-for-n8n-chat', 'nonce');
+        if (!isset($_POST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'boopixel-ai-chat-for-n8n-chat')) {
+            $this->send_error(boopixel_ai_chat_for_n8n_translate('security_check_failed', 'Security check failed. Please refresh the page.'));
+            return;
+        }
         
         $session_id = isset($_POST['sessionId']) ? sanitize_text_field(wp_unslash($_POST['sessionId'])) : '';
         $chat_input = isset($_POST['chatInput']) ? sanitize_text_field(wp_unslash($_POST['chatInput'])) : '';
@@ -137,12 +140,16 @@ class BooPixel_AI_Chat_For_N8n_Ajax {
             return;
         }
         
-        check_ajax_referer('boopixel-ai-chat-for-n8n-statistics', 'nonce');
+        // Verify nonce for security
+        if (!isset($_POST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'boopixel-ai-chat-for-n8n-statistics')) {
+            wp_send_json_error(array('message' => boopixel_ai_chat_for_n8n_translate('security_check_failed', 'Security check failed. Please refresh the page.')));
+            return;
+        }
         
         // Statistics feature is available to all users
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified above
         $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : current_time('Y-m-d');
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified above
         $date_to = isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : current_time('Y-m-d');
         
         wp_send_json_success(array(
@@ -162,16 +169,20 @@ class BooPixel_AI_Chat_For_N8n_Ajax {
      * @return void
      */
     public function ajax_get_sessions() {
-        check_ajax_referer('boopixel-ai-chat-for-n8n-sessions', 'nonce');
+        // Verify nonce for security
+        if (!isset($_POST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'boopixel-ai-chat-for-n8n-sessions')) {
+            wp_send_json_error(array('message' => boopixel_ai_chat_for_n8n_translate('security_check_failed', 'Security check failed. Please refresh the page.')));
+            return;
+        }
         
         if (!current_user_can('manage_options')) {
             wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'boopixel-ai-chat-for-n8n')));
             return;
         }
         
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified above
         $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified above
         $per_page = isset($_POST['per_page']) ? intval($_POST['per_page']) : 20;
         
         $offset = ($page - 1) * $per_page;
@@ -192,7 +203,11 @@ class BooPixel_AI_Chat_For_N8n_Ajax {
      * Get conversation history AJAX handler
      */
     public function ajax_get_conversations() {
-        check_ajax_referer('boopixel-ai-chat-for-n8n-statistics', 'nonce');
+        // Verify nonce for security
+        if (!isset($_POST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'boopixel-ai-chat-for-n8n-statistics')) {
+            wp_send_json_error(array('message' => boopixel_ai_chat_for_n8n_translate('security_check_failed', 'Security check failed. Please refresh the page.')));
+            return;
+        }
         
         if (!current_user_can('manage_options')) {
             wp_send_json_error(array('message' => esc_html__('No permission.', 'boopixel-ai-chat-for-n8n')));
@@ -200,13 +215,13 @@ class BooPixel_AI_Chat_For_N8n_Ajax {
         }
         
         // Statistics feature is available to all users
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified above
         $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : '';
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified above
         $date_to = isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : '';
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified above
         $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified above
         $per_page = isset($_POST['per_page']) ? intval($_POST['per_page']) : 20;
         
         $offset = ($page - 1) * $per_page;
@@ -227,7 +242,11 @@ class BooPixel_AI_Chat_For_N8n_Ajax {
      * Get messages for a specific session AJAX handler
      */
     public function ajax_get_session_messages() {
-        check_ajax_referer('boopixel-ai-chat-for-n8n-statistics', 'nonce');
+        // Verify nonce for security
+        if (!isset($_POST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'boopixel-ai-chat-for-n8n-statistics')) {
+            wp_send_json_error(array('message' => boopixel_ai_chat_for_n8n_translate('security_check_failed', 'Security check failed. Please refresh the page.')));
+            return;
+        }
         
         if (!current_user_can('manage_options')) {
             wp_send_json_error(array('message' => esc_html__('No permission.', 'boopixel-ai-chat-for-n8n')));
@@ -235,7 +254,7 @@ class BooPixel_AI_Chat_For_N8n_Ajax {
         }
         
         // Statistics feature is available to all users
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified above
         $session_id = isset($_POST['session_id']) ? sanitize_text_field(wp_unslash($_POST['session_id'])) : '';
         
         if (empty($session_id)) {
@@ -256,14 +275,18 @@ class BooPixel_AI_Chat_For_N8n_Ajax {
      * @return void
      */
     public function ajax_get_session_details() {
-        check_ajax_referer('boopixel-ai-chat-for-n8n-sessions', 'nonce');
+        // Verify nonce for security
+        if (!isset($_POST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'boopixel-ai-chat-for-n8n-sessions')) {
+            wp_send_json_error(array('message' => boopixel_ai_chat_for_n8n_translate('security_check_failed', 'Security check failed. Please refresh the page.')));
+            return;
+        }
         
         if (!current_user_can('manage_options')) {
             wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'boopixel-ai-chat-for-n8n')));
             return;
         }
         
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified above
         $session_id = isset($_POST['session_id']) ? sanitize_text_field(wp_unslash($_POST['session_id'])) : '';
         
         if (empty($session_id)) {
@@ -283,16 +306,20 @@ class BooPixel_AI_Chat_For_N8n_Ajax {
      * Export session data in JSON or CSV format
      */
     public function ajax_export_session() {
-        check_ajax_referer('boopixel-ai-chat-for-n8n-sessions', 'nonce');
+        // Verify nonce for security
+        if (!isset($_POST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'boopixel-ai-chat-for-n8n-sessions')) {
+            wp_send_json_error(array('message' => boopixel_ai_chat_for_n8n_translate('security_check_failed', 'Security check failed. Please refresh the page.')));
+            return;
+        }
         
         if (!current_user_can('manage_options')) {
             wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'boopixel-ai-chat-for-n8n')));
             return;
         }
         
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified above
         $session_id = isset($_POST['session_id']) ? sanitize_text_field(wp_unslash($_POST['session_id'])) : '';
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified with check_ajax_referer
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified above
         $format = isset($_POST['format']) ? sanitize_text_field(wp_unslash($_POST['format'])) : 'json';
         
         if (empty($session_id)) {
