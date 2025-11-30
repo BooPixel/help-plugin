@@ -15,7 +15,7 @@
     
     <coverage>
         <include>
-            <file>boochat-connect.php</file>
+            <file>boopixel-ai-chat-for-n8n.php</file>
             <directory>includes</directory>
         </include>
         <exclude>

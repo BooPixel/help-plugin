@@ -3,7 +3,7 @@
  * Bootstrap file for PHPUnit tests
  */
 
-// Define WordPress constants
+// Prevent direct access
 if (!defined('ABSPATH')) {
     define('ABSPATH', dirname(__DIR__) . '/');
 }
@@ -21,5 +21,5 @@ if (!defined('DB_NAME')) {
 }
 
 // Load plugin
-require_once dirname(__DIR__) . '/boochat-connect.php';
+require_once dirname(__DIR__) . '/boopixel-ai-chat-for-n8n.php';
 

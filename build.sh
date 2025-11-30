@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ZIP_NAME="boochat-connect.zip"
+ZIP_NAME="boopixel-ai-chat-for-n8n.zip"
 
 # Function to increment version (patch version)
 increment_version() {
@@ -13,8 +13,8 @@ increment_version() {
     echo "$major.$minor.$patch"
 }
 
-# Get current version from boochat-connect.php
-CURRENT_VERSION=$(grep "Version:" boochat-connect.php | head -1 | sed -E 's/.*Version: ([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+# Get current version from boopixel-ai-chat-for-n8n.php
+CURRENT_VERSION=$(grep "Version:" boopixel-ai-chat-for-n8n.php | head -1 | sed -E 's/.*Version: ([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
 
 if [ -z "$CURRENT_VERSION" ]; then
     CURRENT_VERSION="1.0.0"
@@ -25,9 +25,9 @@ NEW_VERSION=$(increment_version "$CURRENT_VERSION")
 
 echo "Updating version from $CURRENT_VERSION to $NEW_VERSION"
 
-# Update version in boochat-connect.php (header and constant)
-sed -i.bak "s/Version: $CURRENT_VERSION/Version: $NEW_VERSION/g" boochat-connect.php
-sed -i.bak "s/define('BOOCHAT_CONNECT_VERSION', '$CURRENT_VERSION');/define('BOOCHAT_CONNECT_VERSION', '$NEW_VERSION');/g" boochat-connect.php
+# Update version in boopixel-ai-chat-for-n8n.php (header and constant)
+sed -i.bak "s/Version: $CURRENT_VERSION/Version: $NEW_VERSION/g" boopixel-ai-chat-for-n8n.php
+sed -i.bak "s/define('BOOPIXEL_AI_CHAT_FOR_N8N_VERSION', '$CURRENT_VERSION');/define('BOOPIXEL_AI_CHAT_FOR_N8N_VERSION', '$NEW_VERSION');/g" boopixel-ai-chat-for-n8n.php
 
 # Update version in package.json
 sed -i.bak "s/\"version\": \"$CURRENT_VERSION\"/\"version\": \"$NEW_VERSION\"/g" package.json
@@ -39,7 +39,7 @@ sed -i.bak "s/Current version: \*\*$CURRENT_VERSION\*\*/Current version: **$NEW_
 sed -i.bak "s/Stable tag: $CURRENT_VERSION/Stable tag: $NEW_VERSION/g" README.txt
 
 # Remove backup files
-rm -f boochat-connect.php.bak package.json.bak README.md.bak README.txt.bak
+rm -f boopixel-ai-chat-for-n8n.php.bak package.json.bak README.md.bak README.txt.bak
 
 echo "Version updated to $NEW_VERSION"
 

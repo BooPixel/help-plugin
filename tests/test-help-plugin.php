@@ -1,12 +1,12 @@
 <?php
 /**
- * Unit tests for BooChat Connect Plugin
+ * Unit tests for BooPixel AI Chat Connect for n8n Plugin
  */
 
 use PHPUnit\Framework\TestCase;
 
 if (!class_exists('WP_Error')) {
-    class WP_Error {
+    class BooPixel_AI_Chat_For_N8n_Test_WP_Error {
         private $code;
         private $message;
         
@@ -25,7 +25,7 @@ if (!class_exists('WP_Error')) {
     }
 }
 
-class BooChat_Connect_Test extends TestCase {
+class BooPixel_AI_Chat_For_N8n_Test extends TestCase {
     
     /**
      * Set up test environment
@@ -37,12 +37,12 @@ class BooChat_Connect_Test extends TestCase {
         $this->mockWordPressFunctions();
         
         // Load plugin file
-        if (!class_exists('BooChat_Connect')) {
-            require_once dirname(__DIR__) . '/boochat-connect.php';
+        if (!class_exists('BooPixel_AI_Chat_For_N8n')) {
+            require_once dirname(__DIR__) . '/boopixel-ai-chat-for-n8n.php';
         }
         
         // Reset singleton instance
-        $reflection = new ReflectionClass('BooChat_Connect');
+        $reflection = new ReflectionClass('BooPixel_AI_Chat_For_N8n');
         $instance = $reflection->getProperty('instance');
         $instance->setAccessible(true);
         $instance->setValue(null, null);
@@ -55,7 +55,7 @@ class BooChat_Connect_Test extends TestCase {
         parent::tearDown();
         
         // Reset singleton instance
-        $reflection = new ReflectionClass('BooChat_Connect');
+        $reflection = new ReflectionClass('BooPixel_AI_Chat_For_N8n');
         $instance = $reflection->getProperty('instance');
         $instance->setAccessible(true);
         $instance->setValue(null, null);
@@ -144,7 +144,7 @@ class BooChat_Connect_Test extends TestCase {
             function is_admin() { return false; }
         }
         if (!function_exists('get_admin_page_title')) {
-            function get_admin_page_title() { return 'BooChat Connect'; }
+            function get_admin_page_title() { return 'BooPixel AI Chat Connect for n8n'; }
         }
         if (!function_exists('submit_button')) {
             function submit_button($text = null, $type = 'primary', $name = 'submit', $wrap = true, $other_attributes = null) {
@@ -255,7 +255,7 @@ class BooChat_Connect_Test extends TestCase {
         
         if (!function_exists('is_wp_error')) {
             function is_wp_error($thing) {
-                return $thing instanceof WP_Error;
+                return $thing instanceof BooPixel_AI_Chat_For_N8n_Test_WP_Error;
             }
         }
         
@@ -315,11 +315,11 @@ class BooChat_Connect_Test extends TestCase {
      * Test plugin initialization
      */
     public function test_plugin_initialization() {
-        $instance1 = BooChat_Connect::get_instance();
-        $instance2 = BooChat_Connect::get_instance();
+        $instance1 = BooPixel_AI_Chat_For_N8n::get_instance();
+        $instance2 = BooPixel_AI_Chat_For_N8n::get_instance();
         
         $this->assertSame($instance1, $instance2);
-        $this->assertInstanceOf('BooChat_Connect', $instance1);
+        $this->assertInstanceOf('BooPixel_AI_Chat_For_N8n', $instance1);
         $this->assertTrue(defined('BOOCHAT_CONNECT_VERSION'));
     }
     
@@ -345,7 +345,7 @@ class BooChat_Connect_Test extends TestCase {
      * Test API class
      */
     public function test_api_class() {
-        $api = new BooChat_Connect_API();
+        $api = new BooPixel_AI_Chat_For_N8n_API();
         
         $this->assertIsString($api->get_api_url());
         
@@ -357,7 +357,7 @@ class BooChat_Connect_Test extends TestCase {
         global $mock_options;
         $mock_options = array('boochat_connect_api_url' => '');
         $result = $api->send_message('test_session', 'test message');
-        $this->assertInstanceOf('WP_Error', $result);
+        $this->assertInstanceOf('BooPixel_AI_Chat_For_N8n_Test_WP_Error', $result);
         $this->assertEquals('no_api_url', $result->get_error_code());
         unset($mock_options);
         
@@ -377,7 +377,7 @@ class BooChat_Connect_Test extends TestCase {
             'response' => array('code' => 500)
         );
         $result = $api->send_message('test_session', 'test message');
-        $this->assertInstanceOf('WP_Error', $result);
+        $this->assertInstanceOf('BooPixel_AI_Chat_For_N8n_Test_WP_Error', $result);
         $this->assertEquals('http_error', $result->get_error_code());
         unset($mock_options, $wp_remote_post_override);
     }
@@ -386,7 +386,7 @@ class BooChat_Connect_Test extends TestCase {
      * Test License class
      */
     public function test_license_class() {
-        $license = new BooChat_Connect_License();
+        $license = new BooPixel_AI_Chat_For_N8n_License();
         
         $this->assertIsString($license->get_license_key());
         $this->assertIsString($license->get_license_status());
@@ -408,7 +408,7 @@ class BooChat_Connect_Test extends TestCase {
      * Test Database class
      */
     public function test_database_class() {
-        $database = new BooChat_Connect_Database();
+        $database = new BooPixel_AI_Chat_For_N8n_Database();
         
         $count = $database->get_interactions_count(1);
         $this->assertIsInt($count);
@@ -427,7 +427,7 @@ class BooChat_Connect_Test extends TestCase {
      * Test Settings class
      */
     public function test_settings_class() {
-        $settings = new BooChat_Connect_Settings();
+        $settings = new BooPixel_AI_Chat_For_N8n_Settings();
         
         $customization = $settings->get_customization_settings();
         $this->assertIsArray($customization);
@@ -440,8 +440,8 @@ class BooChat_Connect_Test extends TestCase {
      * Test Statistics class
      */
     public function test_statistics_class() {
-        $database = new BooChat_Connect_Database();
-        $statistics = new BooChat_Connect_Statistics($database);
+        $database = new BooPixel_AI_Chat_For_N8n_Database();
+        $statistics = new BooPixel_AI_Chat_For_N8n_Statistics($database);
         
         ob_start();
         $statistics->render_page();
@@ -468,7 +468,7 @@ class BooChat_Connect_Test extends TestCase {
         boochat_connect_log_api_request($endpoint, $url);
         boochat_connect_log_api_request($endpoint, $url, $request_body);
         boochat_connect_log_api_request($endpoint, $url, array(), $headers);
-        boochat_connect_log_api_request($endpoint, $url, array(), array(), new WP_Error('test', 'error'));
+        boochat_connect_log_api_request($endpoint, $url, array(), array(), new BooPixel_AI_Chat_For_N8n_Test_WP_Error('test', 'error'));
         boochat_connect_log_api_request($endpoint, $url, array(), array(), $response);
         
         $this->assertTrue(true);

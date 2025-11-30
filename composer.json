@@ -1,5 +1,5 @@
 {
-    "name": "boopixel/boochat-connect",
+    "name": "boopixel/boopixel-ai-chat-for-n8n",
     "description": "AI Chatbot with n8n Automation - WordPress plugin",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
@@ -14,7 +14,7 @@
     },
     "autoload": {
         "classmap": [
-            "boochat-connect.php"
+            "boopixel-ai-chat-for-n8n.php"
         ]
     },
     "autoload-dev": {
