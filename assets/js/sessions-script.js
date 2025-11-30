@@ -11,6 +11,13 @@
     let perPage = 20;
     
     $(document).ready(function() {
+        // Check if configuration is loaded
+        if (typeof boopixelAiChatForN8nSessions === 'undefined') {
+            console.error('Sessions configuration not found');
+            showError('Error: Sessions configuration not loaded. Please refresh the page.');
+            return;
+        }
+        
         loadSessions();
         
         // Refresh button
@@ -28,28 +35,51 @@
     });
     
     function loadSessions() {
+        if (typeof boopixelAiChatForN8nSessions === 'undefined') {
+            showError('Error: Sessions configuration not loaded. Please refresh the page.');
+            return;
+        }
+        
         const container = $('#sessions-container');
-        container.html('<p style="text-align: center; color: #646970; padding: 20px;"><span class="spinner is-active" style="float: none; margin: 0 10px 0 0;"></span>' + boopixelAiChatForN8nSessions.loadingText + '</p>');
+        const loadingText = boopixelAiChatForN8nSessions.loadingText || 'Loading sessions...';
+        container.html('<p style="text-align: center; color: #646970; padding: 20px;"><span class="spinner is-active" style="float: none; margin: 0 10px 0 0;"></span>' + loadingText + '</p>');
         
         $.ajax({
             url: boopixelAiChatForN8nSessions.ajax_url,
             type: 'POST',
             data: {
-                action: 'boochat_connect_get_sessions',
+                action: 'boopixel_ai_chat_for_n8n_get_sessions',
                 nonce: boopixelAiChatForN8nSessions.nonce,
                 page: currentPage,
                 per_page: perPage
             },
             success: function(response) {
-                if (response.success) {
+                if (response.success && response.data) {
                     renderSessions(response.data.sessions);
                     renderPagination(response.data);
                 } else {
-                    showError(response.data.message || boopixelAiChatForN8nSessions.errorLoadingText);
+                    let errorMessage = 'Error loading sessions: ';
+                    if (response.data && response.data.message) {
+                        errorMessage += response.data.message;
+                    } else if (typeof boopixelAiChatForN8nSessions !== 'undefined' && boopixelAiChatForN8nSessions.errorLoadingText) {
+                        errorMessage = boopixelAiChatForN8nSessions.errorLoadingText;
+                    }
+                    showError(errorMessage);
                 }
             },
             error: function(xhr, status, error) {
-                showError(boopixelAiChatForN8nSessions.errorLoadingText + error);
+                let errorMessage = 'Error loading sessions: ';
+                if (typeof boopixelAiChatForN8nSessions !== 'undefined' && boopixelAiChatForN8nSessions.errorLoadingText) {
+                    errorMessage = boopixelAiChatForN8nSessions.errorLoadingText;
+                }
+                if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+                    errorMessage += xhr.responseJSON.data.message;
+                } else if (error) {
+                    errorMessage += error;
+                } else {
+                    errorMessage += 'Unknown error occurred.';
+                }
+                showError(errorMessage);
             }
         });
     }
@@ -227,7 +257,7 @@
             url: boopixelAiChatForN8nSessions.ajax_url,
             type: 'POST',
             data: {
-                action: 'boochat_connect_get_session_details',
+                action: 'boopixel_ai_chat_for_n8n_get_session_details',
                 nonce: boopixelAiChatForN8nSessions.nonce,
                 session_id: sessionId
             },
@@ -343,7 +373,7 @@
             url: boopixelAiChatForN8nSessions.ajax_url,
             type: 'POST',
             data: {
-                action: 'boochat_connect_export_session',
+                action: 'boopixel_ai_chat_for_n8n_export_session',
                 nonce: boopixelAiChatForN8nSessions.nonce,
                 session_id: sessionId,
                 format: format

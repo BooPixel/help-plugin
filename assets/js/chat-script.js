@@ -6,6 +6,12 @@
     'use strict';
     
     $(document).ready(function() {
+        // Check if configuration is loaded
+        if (typeof boopixelAiChatForN8nAjax === 'undefined') {
+            console.error('Chat configuration not found');
+            return;
+        }
+        
         const $popup = $('#boochat-connect-popup');
         const $chatWindow = $('#boochat-connect-chat-window');
         const $chatForm = $('#boochat-connect-chat-form');
@@ -16,7 +22,7 @@
         const $chatSend = $('.boochat-connect-chat-send');
         
         // Session ID storage key
-        const SESSION_ID_KEY = 'boochat_connect_session_id';
+        const SESSION_ID_KEY = 'boopixel_ai_chat_for_n8n_session_id';
         
         /**
          * Get or create session ID
@@ -165,7 +171,7 @@
                 url: boopixelAiChatForN8nAjax.ajaxUrl,
                 type: 'POST',
                 data: {
-                    action: 'boochat_connect_send_message',
+                    action: 'boopixel_ai_chat_for_n8n_send_message',
                     nonce: boopixelAiChatForN8nAjax.nonce,
                     sessionId: sessionId,
                     chatInput: userMessage
@@ -196,17 +202,36 @@
                     $('#' + loadingId).remove();
                     
                     // Show error message
-                    let errorMsg = boopixelAiChatForN8nAjax.errorText || 'Erro ao enviar mensagem';
+                    let errorMsg = 'Error sending message. Please try again.';
+                    
+                    // Try to get error message from configuration
+                    if (typeof boopixelAiChatForN8nAjax !== 'undefined' && boopixelAiChatForN8nAjax.errorText) {
+                        errorMsg = boopixelAiChatForN8nAjax.errorText;
+                    }
+                    
+                    // Try to parse error from response
                     if (xhr.responseText) {
                         try {
                             const errorResponse = JSON.parse(xhr.responseText);
                             if (errorResponse.data && errorResponse.data.message) {
                                 errorMsg = errorResponse.data.message;
+                            } else if (errorResponse.message) {
+                                errorMsg = errorResponse.message;
                             }
                         } catch (e) {
-                            // Keep default error message
+                            // If response is not JSON, check status
+                            if (xhr.status === 0) {
+                                errorMsg = 'Network error. Please check your connection.';
+                            } else if (xhr.status === 403) {
+                                errorMsg = 'Security check failed. Please refresh the page.';
+                            } else if (xhr.status === 500) {
+                                errorMsg = 'Server error. Please try again later.';
+                            }
                         }
+                    } else if (xhr.status === 0) {
+                        errorMsg = 'Network error. Please check your connection.';
                     }
+                    
                     addMessage(errorMsg, 'system');
                 },
                 complete: function() {

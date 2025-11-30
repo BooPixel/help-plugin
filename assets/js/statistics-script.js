@@ -51,6 +51,7 @@
     
     function loadQuickSummary() {
         if (typeof boopixelAiChatForN8nStats === 'undefined') {
+            console.error('Statistics configuration not found for quick summary');
             return;
         }
         
@@ -58,7 +59,7 @@
             url: boopixelAiChatForN8nStats.ajaxUrl,
             type: 'POST',
             data: {
-                action: 'boochat_connect_get_statistics',
+                action: 'boopixel_ai_chat_for_n8n_get_statistics',
                 nonce: boopixelAiChatForN8nStats.nonce,
                 date_from: '',
                 date_to: ''
@@ -71,8 +72,9 @@
                     $('#stats-30days').text(response.data.summary['30days'] || 0);
                 }
             },
-            error: function() {
-                // Silently fail for quick summary
+            error: function(xhr, status, error) {
+                // Log error for debugging but don't show to user for quick summary
+                console.error('Quick summary load error:', status, error, xhr.responseText);
             }
         });
     }
@@ -128,17 +130,19 @@
             url: boopixelAiChatForN8nStats.ajaxUrl,
             type: 'POST',
             data: {
-                action: 'boochat_connect_get_statistics',
+                action: 'boopixel_ai_chat_for_n8n_get_statistics',
                 nonce: boopixelAiChatForN8nStats.nonce,
                 date_from: dateFrom,
                 date_to: dateTo
             },
             success: function(response) {
-                if (response.success) {
+                if (response.success && response.data) {
                     // Update summary
-                    $('#stats-1day').text(response.data.summary['1day'] || 0);
-                    $('#stats-7days').text(response.data.summary['7days'] || 0);
-                    $('#stats-30days').text(response.data.summary['30days'] || 0);
+                    if (response.data.summary) {
+                        $('#stats-1day').text(response.data.summary['1day'] || 0);
+                        $('#stats-7days').text(response.data.summary['7days'] || 0);
+                        $('#stats-30days').text(response.data.summary['30days'] || 0);
+                    }
                     
                     // Update chart
                     if (response.data.chart && response.data.chart.labels) {
@@ -150,12 +154,47 @@
                         showMessage('Statistics loaded successfully.', 'success');
                     }
                 } else {
-                    let errorMessage = boopixelAiChatForN8nStats.errorLoadingText + (response.data.message || '');
+                    let errorMessage = 'Error loading statistics: ';
+                    if (response.data && response.data.message) {
+                        errorMessage += response.data.message;
+                    } else if (typeof boopixelAiChatForN8nStats !== 'undefined' && boopixelAiChatForN8nStats.errorLoadingText) {
+                        errorMessage = boopixelAiChatForN8nStats.errorLoadingText;
+                    }
                     showMessage(errorMessage, 'error');
                 }
             },
             error: function(xhr, status, error) {
-                showMessage(boopixelAiChatForN8nStats.errorConnectingText || 'Error connecting to server. Please try again.', 'error');
+                let errorMessage = 'Error connecting to server. Please try again.';
+                
+                // Try to get error message from configuration
+                if (typeof boopixelAiChatForN8nStats !== 'undefined' && boopixelAiChatForN8nStats.errorConnectingText) {
+                    errorMessage = boopixelAiChatForN8nStats.errorConnectingText;
+                }
+                
+                // Try to parse error from response
+                if (xhr.responseText) {
+                    try {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        if (errorResponse.data && errorResponse.data.message) {
+                            errorMessage = errorResponse.data.message;
+                        } else if (errorResponse.message) {
+                            errorMessage = errorResponse.message;
+                        }
+                    } catch (e) {
+                        // If response is not JSON, check status
+                        if (xhr.status === 0) {
+                            errorMessage = 'Network error. Please check your connection.';
+                        } else if (xhr.status === 403) {
+                            errorMessage = 'Security check failed. Please refresh the page.';
+                        } else if (xhr.status === 500) {
+                            errorMessage = 'Server error. Please try again later.';
+                        }
+                    }
+                } else if (xhr.status === 0) {
+                    errorMessage = 'Network error. Please check your connection.';
+                }
+                
+                showMessage(errorMessage, 'error');
             },
             complete: function() {
                 $button.prop('disabled', false).text(boopixelAiChatForN8nStats.loadStatisticsText);
@@ -234,7 +273,7 @@
             url: boopixelAiChatForN8nStats.ajaxUrl,
             type: 'POST',
             data: {
-                action: 'boochat_connect_get_conversations',
+                action: 'boopixel_ai_chat_for_n8n_get_conversations',
                 nonce: boopixelAiChatForN8nStats.nonce,
                 date_from: '', // Empty to get latest
                 date_to: '', // Empty to get latest
