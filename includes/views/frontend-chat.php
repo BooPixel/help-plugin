@@ -2,7 +2,7 @@
 /**
  * Frontend chat widget template
  *
- * @package BooChat_Connect
+ * @package BooPixel_AI_Chat_For_N8n
  * @var array $settings Customization settings array.
  */
 
@@ -15,9 +15,9 @@ if (!defined('ABSPATH')) {
     <div class="boochat-connect-popup-content">
         <div class="boochat-connect-popup-header">
             <span class="boochat-connect-popup-icon">💬</span>
-            <span class="boochat-connect-popup-text"><?php echo esc_html(boochat_connect_translate('need_help')); ?></span>
+            <span class="boochat-connect-popup-text"><?php echo esc_html(boopixel_ai_chat_for_n8n_translate('need_help')); ?></span>
         </div>
-        <button class="boochat-connect-popup-close" aria-label="<?php echo esc_attr(boochat_connect_translate('close')); ?>">&times;</button>
+        <button class="boochat-connect-popup-close" aria-label="<?php echo esc_attr(boopixel_ai_chat_for_n8n_translate('close')); ?>">&times;</button>
     </div>
 </div>
 
@@ -25,13 +25,13 @@ if (!defined('ABSPATH')) {
     <div class="boochat-connect-chat-header">
         <div class="boochat-connect-chat-title">
             <?php if (!empty($settings['chat_icon'])): ?>
-                <img src="<?php echo esc_url($settings['chat_icon']); ?>" alt="<?php echo esc_attr(boochat_connect_translate('chat_icon', 'Chat Icon')); ?>" class="boochat-connect-chat-icon-image">
+                <img src="<?php echo esc_url($settings['chat_icon']); ?>" alt="<?php echo esc_attr(boopixel_ai_chat_for_n8n_translate('chat_icon', 'Chat Icon')); ?>" class="boochat-connect-chat-icon-image">
             <?php else: ?>
             <span class="boochat-connect-chat-icon">💬</span>
             <?php endif; ?>
             <span><?php echo esc_html($settings['chat_name']); ?></span>
         </div>
-        <button class="boochat-connect-chat-close" aria-label="<?php echo esc_attr(boochat_connect_translate('close_chat')); ?>">&times;</button>
+        <button class="boochat-connect-chat-close" aria-label="<?php echo esc_attr(boopixel_ai_chat_for_n8n_translate('close_chat')); ?>">&times;</button>
     </div>
     <div class="boochat-connect-chat-body">
         <div class="boochat-connect-chat-messages" id="boochat-connect-chat-messages">
@@ -46,11 +46,11 @@ if (!defined('ABSPATH')) {
                 type="text" 
                 id="boochat-connect-chat-input" 
                 class="boochat-connect-chat-input" 
-                placeholder="<?php echo esc_attr(boochat_connect_translate('type_message')); ?>"
+                placeholder="<?php echo esc_attr(boopixel_ai_chat_for_n8n_translate('type_message')); ?>"
                 autocomplete="off"
             >
             <button type="submit" class="boochat-connect-chat-send">
-                <span><?php echo esc_html(boochat_connect_translate('send')); ?></span>
+                <span><?php echo esc_html(boopixel_ai_chat_for_n8n_translate('send')); ?></span>
             </button>
         </form>
     </div>

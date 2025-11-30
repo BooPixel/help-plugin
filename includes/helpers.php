@@ -1,8 +1,8 @@
 <?php
 /**
- * Helper functions for BooChat Connect
+ * Helper functions for BooPixel AI Chat Connect for n8n
  *
- * @package BooChat_Connect
+ * @package BooPixel_AI_Chat_For_N8n
  */
 
 // Prevent direct access
@@ -15,12 +15,12 @@ if (!defined('ABSPATH')) {
  *
  * @return string Version number
  */
-if (!function_exists('boochat_connect_get_version')) {
-    function boochat_connect_get_version() {
-    $version = get_option('boochat_connect_cache_version');
+if (!function_exists('boopixel_ai_chat_for_n8n_get_version')) {
+    function boopixel_ai_chat_for_n8n_get_version() {
+    $version = get_option('boopixel_ai_chat_for_n8n_cache_version');
     if (empty($version)) {
         $version = time();
-        update_option('boochat_connect_cache_version', $version);
+        update_option('boopixel_ai_chat_for_n8n_cache_version', $version);
     }
     return $version;
     }
@@ -32,8 +32,8 @@ if (!function_exists('boochat_connect_get_version')) {
  * @param string $locale WordPress locale (e.g., pt_BR, es_ES, en_US).
  * @return string Language code (en, pt, es)
  */
-if (!function_exists('boochat_connect_get_language_from_locale')) {
-    function boochat_connect_get_language_from_locale($locale) {
+if (!function_exists('boopixel_ai_chat_for_n8n_get_language_from_locale')) {
+    function boopixel_ai_chat_for_n8n_get_language_from_locale($locale) {
     // Map WordPress locales to plugin codes
     $locale_map = array(
         'pt_BR' => 'pt',
@@ -68,6 +68,232 @@ if (!function_exists('boochat_connect_get_language_from_locale')) {
 }
 
 /**
+ * Get translated string using literal strings for proper i18n support
+ *
+ * @param string $key Translation key.
+ * @param string $msgid English text (msgid).
+ * @return string Translated string
+ */
+if (!function_exists('boopixel_ai_chat_for_n8n_get_translated_string')) {
+    function boopixel_ai_chat_for_n8n_get_translated_string($key, $msgid) {
+        // Use switch to ensure all strings are literal for translators
+        // This ensures the translation parser can see all strings
+        switch ($msgid) {
+            case 'Main Panel':
+                return esc_html__('Main Panel', 'boopixel-ai-chat-for-n8n');
+            case 'Customization':
+                return esc_html__('Customization', 'boopixel-ai-chat-for-n8n');
+            case 'Settings':
+                return esc_html__('Settings', 'boopixel-ai-chat-for-n8n');
+            case 'Statistics':
+                return esc_html__('Statistics', 'boopixel-ai-chat-for-n8n');
+            case 'Close':
+                return esc_html__('Close', 'boopixel-ai-chat-for-n8n');
+            case 'Loading...':
+                return esc_html__('Loading...', 'boopixel-ai-chat-for-n8n');
+            case 'Small':
+                return esc_html__('Small', 'boopixel-ai-chat-for-n8n');
+            case 'Normal':
+                return esc_html__('Normal', 'boopixel-ai-chat-for-n8n');
+            case 'Medium':
+                return esc_html__('Medium', 'boopixel-ai-chat-for-n8n');
+            case 'Large':
+                return esc_html__('Large', 'boopixel-ai-chat-for-n8n');
+            case 'Extra Large':
+                return esc_html__('Extra Large', 'boopixel-ai-chat-for-n8n');
+            case 'Less':
+                return esc_html__('Less', 'boopixel-ai-chat-for-n8n');
+            case 'More':
+                return esc_html__('More', 'boopixel-ai-chat-for-n8n');
+            case 'Status':
+                return esc_html__('Status', 'boopixel-ai-chat-for-n8n');
+            case 'Information':
+                return esc_html__('Information', 'boopixel-ai-chat-for-n8n');
+            case 'Language':
+                return esc_html__('Language', 'boopixel-ai-chat-for-n8n');
+            case 'Select the plugin language.':
+                return esc_html__('Select the plugin language.', 'boopixel-ai-chat-for-n8n');
+            case 'Auto (WordPress Language)':
+                return esc_html__('Auto (WordPress Language)', 'boopixel-ai-chat-for-n8n');
+            case 'Default Settings':
+                return esc_html__('Default Settings', 'boopixel-ai-chat-for-n8n');
+            case 'Version':
+                return esc_html__('Version', 'boopixel-ai-chat-for-n8n');
+            case 'AI Chatbot & n8n Automation':
+                return esc_html__('AI Chatbot & n8n Automation', 'boopixel-ai-chat-for-n8n');
+            case 'Support':
+                return esc_html__('Support', 'boopixel-ai-chat-for-n8n');
+            case 'Hello! How can we help you today?':
+                return esc_html__('Hello! How can we help you today?', 'boopixel-ai-chat-for-n8n');
+            case 'Need help?':
+                return esc_html__('Need help?', 'boopixel-ai-chat-for-n8n');
+            case 'Close chat':
+                return esc_html__('Close chat', 'boopixel-ai-chat-for-n8n');
+            case 'Type your message...':
+                return esc_html__('Type your message...', 'boopixel-ai-chat-for-n8n');
+            case 'Send':
+                return esc_html__('Send', 'boopixel-ai-chat-for-n8n');
+            case 'Waiting for response...':
+                return esc_html__('Waiting for response...', 'boopixel-ai-chat-for-n8n');
+            case 'Error sending message. Please try again.':
+                return esc_html__('Error sending message. Please try again.', 'boopixel-ai-chat-for-n8n');
+            case 'API URL not configured. Configure in Help Plugin > Settings.':
+                return esc_html__('API URL not configured. Configure in Help Plugin > Settings.', 'boopixel-ai-chat-for-n8n');
+            case 'HTTP %d: %s':
+                return esc_html__('HTTP %d: %s', 'boopixel-ai-chat-for-n8n');
+            case 'Empty message.':
+                return esc_html__('Empty message.', 'boopixel-ai-chat-for-n8n');
+            case 'Error connecting to the service. Please try again.':
+                return esc_html__('Error connecting to the service. Please try again.', 'boopixel-ai-chat-for-n8n');
+            case 'Error processing server response.':
+                return esc_html__('Error processing server response.', 'boopixel-ai-chat-for-n8n');
+            case 'Customizations saved successfully!':
+                return esc_html__('Customizations saved successfully!', 'boopixel-ai-chat-for-n8n');
+            case 'Chat Customization':
+                return esc_html__('Chat Customization', 'boopixel-ai-chat-for-n8n');
+            case 'Customize colors and typography of the support chat.':
+                return esc_html__('Customize colors and typography of the support chat.', 'boopixel-ai-chat-for-n8n');
+            case 'Save Customizations':
+                return esc_html__('Save Customizations', 'boopixel-ai-chat-for-n8n');
+            case 'Chat Icon':
+                return esc_html__('Chat Icon', 'boopixel-ai-chat-for-n8n');
+            case 'Upload Icon':
+                return esc_html__('Upload Icon', 'boopixel-ai-chat-for-n8n');
+            case 'Remove Icon':
+                return esc_html__('Remove Icon', 'boopixel-ai-chat-for-n8n');
+            case 'Icon displayed in the chat header. Recommended size: 48x48 pixels.':
+                return esc_html__('Icon displayed in the chat header. Recommended size: 48x48 pixels.', 'boopixel-ai-chat-for-n8n');
+            case 'Name displayed in chat header.':
+                return esc_html__('Name displayed in chat header.', 'boopixel-ai-chat-for-n8n');
+            case 'Welcome message displayed when chat is opened.':
+                return esc_html__('Welcome message displayed when chat is opened.', 'boopixel-ai-chat-for-n8n');
+            case 'Primary gradient color (header and buttons).':
+                return esc_html__('Primary gradient color (header and buttons).', 'boopixel-ai-chat-for-n8n');
+            case 'Secondary gradient color.':
+                return esc_html__('Secondary gradient color.', 'boopixel-ai-chat-for-n8n');
+            case 'Chat window background color.':
+                return esc_html__('Chat window background color.', 'boopixel-ai-chat-for-n8n');
+            case 'Message text color.':
+                return esc_html__('Message text color.', 'boopixel-ai-chat-for-n8n');
+            case 'Font family for the chat.':
+                return esc_html__('Font family for the chat.', 'boopixel-ai-chat-for-n8n');
+            case 'Font size for messages.':
+                return esc_html__('Font size for messages.', 'boopixel-ai-chat-for-n8n');
+            case 'Text Customization':
+                return esc_html__('Text Customization', 'boopixel-ai-chat-for-n8n');
+            case 'Color Customization':
+                return esc_html__('Color Customization', 'boopixel-ai-chat-for-n8n');
+            case 'Customize text and typography settings.':
+                return esc_html__('Customize text and typography settings.', 'boopixel-ai-chat-for-n8n');
+            case 'Customize color and appearance settings.':
+                return esc_html__('Customize color and appearance settings.', 'boopixel-ai-chat-for-n8n');
+            case 'Chat Name':
+                return esc_html__('Chat Name', 'boopixel-ai-chat-for-n8n');
+            case 'Welcome Message':
+                return esc_html__('Welcome Message', 'boopixel-ai-chat-for-n8n');
+            case 'Primary Color':
+                return esc_html__('Primary Color', 'boopixel-ai-chat-for-n8n');
+            case 'Secondary Color':
+                return esc_html__('Secondary Color', 'boopixel-ai-chat-for-n8n');
+            case 'Chat Background Color':
+                return esc_html__('Chat Background Color', 'boopixel-ai-chat-for-n8n');
+            case 'Text Color':
+                return esc_html__('Text Color', 'boopixel-ai-chat-for-n8n');
+            case 'Font':
+                return esc_html__('Font', 'boopixel-ai-chat-for-n8n');
+            case 'Font Size':
+                return esc_html__('Font Size', 'boopixel-ai-chat-for-n8n');
+            case 'Settings saved successfully!':
+                return esc_html__('Settings saved successfully!', 'boopixel-ai-chat-for-n8n');
+            case 'API Settings':
+                return esc_html__('API Settings', 'boopixel-ai-chat-for-n8n');
+            case 'Configure the customer service API URL.':
+                return esc_html__('Configure the customer service API URL.', 'boopixel-ai-chat-for-n8n');
+            case 'Save Settings':
+                return esc_html__('Save Settings', 'boopixel-ai-chat-for-n8n');
+            case 'Complete webhook URL for customer service API.':
+                return esc_html__('Complete webhook URL for customer service API.', 'boopixel-ai-chat-for-n8n');
+            case 'Configured':
+                return esc_html__('Configured', 'boopixel-ai-chat-for-n8n');
+            case 'Not configured':
+                return esc_html__('Not configured', 'boopixel-ai-chat-for-n8n');
+            case 'The API URL will be used to process all support chat messages.':
+                return esc_html__('The API URL will be used to process all support chat messages.', 'boopixel-ai-chat-for-n8n');
+            case 'API URL':
+                return esc_html__('API URL', 'boopixel-ai-chat-for-n8n');
+            case 'Interaction Statistics':
+                return esc_html__('Interaction Statistics', 'boopixel-ai-chat-for-n8n');
+            case 'View chat interactions by period.':
+                return esc_html__('View chat interactions by period.', 'boopixel-ai-chat-for-n8n');
+            case 'Quick Summary':
+                return esc_html__('Quick Summary', 'boopixel-ai-chat-for-n8n');
+            case 'Last 24 hours':
+                return esc_html__('Last 24 hours', 'boopixel-ai-chat-for-n8n');
+            case 'Last 7 days':
+                return esc_html__('Last 7 days', 'boopixel-ai-chat-for-n8n');
+            case 'Last month':
+                return esc_html__('Last month', 'boopixel-ai-chat-for-n8n');
+            case 'Select Period':
+                return esc_html__('Select Period', 'boopixel-ai-chat-for-n8n');
+            case 'Start Date:':
+                return esc_html__('Start Date:', 'boopixel-ai-chat-for-n8n');
+            case 'End Date:':
+                return esc_html__('End Date:', 'boopixel-ai-chat-for-n8n');
+            case 'Load Statistics':
+                return esc_html__('Load Statistics', 'boopixel-ai-chat-for-n8n');
+            case 'Please select start and end dates.':
+                return esc_html__('Please select start and end dates.', 'boopixel-ai-chat-for-n8n');
+            case 'Start date must be before end date.':
+                return esc_html__('Start date must be before end date.', 'boopixel-ai-chat-for-n8n');
+            case 'Error loading statistics: ':
+                return esc_html__('Error loading statistics: ', 'boopixel-ai-chat-for-n8n');
+            case 'Error connecting to server. Please try again.':
+                return esc_html__('Error connecting to server. Please try again.', 'boopixel-ai-chat-for-n8n');
+            case 'Interactions Chart':
+                return esc_html__('Interactions Chart', 'boopixel-ai-chat-for-n8n');
+            case 'Interaction Calendar':
+                return esc_html__('Interaction Calendar', 'boopixel-ai-chat-for-n8n');
+            case 'Visualize user interactions over the past year. Darker colors indicate more interactions.':
+                return esc_html__('Visualize user interactions over the past year. Darker colors indicate more interactions.', 'boopixel-ai-chat-for-n8n');
+            case 'No permission.':
+                return esc_html__('No permission.', 'boopixel-ai-chat-for-n8n');
+            case 'Security error. Please reload the page.':
+                return esc_html__('Security error. Please reload the page.', 'boopixel-ai-chat-for-n8n');
+            case 'You do not have permission to access this page.':
+                return esc_html__('You do not have permission to access this page.', 'boopixel-ai-chat-for-n8n');
+            case 'Security check failed.':
+                return esc_html__('Security check failed.', 'boopixel-ai-chat-for-n8n');
+            case 'Security error. Please try again.':
+                return esc_html__('Security error. Please try again.', 'boopixel-ai-chat-for-n8n');
+            case 'Sessions':
+                return esc_html__('Sessions', 'boopixel-ai-chat-for-n8n');
+            case 'User Sessions':
+                return esc_html__('User Sessions', 'boopixel-ai-chat-for-n8n');
+            case 'Upgrade to PRO':
+                return esc_html__('Upgrade to PRO', 'boopixel-ai-chat-for-n8n');
+            case 'Loading sessions...':
+                return esc_html__('Loading sessions...', 'boopixel-ai-chat-for-n8n');
+            case 'Error loading sessions: ':
+                return esc_html__('Error loading sessions: ', 'boopixel-ai-chat-for-n8n');
+            case 'No sessions found.':
+                return esc_html__('No sessions found.', 'boopixel-ai-chat-for-n8n');
+            case 'Failed to create checkout session.':
+                return esc_html__('Failed to create checkout session.', 'boopixel-ai-chat-for-n8n');
+            case 'View all user chat sessions and their details.':
+                return esc_html__('View all user chat sessions and their details.', 'boopixel-ai-chat-for-n8n');
+            case 'Show:':
+                return esc_html__('Show:', 'boopixel-ai-chat-for-n8n');
+            case 'Refresh':
+                return esc_html__('Refresh', 'boopixel-ai-chat-for-n8n');
+            default:
+                // Fallback: use the msgid directly if not in switch
+                // This handles any keys not explicitly listed above
+                return esc_html__($msgid, 'boopixel-ai-chat-for-n8n');
+        }
+    }
+}
+
+/**
  * Get translation based on configured language
  *
  * This function maps translation keys to English text (msgid) and uses
@@ -77,8 +303,8 @@ if (!function_exists('boochat_connect_get_language_from_locale')) {
  * @param string $default Default value if key not found (used as fallback msgid).
  * @return string Translated string
  */
-if (!function_exists('boochat_connect_translate')) {
-    function boochat_connect_translate($key, $default = '') {
+if (!function_exists('boopixel_ai_chat_for_n8n_translate')) {
+    function boopixel_ai_chat_for_n8n_translate($key, $default = '') {
         // Map translation keys to English text (msgid)
         $key_to_msgid = array(
             // Common
@@ -196,11 +422,11 @@ if (!function_exists('boochat_connect_translate')) {
         $msgid = isset($key_to_msgid[$key]) ? $key_to_msgid[$key] : ($default ? $default : $key);
         
         // Get configured language
-        $configured_language = get_option('boochat_connect_language', '');
+        $configured_language = get_option('boopixel_ai_chat_for_n8n_language', '');
         
-        // Use WordPress gettext function (locale is already set by force_plugin_locale filter)
-        // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- $msgid is dynamically mapped from translation keys
-        return esc_html__($msgid, 'boochat-connect');
+        // Use WordPress gettext function with string literal (locale is already set by force_plugin_locale filter)
+        // Map each key to its literal string to ensure translators can see all strings
+        return boopixel_ai_chat_for_n8n_get_translated_string($key, $msgid);
     }
 }
 
@@ -214,9 +440,9 @@ if (!function_exists('boochat_connect_translate')) {
  * @param array|WP_Error $response WordPress HTTP response or error.
  * @return void
  */
-if (!function_exists('boochat_connect_log_api_request')) {
-    function boochat_connect_log_api_request($endpoint_name, $url, $request_body = array(), $headers = array(), $response = null) {
-        $log_prefix = '[BooChat Connect] [' . $endpoint_name . ']';
+if (!function_exists('boopixel_ai_chat_for_n8n_log_api_request')) {
+    function boopixel_ai_chat_for_n8n_log_api_request($endpoint_name, $url, $request_body = array(), $headers = array(), $response = null) {
+        $log_prefix = '[BooPixel AI Chat Connect for n8n] [' . $endpoint_name . ']';
         
         // Log request details
         // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- API request logging
