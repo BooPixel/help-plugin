@@ -1,8 +1,8 @@
 <?php
 /**
- * Settings management for BooChat Connect
+ * Settings management for BooPixel AI Chat Connect for n8n
  *
- * @package BooChat_Connect
+ * @package BooPixel_AI_Chat_For_N8n
  */
 
 // Prevent direct access
@@ -11,9 +11,9 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Class BooChat_Connect_Settings
+ * Class BooPixel_AI_Chat_For_N8n_Settings
  */
-class BooChat_Connect_Settings {
+class BooPixel_AI_Chat_For_N8n_Settings {
     
     /**
      * Get currently configured language (returns empty if using WordPress)
@@ -21,7 +21,7 @@ class BooChat_Connect_Settings {
      * @return string Language code (en, pt, es) or empty string to use WordPress
      */
     public function get_language() {
-        return get_option('boochat_connect_language', '');
+        return get_option('boopixel_ai_chat_for_n8n_language', '');
     }
     
     /**
@@ -35,7 +35,7 @@ class BooChat_Connect_Settings {
         if (empty($configured_language)) {
             // If no configuration, use WordPress locale
             $wp_locale = get_locale();
-            return boochat_connect_get_language_from_locale($wp_locale);
+            return boopixel_ai_chat_for_n8n_get_language_from_locale($wp_locale);
         }
         
         return $configured_language;
@@ -50,15 +50,15 @@ class BooChat_Connect_Settings {
         $language = $this->get_effective_language();
         
         return array(
-            'chat_icon' => get_option('boochat_connect_chat_icon', ''),
-            'chat_name' => get_option('boochat_connect_chat_name', boochat_connect_translate('chat_name_default')),
-            'welcome_message' => get_option('boochat_connect_welcome_message', boochat_connect_translate('welcome_message_default')),
-            'primary_color' => get_option('boochat_connect_primary_color', '#1B8EF0'),
-            'secondary_color' => get_option('boochat_connect_secondary_color', '#1B5D98'),
-            'chat_bg_color' => get_option('boochat_connect_chat_bg_color', '#ffffff'),
-            'text_color' => get_option('boochat_connect_text_color', '#333333'),
-            'font_family' => get_option('boochat_connect_font_family', 'Arial, sans-serif'),
-            'font_size' => get_option('boochat_connect_font_size', '14px'),
+            'chat_icon' => get_option('boopixel_ai_chat_for_n8n_chat_icon', ''),
+            'chat_name' => get_option('boopixel_ai_chat_for_n8n_chat_name', boopixel_ai_chat_for_n8n_translate('chat_name_default')),
+            'welcome_message' => get_option('boopixel_ai_chat_for_n8n_welcome_message', boopixel_ai_chat_for_n8n_translate('welcome_message_default')),
+            'primary_color' => get_option('boopixel_ai_chat_for_n8n_primary_color', '#1B8EF0'),
+            'secondary_color' => get_option('boopixel_ai_chat_for_n8n_secondary_color', '#1B5D98'),
+            'chat_bg_color' => get_option('boopixel_ai_chat_for_n8n_chat_bg_color', '#ffffff'),
+            'text_color' => get_option('boopixel_ai_chat_for_n8n_text_color', '#333333'),
+            'font_family' => get_option('boopixel_ai_chat_for_n8n_font_family', 'Arial, sans-serif'),
+            'font_size' => get_option('boopixel_ai_chat_for_n8n_font_size', '14px'),
             'language' => $language,
         );
     }
@@ -69,7 +69,7 @@ class BooChat_Connect_Settings {
     public function clear_cache() {
         // Update cache version to force asset reload
         $new_version = time();
-        update_option('boochat_connect_cache_version', $new_version);
+        update_option('boopixel_ai_chat_for_n8n_cache_version', $new_version);
         
         // Clear cache of popular plugins
         if (function_exists('wp_cache_flush')) {

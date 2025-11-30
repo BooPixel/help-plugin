@@ -1,8 +1,8 @@
 <?php
 /**
- * Database operations for BooChat Connect
+ * Database operations for BooPixel AI Chat Connect for n8n
  *
- * @package BooChat_Connect
+ * @package BooPixel_AI_Chat_For_N8n
  */
 
 // Prevent direct access
@@ -11,9 +11,9 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Class BooChat_Connect_Database
+ * Class BooPixel_AI_Chat_For_N8n_Database
  */
-class BooChat_Connect_Database {
+class BooPixel_AI_Chat_For_N8n_Database {
     
     /**
      * Get table name
@@ -22,7 +22,7 @@ class BooChat_Connect_Database {
      */
     private function get_table_name() {
         global $wpdb;
-        return $wpdb->prefix . 'boochat_connect_interactions';
+        return $wpdb->prefix . 'boopixel_ai_chat_for_n8n_interactions';
     }
     
     /**

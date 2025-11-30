@@ -1,8 +1,8 @@
 <?php
 /**
- * License management for BooChat Connect PRO
+ * License management for BooPixel AI Chat Connect for n8n PRO
  *
- * @package BooChat_Connect
+ * @package BooPixel_AI_Chat_For_N8n
  */
 
 // Prevent direct access
@@ -11,37 +11,37 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Class BooChat_Connect_License
+ * Class BooPixel_AI_Chat_For_N8n_License
  */
-class BooChat_Connect_License {
+class BooPixel_AI_Chat_For_N8n_License {
     
     /**
      * License key option name
      *
      * @var string
      */
-    private $license_key_option = 'boochat_connect_license_key';
+    private $license_key_option = 'boopixel_ai_chat_for_n8n_license_key';
     
     /**
      * License status option name
      *
      * @var string
      */
-    private $license_status_option = 'boochat_connect_license_status';
+    private $license_status_option = 'boopixel_ai_chat_for_n8n_license_status';
     
     /**
      * License expires option name
      *
      * @var string
      */
-    private $license_expires_option = 'boochat_connect_license_expires';
+    private $license_expires_option = 'boopixel_ai_chat_for_n8n_license_expires';
     
     /**
      * License last check option name
      *
      * @var string
      */
-    private $license_last_check_option = 'boochat_connect_license_last_check';
+    private $license_last_check_option = 'boopixel_ai_chat_for_n8n_license_last_check';
     
     /**
      * API URL for license verification
@@ -55,7 +55,7 @@ class BooChat_Connect_License {
      *
      * @var string
      */
-    private $api_key_option = 'boochat_connect_api_key';
+    private $api_key_option = 'boopixel_ai_chat_for_n8n_api_key';
     
     /**
      * Get API URL (allows customization)
@@ -63,7 +63,7 @@ class BooChat_Connect_License {
      * @return string API URL.
      */
     private function get_api_url() {
-        $custom_url = get_option('boochat_connect_license_api_url', '');
+        $custom_url = get_option('boopixel_ai_chat_for_n8n_license_api_url', '');
         return !empty($custom_url) ? $custom_url : $this->api_url;
     }
     
@@ -97,7 +97,7 @@ class BooChat_Connect_License {
             return false;
         }
         
-        $cache_key = 'boochat_connect_pro_status';
+        $cache_key = 'boopixel_ai_chat_for_n8n_pro_status';
         $cached_status = get_transient($cache_key);
         
         if (!$force_check && $cached_status !== false) {
@@ -138,7 +138,7 @@ class BooChat_Connect_License {
         if (empty($license_key)) {
             return array(
                 'success' => false,
-                'message' => esc_html__('License key is required.', 'boochat-connect')
+                'message' => esc_html__('License key is required.', 'boopixel-ai-chat-for-n8n')
             );
         }
         
@@ -146,7 +146,7 @@ class BooChat_Connect_License {
         $request_body = array(
             'license_key' => sanitize_text_field($license_key),
             'site_url' => esc_url_raw(home_url()),
-            'plugin_version' => BOOCHAT_CONNECT_VERSION
+            'plugin_version' => BOOPIXEL_AI_CHAT_FOR_N8N_VERSION
         );
         
         $headers = array(
@@ -159,12 +159,12 @@ class BooChat_Connect_License {
             'body' => wp_json_encode($request_body)
         ));
         
-        boochat_connect_log_api_request('activate', $api_url, $request_body, $headers, $response);
+        boopixel_ai_chat_for_n8n_log_api_request('activate', $api_url, $request_body, $headers, $response);
         
         if (is_wp_error($response)) {
             return array(
                 'success' => false,
-                'message' => esc_html__('Connection error. Please try again later.', 'boochat-connect')
+                'message' => esc_html__('Connection error. Please try again later.', 'boopixel-ai-chat-for-n8n')
             );
         }
         
@@ -173,7 +173,7 @@ class BooChat_Connect_License {
         $data = json_decode($response_body, true);
         
         if ($response_code !== 200) {
-            $error_message = esc_html__('Server error. Please try again later.', 'boochat-connect');
+            $error_message = esc_html__('Server error. Please try again later.', 'boopixel-ai-chat-for-n8n');
             if (isset($data['detail'])) {
                 $error_message = esc_html($data['detail']);
             } elseif (isset($data['message'])) {
@@ -190,16 +190,16 @@ class BooChat_Connect_License {
             update_option($this->license_status_option, 'valid');
             update_option($this->license_expires_option, isset($data['expires']) ? intval($data['expires']) : (time() + YEAR_IN_SECONDS));
             update_option($this->license_last_check_option, time());
-            delete_transient('boochat_connect_pro_status');
+            delete_transient('boopixel_ai_chat_for_n8n_pro_status');
             
             return array(
                 'success' => true,
-                'message' => esc_html__('License activated successfully!', 'boochat-connect')
+                'message' => esc_html__('License activated successfully!', 'boopixel-ai-chat-for-n8n')
             );
         }
         return array(
             'success' => false,
-            'message' => isset($data['message']) ? esc_html($data['message']) : esc_html__('Invalid license key.', 'boochat-connect')
+            'message' => isset($data['message']) ? esc_html($data['message']) : esc_html__('Invalid license key.', 'boopixel-ai-chat-for-n8n')
         );
     }
     
@@ -231,7 +231,7 @@ class BooChat_Connect_License {
             'body' => wp_json_encode($request_body)
         ));
         
-        boochat_connect_log_api_request('verify', $api_url, $request_body, $headers, $response);
+        boopixel_ai_chat_for_n8n_log_api_request('verify', $api_url, $request_body, $headers, $response);
         
         if (is_wp_error($response)) {
             $cached_status = get_option($this->license_status_option, 'invalid');
@@ -258,7 +258,7 @@ class BooChat_Connect_License {
             update_option($this->license_last_check_option, time());
             
             $is_valid = ($status === 'valid' && get_option($this->license_expires_option, 0) > time());
-            set_transient('boochat_connect_pro_status', $is_valid ? 1 : 0, HOUR_IN_SECONDS);
+            set_transient('boopixel_ai_chat_for_n8n_pro_status', $is_valid ? 1 : 0, HOUR_IN_SECONDS);
             
             return $is_valid;
         }
@@ -277,7 +277,7 @@ class BooChat_Connect_License {
         if (empty($license_key)) {
             return array(
                 'success' => false,
-                'message' => esc_html__('No license key found.', 'boochat-connect')
+                'message' => esc_html__('No license key found.', 'boopixel-ai-chat-for-n8n')
             );
         }
         
@@ -297,18 +297,18 @@ class BooChat_Connect_License {
             'body' => wp_json_encode($request_body)
         ));
         
-        boochat_connect_log_api_request('deactivate', $api_url, $request_body, $headers, $response);
+        boopixel_ai_chat_for_n8n_log_api_request('deactivate', $api_url, $request_body, $headers, $response);
         
         delete_option($this->license_key_option);
         delete_option($this->license_status_option);
         delete_option($this->license_expires_option);
         delete_option($this->license_last_check_option);
-        delete_transient('boochat_connect_pro_status');
+        delete_transient('boopixel_ai_chat_for_n8n_pro_status');
         
         if (is_wp_error($response)) {
             return array(
                 'success' => true,
-                'message' => esc_html__('License deactivated locally. API connection error.', 'boochat-connect')
+                'message' => esc_html__('License deactivated locally. API connection error.', 'boopixel-ai-chat-for-n8n')
             );
         }
         
@@ -316,13 +316,13 @@ class BooChat_Connect_License {
         if ($response_code !== 200) {
             return array(
                 'success' => true,
-                'message' => esc_html__('License deactivated locally.', 'boochat-connect')
+                'message' => esc_html__('License deactivated locally.', 'boopixel-ai-chat-for-n8n')
             );
         }
         
         return array(
             'success' => true,
-            'message' => esc_html__('License deactivated successfully.', 'boochat-connect')
+            'message' => esc_html__('License deactivated successfully.', 'boopixel-ai-chat-for-n8n')
         );
     }
     
@@ -333,12 +333,12 @@ class BooChat_Connect_License {
      */
     public function request_checkout_url() {
         $api_url = $this->get_api_url() . 'create-checkout';
-        $return_url = admin_url('admin.php?page=boochat-connect-pro&payment=success&session_id={CHECKOUT_SESSION_ID}');
-        $cancel_url = admin_url('admin.php?page=boochat-connect-pro&payment=cancel');
+        $return_url = admin_url('admin.php?page=boopixel-ai-chat-for-n8n-pro&payment=success&session_id={CHECKOUT_SESSION_ID}');
+        $cancel_url = admin_url('admin.php?page=boopixel-ai-chat-for-n8n-pro&payment=cancel');
         
         $request_body = array(
             'site_url' => esc_url_raw(home_url()),
-            'plugin_version' => BOOCHAT_CONNECT_VERSION,
+            'plugin_version' => BOOPIXEL_AI_CHAT_FOR_N8N_VERSION,
             'return_url' => $return_url,
             'cancel_url' => $cancel_url
         );
@@ -353,12 +353,12 @@ class BooChat_Connect_License {
             'body' => wp_json_encode($request_body)
         ));
         
-        boochat_connect_log_api_request('create-checkout', $api_url, $request_body, $headers, $response);
+        boopixel_ai_chat_for_n8n_log_api_request('create-checkout', $api_url, $request_body, $headers, $response);
         
         if (is_wp_error($response)) {
             return array(
                 'success' => false,
-                'message' => esc_html__('Connection error. Please try again later.', 'boochat-connect')
+                'message' => esc_html__('Connection error. Please try again later.', 'boopixel-ai-chat-for-n8n')
             );
         }
         
@@ -367,7 +367,7 @@ class BooChat_Connect_License {
         $data = json_decode($response_body, true);
         
         if ($response_code !== 200) {
-            $error_message = esc_html__('Server error. Please try again later.', 'boochat-connect');
+            $error_message = esc_html__('Server error. Please try again later.', 'boopixel-ai-chat-for-n8n');
             if (isset($data['detail'])) {
                 $error_message = esc_html($data['detail']);
             } elseif (isset($data['message'])) {
@@ -388,7 +388,7 @@ class BooChat_Connect_License {
         }
         return array(
             'success' => false,
-            'message' => esc_html__('Invalid response from server.', 'boochat-connect')
+            'message' => esc_html__('Invalid response from server.', 'boopixel-ai-chat-for-n8n')
         );
     }
     
@@ -402,7 +402,7 @@ class BooChat_Connect_License {
         if (empty($session_id)) {
             return array(
                 'success' => false,
-                'message' => esc_html__('Session ID is required.', 'boochat-connect')
+                'message' => esc_html__('Session ID is required.', 'boopixel-ai-chat-for-n8n')
             );
         }
         
@@ -422,12 +422,12 @@ class BooChat_Connect_License {
             'body' => wp_json_encode($request_body)
         ));
         
-        boochat_connect_log_api_request('check-payment', $api_url, $request_body, $headers, $response);
+        boopixel_ai_chat_for_n8n_log_api_request('check-payment', $api_url, $request_body, $headers, $response);
         
         if (is_wp_error($response)) {
             return array(
                 'success' => false,
-                'message' => esc_html__('Connection error. Please try again later.', 'boochat-connect')
+                'message' => esc_html__('Connection error. Please try again later.', 'boopixel-ai-chat-for-n8n')
             );
         }
         
@@ -436,7 +436,7 @@ class BooChat_Connect_License {
         $data = json_decode($response_body, true);
         
         if ($response_code !== 200) {
-            $error_message = esc_html__('Payment verification failed.', 'boochat-connect');
+            $error_message = esc_html__('Payment verification failed.', 'boopixel-ai-chat-for-n8n');
             if (isset($data['detail'])) {
                 $error_message = esc_html($data['detail']);
             } elseif (isset($data['message'])) {
@@ -451,12 +451,12 @@ class BooChat_Connect_License {
         if (isset($data['status']) && $data['status'] === 'processing') {
             return array(
                 'success' => false,
-                'message' => esc_html__('Payment is being processed. Please wait a moment and refresh the page.', 'boochat-connect')
+                'message' => esc_html__('Payment is being processed. Please wait a moment and refresh the page.', 'boopixel-ai-chat-for-n8n')
             );
         }
         
         if (isset($data['status']) && $data['status'] === 'failed') {
-            $error_message = isset($data['message']) ? esc_html($data['message']) : esc_html__('Payment was not completed.', 'boochat-connect');
+            $error_message = isset($data['message']) ? esc_html($data['message']) : esc_html__('Payment was not completed.', 'boopixel-ai-chat-for-n8n');
             return array(
                 'success' => false,
                 'message' => $error_message
@@ -468,7 +468,7 @@ class BooChat_Connect_License {
             
             update_option($this->license_key_option, $license_key);
             update_option($this->license_last_check_option, time());
-            delete_transient('boochat_connect_pro_status');
+            delete_transient('boopixel_ai_chat_for_n8n_pro_status');
             
             $activation = $this->activate_license($license_key);
             
@@ -476,7 +476,7 @@ class BooChat_Connect_License {
                 return array(
                     'success' => true,
                     'license_key' => $license_key,
-                    'message' => esc_html__('Payment successful! License activated automatically.', 'boochat-connect')
+                    'message' => esc_html__('Payment successful! License activated automatically.', 'boopixel-ai-chat-for-n8n')
                 );
             }
             
@@ -486,7 +486,7 @@ class BooChat_Connect_License {
         
         return array(
             'success' => false,
-            'message' => isset($data['message']) ? esc_html($data['message']) : esc_html__('License key not found. Payment may still be processing.', 'boochat-connect')
+            'message' => isset($data['message']) ? esc_html($data['message']) : esc_html__('License key not found. Payment may still be processing.', 'boopixel-ai-chat-for-n8n')
         );
     }
 }

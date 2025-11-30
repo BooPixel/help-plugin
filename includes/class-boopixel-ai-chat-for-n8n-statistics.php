@@ -1,8 +1,8 @@
 <?php
 /**
- * Statistics functionality for BooChat Connect
+ * Statistics functionality for BooPixel AI Chat Connect for n8n
  *
- * @package BooChat_Connect
+ * @package BooPixel_AI_Chat_For_N8n
  */
 
 // Prevent direct access
@@ -11,21 +11,21 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Class BooChat_Connect_Statistics
+ * Class BooPixel_AI_Chat_For_N8n_Statistics
  */
-class BooChat_Connect_Statistics {
+class BooPixel_AI_Chat_For_N8n_Statistics {
     
     /**
      * Database instance
      *
-     * @var BooChat_Connect_Database
+     * @var BooPixel_AI_Chat_For_N8n_Database
      */
     private $database;
     
     /**
      * Constructor
      *
-     * @param BooChat_Connect_Database $database Database instance.
+     * @param BooPixel_AI_Chat_For_N8n_Database $database Database instance.
      */
     public function __construct($database) {
         $this->database = $database;
@@ -38,7 +38,7 @@ class BooChat_Connect_Statistics {
      * @param array  $vars      Variables to pass to the view.
      */
     private function load_view($view_name, $vars = array()) {
-        $view_file = BOOCHAT_CONNECT_DIR . 'includes/views/' . $view_name . '.php';
+        $view_file = BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'includes/views/' . $view_name . '.php';
         if (file_exists($view_file)) {
             extract($vars);
             include $view_file;
@@ -49,15 +49,9 @@ class BooChat_Connect_Statistics {
      * Render statistics page
      */
     public function render_page() {
-        // Check PRO license before rendering
-        $license = new BooChat_Connect_License();
-        if (!$license->is_pro()) {
-            wp_safe_redirect(admin_url('admin.php?page=boochat-connect-pro'));
-            exit;
-        }
-        
+        // Statistics page is available to all users
         $ajax_url = admin_url('admin-ajax.php');
-        $nonce = wp_create_nonce('boochat-connect-statistics');
+        $nonce = wp_create_nonce('boopixel-ai-chat-for-n8n-statistics');
         $today = current_time('Y-m-d');
         $seven_days_ago = gmdate('Y-m-d', strtotime('-7 days', current_time('timestamp')));
         

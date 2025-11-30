@@ -1,8 +1,8 @@
 <?php
 /**
- * API integration for BooChat Connect
+ * API integration for BooPixel AI Chat Connect for n8n
  *
- * @package BooChat_Connect
+ * @package BooPixel_AI_Chat_For_N8n
  */
 
 // Prevent direct access
@@ -11,9 +11,9 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Class BooChat_Connect_API
+ * Class BooPixel_AI_Chat_For_N8n_API
  */
-class BooChat_Connect_API {
+class BooPixel_AI_Chat_For_N8n_API {
     
     /**
      * Get API URL from options
@@ -21,7 +21,7 @@ class BooChat_Connect_API {
      * @return string API URL or empty string
      */
     public function get_api_url() {
-        return get_option('boochat_connect_api_url', '');
+        return get_option('boopixel_ai_chat_for_n8n_api_url', '');
     }
     
     /**
@@ -35,7 +35,7 @@ class BooChat_Connect_API {
         $url = $this->get_api_url();
         
         if (empty($url)) {
-            return new WP_Error('no_api_url', boochat_connect_translate('api_not_configured_error', 'API URL not configured. Configure in BooChat Connect > Settings.'));
+            return new WP_Error('no_api_url', boopixel_ai_chat_for_n8n_translate('api_not_configured_error', 'API URL not configured. Configure in BooPixel AI Chat Connect for n8n > Settings.'));
         }
         
         $request_body = array(
@@ -55,7 +55,7 @@ class BooChat_Connect_API {
             'sslverify' => true,
         ));
         
-        boochat_connect_log_api_request('send_message', $url, $request_body, $headers, $response);
+        boopixel_ai_chat_for_n8n_log_api_request('send_message', $url, $request_body, $headers, $response);
         
         if (is_wp_error($response)) {
             return $response;
@@ -65,7 +65,7 @@ class BooChat_Connect_API {
         $body = wp_remote_retrieve_body($response);
         
         if ($response_code !== 200) {
-            return new WP_Error('http_error', sprintf(boochat_connect_translate('http_error_message', 'HTTP %d: %s'), $response_code, $body));
+            return new WP_Error('http_error', sprintf(boopixel_ai_chat_for_n8n_translate('http_error_message', 'HTTP %d: %s'), $response_code, $body));
         }
         
         return array(

@@ -1,8 +1,8 @@
 <?php
 /**
- * Admin functionality for BooChat Connect
+ * Admin functionality for BooPixel AI Chat Connect for n8n
  *
- * @package BooChat_Connect
+ * @package BooPixel_AI_Chat_For_N8n
  */
 
 // Prevent direct access
@@ -11,63 +11,63 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Class BooChat_Connect_Admin
+ * Class BooPixel_AI_Chat_For_N8n_Admin
  */
-class BooChat_Connect_Admin {
+class BooPixel_AI_Chat_For_N8n_Admin {
     
     /**
      * Settings instance
      *
-     * @var BooChat_Connect_Settings
+     * @var BooPixel_AI_Chat_For_N8n_Settings
      */
     private $settings;
     
     /**
      * API instance
      *
-     * @var BooChat_Connect_API
+     * @var BooPixel_AI_Chat_For_N8n_API
      */
     private $api;
     
     /**
      * Statistics instance
      *
-     * @var BooChat_Connect_Statistics
+     * @var BooPixel_AI_Chat_For_N8n_Statistics
      */
     private $statistics;
     
     /**
      * License instance
      *
-     * @var BooChat_Connect_License
+     * @var BooPixel_AI_Chat_For_N8n_License
      */
     private $license;
     
     /**
      * Constructor
      *
-     * @param BooChat_Connect_Settings  $settings Settings instance.
-     * @param BooChat_Connect_API       $api API instance.
-     * @param BooChat_Connect_Statistics $statistics Statistics instance.
+     * @param BooPixel_AI_Chat_For_N8n_Settings  $settings Settings instance.
+     * @param BooPixel_AI_Chat_For_N8n_API       $api API instance.
+     * @param BooPixel_AI_Chat_For_N8n_Statistics $statistics Statistics instance.
      */
     public function __construct($settings, $api, $statistics) {
         $this->settings = $settings;
         $this->api = $api;
         $this->statistics = $statistics;
-        $this->license = new BooChat_Connect_License();
+        $this->license = new BooPixel_AI_Chat_For_N8n_License();
         
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
         add_filter('locale', array($this, 'force_plugin_locale'), 999);
         add_action('admin_init', array($this, 'reload_textdomain'), 1);
-        add_filter('plugin_action_links_' . plugin_basename(BOOCHAT_CONNECT_DIR . 'boochat-connect.php'), array($this, 'add_plugin_action_links'));
-        add_action('admin_post_boochat_connect_save_settings', array($this, 'save_settings'));
-        add_action('admin_post_boochat_connect_save_customization', array($this, 'save_customization'));
-        add_action('admin_post_boochat_connect_activate_license', array($this, 'handle_activate_license'));
-        add_action('admin_post_boochat_connect_deactivate_license', array($this, 'handle_deactivate_license'));
-        add_action('admin_post_boochat_connect_stripe_checkout', array($this, 'handle_stripe_checkout'));
+        add_filter('plugin_action_links_' . plugin_basename(BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'boopixel-ai-chat-for-n8n.php'), array($this, 'add_plugin_action_links'));
+        add_action('admin_post_boopixel_ai_chat_for_n8n_save_settings', array($this, 'save_settings'));
+        add_action('admin_post_boopixel_ai_chat_for_n8n_save_customization', array($this, 'save_customization'));
+        add_action('admin_post_boopixel_ai_chat_for_n8n_activate_license', array($this, 'handle_activate_license'));
+        add_action('admin_post_boopixel_ai_chat_for_n8n_deactivate_license', array($this, 'handle_deactivate_license'));
+        add_action('admin_post_boopixel_ai_chat_for_n8n_stripe_checkout', array($this, 'handle_stripe_checkout'));
         add_action('admin_init', array($this, 'handle_stripe_return'));
-        add_action('wp_ajax_boochat_connect_create_stripe_session', array($this, 'ajax_create_stripe_session'));
+        add_action('wp_ajax_boopixel_ai_chat_for_n8n_create_stripe_session', array($this, 'ajax_create_stripe_session'));
     }
     
     /**
@@ -75,91 +75,73 @@ class BooChat_Connect_Admin {
      */
     public function add_admin_menu() {
         add_menu_page(
-            __('BooChat Connect', 'boochat-connect'),
-            __('BooChat Connect', 'boochat-connect'),
+            __('BooPixel AI Chat Connect for n8n', 'boopixel-ai-chat-for-n8n'),
+            __('BooPixel AI Chat', 'boopixel-ai-chat-for-n8n'),
             'manage_options',
-            'boochat-connect',
+            'boopixel-ai-chat-for-n8n',
             array($this, 'render_admin_page'),
             'dashicons-sos',
             30
         );
         
         add_submenu_page(
-            'boochat-connect',
-            boochat_connect_translate('main_panel'),
-            boochat_connect_translate('main_panel'),
+            'boopixel-ai-chat-for-n8n',
+            boopixel_ai_chat_for_n8n_translate('main_panel'),
+            boopixel_ai_chat_for_n8n_translate('main_panel'),
             'manage_options',
-            'boochat-connect',
+            'boopixel-ai-chat-for-n8n',
             array($this, 'render_admin_page')
         );
         
         add_submenu_page(
-            'boochat-connect',
-            boochat_connect_translate('customization'),
-            boochat_connect_translate('customization'),
+            'boopixel-ai-chat-for-n8n',
+            boopixel_ai_chat_for_n8n_translate('customization'),
+            boopixel_ai_chat_for_n8n_translate('customization'),
             'manage_options',
-            'boochat-connect-customization',
+            'boopixel-ai-chat-for-n8n-customization',
             array($this, 'render_customization_page')
         );
         
         add_submenu_page(
-            'boochat-connect',
-            boochat_connect_translate('settings'),
-            boochat_connect_translate('settings'),
+            'boopixel-ai-chat-for-n8n',
+            boopixel_ai_chat_for_n8n_translate('settings'),
+            boopixel_ai_chat_for_n8n_translate('settings'),
             'manage_options',
-            'boochat-connect-settings',
+            'boopixel-ai-chat-for-n8n-settings',
             array($this, 'render_settings_page')
         );
         
-        // Add Statistics menu with PRO badge if not licensed
-        // $statistics_title = boochat_connect_translate('statistics');
-        // $statistics_menu_title = $statistics_title;
-        // $statistics_callback = array($this, 'render_statistics_page');
-        //
-        // if (!$this->license->is_pro()) {
-        //     $statistics_menu_title = $statistics_title . ' <span class="boochat-connect-pro-badge">PRO</span>';
-        //     // Change callback to redirect to PRO page
-        //     $statistics_callback = array($this, 'redirect_to_pro_page');
-        // }
-        //
-        // add_submenu_page(
-        //     'boochat-connect',
-        //     $statistics_title,
-        //     $statistics_menu_title,
-        //     'manage_options',
-        //     'boochat-connect-statistics',
-        //     $statistics_callback
-        // );
+        // Add Statistics menu (available to all users)
+        $statistics_title = boopixel_ai_chat_for_n8n_translate('statistics');
+        add_submenu_page(
+            'boopixel-ai-chat-for-n8n',
+            $statistics_title,
+            $statistics_title,
+            'manage_options',
+            'boopixel-ai-chat-for-n8n-statistics',
+            array($this, 'render_statistics_page')
+        );
         
-        // Add Sessions menu with PRO badge if not licensed
-        // $sessions_title = boochat_connect_translate('sessions', 'Sessions');
-        // $sessions_menu_title = $sessions_title;
-        // $sessions_callback = array($this, 'render_sessions_page');
-        //
-        // if (!$this->license->is_pro()) {
-        //     $sessions_menu_title = $sessions_title . ' <span class="boochat-connect-pro-badge">PRO</span>';
-        //     // Change callback to redirect to PRO page
-        //     $sessions_callback = array($this, 'redirect_to_pro_page');
-        // }
-        //
-        // add_submenu_page(
-        //     'boochat-connect',
-        //     $sessions_title,
-        //     $sessions_menu_title,
-        //     'manage_options',
-        //     'boochat-connect-sessions',
-        //     $sessions_callback
-        // );
+        // Add Sessions menu (available to all users)
+        $sessions_title = boopixel_ai_chat_for_n8n_translate('sessions', 'Sessions');
+        add_submenu_page(
+            'boopixel-ai-chat-for-n8n',
+            $sessions_title,
+            $sessions_title,
+            'manage_options',
+            'boopixel-ai-chat-for-n8n-sessions',
+            array($this, 'render_sessions_page')
+        );
         
         // Add PRO upgrade page
-        // add_submenu_page(
-        //     'boochat-connect',
-        //     boochat_connect_translate('upgrade_to_pro', 'Upgrade to PRO'),
-        //     boochat_connect_translate('upgrade_to_pro', 'Upgrade to PRO'),
-        //     'manage_options',
-        //     'boochat-connect-pro',
-        //     array($this, 'render_pro_upgrade_page')
-        // );
+        add_submenu_page(
+            'boopixel-ai-chat-for-n8n',
+            boopixel_ai_chat_for_n8n_translate('upgrade_to_pro', 'Upgrade to PRO'),
+            boopixel_ai_chat_for_n8n_translate('upgrade_to_pro', 'Upgrade to PRO'),
+            'manage_options',
+            'boopixel-ai-chat-for-n8n-pro',
+            array($this, 'render_pro_upgrade_page')
+        );
     }
     
     /**
@@ -171,13 +153,13 @@ class BooChat_Connect_Admin {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameter for display only
         $current_page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
         $is_plugin_page = (
-            $current_page === 'boochat-connect' ||
-            $current_page === 'boochat-connect-customization' ||
-            $current_page === 'boochat-connect-settings' ||
-            $current_page === 'boochat-connect-statistics' ||
-            $current_page === 'boochat-connect-sessions' ||
-            $current_page === 'boochat-connect-pro' ||
-            strpos($hook, 'boochat-connect') !== false
+            $current_page === 'boopixel-ai-chat-for-n8n' ||
+            $current_page === 'boopixel-ai-chat-for-n8n-customization' ||
+            $current_page === 'boopixel-ai-chat-for-n8n-settings' ||
+            $current_page === 'boopixel-ai-chat-for-n8n-statistics' ||
+            $current_page === 'boopixel-ai-chat-for-n8n-sessions' ||
+            $current_page === 'boopixel-ai-chat-for-n8n-pro' ||
+            strpos($hook, 'boopixel-ai-chat-for-n8n') !== false
         );
         
         if (!$is_plugin_page) {
@@ -186,56 +168,56 @@ class BooChat_Connect_Admin {
         
         // Base admin styles (always loaded)
         wp_enqueue_style(
-            'boochat-connect-admin-style',
-            BOOCHAT_CONNECT_URL . 'assets/css/admin-style.css',
+            'boopixel-ai-chat-for-n8n-admin-style',
+            BOOPIXEL_AI_CHAT_FOR_N8N_URL . 'assets/css/admin-style.css',
             array(),
-            BOOCHAT_CONNECT_VERSION
+            BOOPIXEL_AI_CHAT_FOR_N8N_VERSION
         );
         
         // Admin main styles (header styles - loaded on all pages)
         wp_enqueue_style(
-            'boochat-connect-admin-main',
-            BOOCHAT_CONNECT_URL . 'assets/css/admin-main.css',
-            array('boochat-connect-admin-style'),
-            BOOCHAT_CONNECT_VERSION
+            'boopixel-ai-chat-for-n8n-admin-main',
+            BOOPIXEL_AI_CHAT_FOR_N8N_URL . 'assets/css/admin-main.css',
+            array('boopixel-ai-chat-for-n8n-admin-style'),
+            BOOPIXEL_AI_CHAT_FOR_N8N_VERSION
         );
         
-        if ($current_page === 'boochat-connect-statistics') {
+        if ($current_page === 'boopixel-ai-chat-for-n8n-statistics') {
             wp_enqueue_style(
-                'boochat-connect-admin-statistics',
-                BOOCHAT_CONNECT_URL . 'assets/css/admin-statistics.css',
-                array('boochat-connect-admin-style'),
-                BOOCHAT_CONNECT_VERSION
+                'boopixel-ai-chat-for-n8n-admin-statistics',
+                BOOPIXEL_AI_CHAT_FOR_N8N_URL . 'assets/css/admin-statistics.css',
+                array('boopixel-ai-chat-for-n8n-admin-style'),
+                BOOPIXEL_AI_CHAT_FOR_N8N_VERSION
             );
         }
         
         // Sessions page styles
-        if ($current_page === 'boochat-connect-sessions') {
+        if ($current_page === 'boopixel-ai-chat-for-n8n-sessions') {
             wp_enqueue_style(
-                'boochat-connect-admin-sessions',
-                BOOCHAT_CONNECT_URL . 'assets/css/admin-sessions.css',
-                array('boochat-connect-admin-style'),
-                BOOCHAT_CONNECT_VERSION
+                'boopixel-ai-chat-for-n8n-admin-sessions',
+                BOOPIXEL_AI_CHAT_FOR_N8N_URL . 'assets/css/admin-sessions.css',
+                array('boopixel-ai-chat-for-n8n-admin-style'),
+                BOOPIXEL_AI_CHAT_FOR_N8N_VERSION
             );
         }
         
         // Settings page styles
-        if ($current_page === 'boochat-connect-settings') {
+        if ($current_page === 'boopixel-ai-chat-for-n8n-settings') {
             wp_enqueue_style(
-                'boochat-connect-admin-settings',
-                BOOCHAT_CONNECT_URL . 'assets/css/admin-settings.css',
-                array('boochat-connect-admin-style'),
-                BOOCHAT_CONNECT_VERSION
+                'boopixel-ai-chat-for-n8n-admin-settings',
+                BOOPIXEL_AI_CHAT_FOR_N8N_URL . 'assets/css/admin-settings.css',
+                array('boopixel-ai-chat-for-n8n-admin-style'),
+                BOOPIXEL_AI_CHAT_FOR_N8N_VERSION
             );
         }
         
         // Customization page styles
-        if ($current_page === 'boochat-connect-customization') {
+        if ($current_page === 'boopixel-ai-chat-for-n8n-customization') {
             wp_enqueue_style(
-                'boochat-connect-admin-customization',
-                BOOCHAT_CONNECT_URL . 'assets/css/admin-customization.css',
-                array('boochat-connect-admin-style'),
-                BOOCHAT_CONNECT_VERSION
+                'boopixel-ai-chat-for-n8n-admin-customization',
+                BOOPIXEL_AI_CHAT_FOR_N8N_URL . 'assets/css/admin-customization.css',
+                array('boopixel-ai-chat-for-n8n-admin-style'),
+                BOOPIXEL_AI_CHAT_FOR_N8N_VERSION
             );
             
             // Enqueue WordPress media uploader
@@ -243,73 +225,73 @@ class BooChat_Connect_Admin {
             
             // Enqueue customization script
             wp_enqueue_script(
-                'boochat-connect-customization-script',
-                BOOCHAT_CONNECT_URL . 'assets/js/admin-customization.js',
+                'boopixel-ai-chat-for-n8n-customization-script',
+                BOOPIXEL_AI_CHAT_FOR_N8N_URL . 'assets/js/admin-customization.js',
                 array('jquery'),
-                BOOCHAT_CONNECT_VERSION,
+                BOOPIXEL_AI_CHAT_FOR_N8N_VERSION,
                 true
             );
             
             // Localize customization script with translations
-            wp_localize_script('boochat-connect-customization-script', 'boochatConnectCustomization', array(
-                'chooseIcon' => esc_html__('Choose Chat Icon', 'boochat-connect'),
-                'useIcon' => esc_html__('Use this icon', 'boochat-connect'),
-                'removeIcon' => esc_html__('Remove Icon', 'boochat-connect'),
+            wp_localize_script('boopixel-ai-chat-for-n8n-customization-script', 'boopixelAiChatForN8nCustomization', array(
+                'chooseIcon' => esc_html__('Choose Chat Icon', 'boopixel-ai-chat-for-n8n'),
+                'useIcon' => esc_html__('Use this icon', 'boopixel-ai-chat-for-n8n'),
+                'removeIcon' => esc_html__('Remove Icon', 'boopixel-ai-chat-for-n8n'),
             ));
         }
         
         // PRO page styles
-        if ($current_page === 'boochat-connect-pro') {
+        if ($current_page === 'boopixel-ai-chat-for-n8n-pro') {
             wp_enqueue_style(
-                'boochat-connect-admin-main',
-                BOOCHAT_CONNECT_URL . 'assets/css/admin-main.css',
-                array('boochat-connect-admin-style'),
-                BOOCHAT_CONNECT_VERSION
+                'boopixel-ai-chat-for-n8n-admin-main',
+                BOOPIXEL_AI_CHAT_FOR_N8N_URL . 'assets/css/admin-main.css',
+                array('boopixel-ai-chat-for-n8n-admin-style'),
+                BOOPIXEL_AI_CHAT_FOR_N8N_VERSION
             );
             
             // Enqueue Stripe checkout script
             wp_enqueue_script(
-                'boochat-connect-stripe-checkout',
-                BOOCHAT_CONNECT_URL . 'assets/js/stripe-checkout.js',
+                'boopixel-ai-chat-for-n8n-stripe-checkout',
+                BOOPIXEL_AI_CHAT_FOR_N8N_URL . 'assets/js/stripe-checkout.js',
                 array('jquery'),
-                BOOCHAT_CONNECT_VERSION,
+                BOOPIXEL_AI_CHAT_FOR_N8N_VERSION,
                 true
             );
             
-            wp_localize_script('boochat-connect-stripe-checkout', 'boochatConnectStripe', array(
+            wp_localize_script('boopixel-ai-chat-for-n8n-stripe-checkout', 'boopixelAiChatForN8nStripe', array(
                 'ajaxUrl' => admin_url('admin-ajax.php'),
-                'nonce' => wp_create_nonce('boochat-connect-stripe'),
-                'proPageUrl' => admin_url('admin.php?page=boochat-connect-pro'),
-                'configurationError' => esc_html__('Configuration Error', 'boochat-connect'),
-                'loading' => esc_html__('Loading...', 'boochat-connect'),
-                'failedCheckout' => esc_html__('Failed to create checkout session. Please try again.', 'boochat-connect'),
-                'errorConnecting' => esc_html__('Error connecting to server. Please try again.', 'boochat-connect'),
+                'nonce' => wp_create_nonce('boopixel-ai-chat-for-n8n-stripe'),
+                'proPageUrl' => admin_url('admin.php?page=boopixel-ai-chat-for-n8n-pro'),
+                'configurationError' => esc_html__('Configuration Error', 'boopixel-ai-chat-for-n8n'),
+                'loading' => esc_html__('Loading...', 'boopixel-ai-chat-for-n8n'),
+                'failedCheckout' => esc_html__('Failed to create checkout session. Please try again.', 'boopixel-ai-chat-for-n8n'),
+                'errorConnecting' => esc_html__('Error connecting to server. Please try again.', 'boopixel-ai-chat-for-n8n'),
             ));
         }
         
         wp_enqueue_script(
-            'boochat-connect-admin-script',
-            BOOCHAT_CONNECT_URL . 'assets/js/admin-script.js',
+            'boopixel-ai-chat-for-n8n-admin-script',
+            BOOPIXEL_AI_CHAT_FOR_N8N_URL . 'assets/js/admin-script.js',
             array('jquery'),
-            BOOCHAT_CONNECT_VERSION,
+            BOOPIXEL_AI_CHAT_FOR_N8N_VERSION,
             true
         );
         
-        $is_statistics_page = ($current_page === 'boochat-connect-statistics');
+        $is_statistics_page = ($current_page === 'boopixel-ai-chat-for-n8n-statistics');
         
         if ($is_statistics_page) {
             wp_enqueue_script(
                 'chart-js',
-                BOOCHAT_CONNECT_URL . 'assets/js/chart.umd.min.js',
+                BOOPIXEL_AI_CHAT_FOR_N8N_URL . 'assets/js/chart.umd.min.js',
                 array(),
                 '4.4.0',
                 false
             );
             
-            $version = boochat_connect_get_version();
+            $version = boopixel_ai_chat_for_n8n_get_version();
             wp_enqueue_script(
-                'boochat-connect-statistics-script',
-                BOOCHAT_CONNECT_URL . 'assets/js/statistics-script.js',
+                'boopixel-ai-chat-for-n8n-statistics-script',
+                BOOPIXEL_AI_CHAT_FOR_N8N_URL . 'assets/js/statistics-script.js',
                 array('jquery', 'chart-js'),
                 $version,
                 false
@@ -317,17 +299,17 @@ class BooChat_Connect_Admin {
             
             $localize_data = array(
                 'ajaxUrl' => admin_url('admin-ajax.php'),
-                'nonce' => wp_create_nonce('boochat-connect-statistics'),
-                'loadStatisticsText' => boochat_connect_translate('load_statistics'),
-                'loadingText' => boochat_connect_translate('loading', 'Loading...'),
-                'selectDatesText' => boochat_connect_translate('select_dates', 'Please select start and end dates.'),
-                'invalidDateRangeText' => boochat_connect_translate('invalid_date_range', 'Start date must be before end date.'),
-                'errorLoadingText' => boochat_connect_translate('error_loading_statistics', 'Error loading statistics: '),
-                'errorConnectingText' => boochat_connect_translate('error_connecting_server', 'Error connecting to server. Please try again.'),
-                'proUpgradeUrl' => admin_url('admin.php?page=boochat-connect-pro'),
+                'nonce' => wp_create_nonce('boopixel-ai-chat-for-n8n-statistics'),
+                'loadStatisticsText' => boopixel_ai_chat_for_n8n_translate('load_statistics'),
+                'loadingText' => boopixel_ai_chat_for_n8n_translate('loading', 'Loading...'),
+                'selectDatesText' => boopixel_ai_chat_for_n8n_translate('select_dates', 'Please select start and end dates.'),
+                'invalidDateRangeText' => boopixel_ai_chat_for_n8n_translate('invalid_date_range', 'Start date must be before end date.'),
+                'errorLoadingText' => boopixel_ai_chat_for_n8n_translate('error_loading_statistics', 'Error loading statistics: '),
+                'errorConnectingText' => boopixel_ai_chat_for_n8n_translate('error_connecting_server', 'Error connecting to server. Please try again.'),
+                'proUpgradeUrl' => admin_url('admin.php?page=boopixel-ai-chat-for-n8n-pro'),
             );
             
-            wp_localize_script('boochat-connect-statistics-script', 'boochatConnectStats', $localize_data);
+            wp_localize_script('boopixel-ai-chat-for-n8n-statistics-script', 'boopixelAiChatForN8nStats', $localize_data);
         }
     }
     
@@ -340,12 +322,12 @@ class BooChat_Connect_Admin {
      */
     private function verify_request($nonce_action, $nonce_field) {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html(boochat_connect_translate('no_permission_page', 'You do not have permission to access this page.')));
+            wp_die(esc_html(boopixel_ai_chat_for_n8n_translate('no_permission_page', 'You do not have permission to access this page.')));
             return false;
         }
         
         if (!isset($_POST[$nonce_field]) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST[$nonce_field])), $nonce_action)) {
-            wp_die(esc_html(boochat_connect_translate('security_error_try_again', 'Security error. Please try again.')));
+            wp_die(esc_html(boopixel_ai_chat_for_n8n_translate('security_error_try_again', 'Security error. Please try again.')));
             return false;
         }
         
@@ -356,35 +338,35 @@ class BooChat_Connect_Admin {
      * Save customization
      */
     public function save_customization() {
-        if (!$this->verify_request('boochat_connect_save_customization', 'boochat_connect_customization_nonce')) {
+        if (!$this->verify_request('boopixel_ai_chat_for_n8n_save_customization', 'boopixel_ai_chat_for_n8n_customization_nonce')) {
             return;
         }
         
         // Save customization settings
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
         $chat_icon = isset($_POST['chat_icon']) ? esc_url_raw(wp_unslash($_POST['chat_icon'])) : '';
-        update_option('boochat_connect_chat_icon', $chat_icon);
+        update_option('boopixel_ai_chat_for_n8n_chat_icon', $chat_icon);
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
-        update_option('boochat_connect_chat_name', sanitize_text_field(wp_unslash($_POST['chat_name'] ?? boochat_connect_translate('chat_name_default'))));
+        update_option('boopixel_ai_chat_for_n8n_chat_name', sanitize_text_field(wp_unslash($_POST['chat_name'] ?? boopixel_ai_chat_for_n8n_translate('chat_name_default'))));
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
-        update_option('boochat_connect_welcome_message', sanitize_textarea_field(wp_unslash($_POST['welcome_message'] ?? boochat_connect_translate('welcome_message_default'))));
+        update_option('boopixel_ai_chat_for_n8n_welcome_message', sanitize_textarea_field(wp_unslash($_POST['welcome_message'] ?? boopixel_ai_chat_for_n8n_translate('welcome_message_default'))));
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
-        update_option('boochat_connect_primary_color', sanitize_hex_color(wp_unslash($_POST['primary_color'] ?? '#1B8EF0')));
+        update_option('boopixel_ai_chat_for_n8n_primary_color', sanitize_hex_color(wp_unslash($_POST['primary_color'] ?? '#1B8EF0')));
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
-        update_option('boochat_connect_secondary_color', sanitize_hex_color(wp_unslash($_POST['secondary_color'] ?? '#1B5D98')));
+        update_option('boopixel_ai_chat_for_n8n_secondary_color', sanitize_hex_color(wp_unslash($_POST['secondary_color'] ?? '#1B5D98')));
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
-        update_option('boochat_connect_chat_bg_color', sanitize_hex_color(wp_unslash($_POST['chat_bg_color'] ?? '#ffffff')));
+        update_option('boopixel_ai_chat_for_n8n_chat_bg_color', sanitize_hex_color(wp_unslash($_POST['chat_bg_color'] ?? '#ffffff')));
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
-        update_option('boochat_connect_text_color', sanitize_hex_color(wp_unslash($_POST['text_color'] ?? '#333333')));
+        update_option('boopixel_ai_chat_for_n8n_text_color', sanitize_hex_color(wp_unslash($_POST['text_color'] ?? '#333333')));
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
-        update_option('boochat_connect_font_family', sanitize_text_field(wp_unslash($_POST['font_family'] ?? 'Arial, sans-serif')));
+        update_option('boopixel_ai_chat_for_n8n_font_family', sanitize_text_field(wp_unslash($_POST['font_family'] ?? 'Arial, sans-serif')));
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
-        update_option('boochat_connect_font_size', sanitize_text_field(wp_unslash($_POST['font_size'] ?? '14px')));
+        update_option('boopixel_ai_chat_for_n8n_font_size', sanitize_text_field(wp_unslash($_POST['font_size'] ?? '14px')));
         
         $this->settings->clear_cache();
         
         wp_safe_redirect(add_query_arg(array(
-            'page' => 'boochat-connect-customization',
+            'page' => 'boopixel-ai-chat-for-n8n-customization',
             'customization-updated' => 'true'
         ), admin_url('admin.php')));
         exit;
@@ -394,24 +376,24 @@ class BooChat_Connect_Admin {
      * Save settings
      */
     public function save_settings() {
-        if (!$this->verify_request('boochat_connect_save_settings', 'boochat_connect_settings_nonce')) {
+        if (!$this->verify_request('boopixel_ai_chat_for_n8n_save_settings', 'boopixel_ai_chat_for_n8n_settings_nonce')) {
             return;
         }
         
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
         $api_url = isset($_POST['api_url']) ? esc_url_raw(wp_unslash($_POST['api_url'])) : '';
-        update_option('boochat_connect_api_url', $api_url);
+        update_option('boopixel_ai_chat_for_n8n_api_url', $api_url);
         
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request() above
         $language = isset($_POST['language']) ? sanitize_text_field(wp_unslash($_POST['language'])) : '';
         if (empty($language)) {
-            delete_option('boochat_connect_language');
+            delete_option('boopixel_ai_chat_for_n8n_language');
         } elseif (in_array($language, array('en', 'pt', 'es'))) {
-            update_option('boochat_connect_language', $language);
+            update_option('boopixel_ai_chat_for_n8n_language', $language);
         }
         
         wp_safe_redirect(add_query_arg(array(
-            'page' => 'boochat-connect-settings',
+            'page' => 'boopixel-ai-chat-for-n8n-settings',
             'settings-updated' => 'true'
         ), admin_url('admin.php')));
         exit;
@@ -424,7 +406,7 @@ class BooChat_Connect_Admin {
      * @param array  $vars      Variables to pass to the view.
      */
     private function load_view($view_name, $vars = array()) {
-        $view_file = BOOCHAT_CONNECT_DIR . 'includes/views/' . $view_name . '.php';
+        $view_file = BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'includes/views/' . $view_name . '.php';
         if (file_exists($view_file)) {
             extract($vars);
             include $view_file;
@@ -446,7 +428,7 @@ class BooChat_Connect_Admin {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just checking page parameter
         $current_page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
         
-        if (!empty($current_page) && strpos($current_page, 'boochat-connect') !== false) {
+        if (!empty($current_page) && strpos($current_page, 'boopixel-ai-chat-for-n8n') !== false) {
             return true;
         }
         
@@ -460,7 +442,7 @@ class BooChat_Connect_Admin {
         // Check current screen (only if function exists and check_screen is true)
         if ($check_screen && function_exists('get_current_screen')) {
             $screen = get_current_screen();
-            if ($screen && strpos($screen->id, 'boochat-connect') !== false) {
+            if ($screen && strpos($screen->id, 'boopixel-ai-chat-for-n8n') !== false) {
                 return true;
             }
         }
@@ -482,7 +464,7 @@ class BooChat_Connect_Admin {
         $target_locale = null;
         
         // Get configured language from plugin settings
-        $configured_language = get_option('boochat_connect_language', '');
+        $configured_language = get_option('boopixel_ai_chat_for_n8n_language', '');
         
         if (!empty($configured_language)) {
             // Use plugin configured language
@@ -497,7 +479,7 @@ class BooChat_Connect_Admin {
             }
         } else {
             // Use WordPress locale, but map to supported locales
-            $language_code = boochat_connect_get_language_from_locale($default_locale);
+            $language_code = boopixel_ai_chat_for_n8n_get_language_from_locale($default_locale);
             
             $locale_map = array(
                 'en' => 'en_US',
@@ -546,13 +528,17 @@ class BooChat_Connect_Admin {
         if ($target_locale !== $current_locale && function_exists('switch_to_locale')) {
             switch_to_locale($target_locale);
             // Reload text domain with new locale
-            unload_textdomain('boochat-connect');
-            // phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- Required for non-WordPress.org plugins and locale switching
-            load_plugin_textdomain(
-                'boochat-connect',
-                false,
-                dirname(plugin_basename(BOOCHAT_CONNECT_DIR . 'boochat-connect.php')) . '/languages'
-            );
+            unload_textdomain('boopixel-ai-chat-for-n8n');
+            // Note: load_plugin_textdomain() not needed for WordPress.org plugins since 4.6
+            // WordPress automatically loads translations, but we reload for locale switching
+            // Only reload if supporting WordPress < 4.6
+            if (version_compare(get_bloginfo('version'), '4.6', '<')) {
+                load_plugin_textdomain(
+                    'boopixel-ai-chat-for-n8n',
+                    false,
+                    dirname(plugin_basename(BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'boopixel-ai-chat-for-n8n.php')) . '/languages'
+                );
+            }
         }
     }
     
@@ -574,28 +560,28 @@ class BooChat_Connect_Admin {
      */
     public function render_sessions_page() {
         $ajax_url = admin_url('admin-ajax.php');
-        $nonce = wp_create_nonce('boochat-connect-sessions');
+        $nonce = wp_create_nonce('boopixel-ai-chat-for-n8n-sessions');
         
         // Enqueue sessions script
         wp_enqueue_script(
-            'boochat-connect-sessions',
-            BOOCHAT_CONNECT_URL . 'assets/js/sessions-script.js',
+            'boopixel-ai-chat-for-n8n-sessions',
+            BOOPIXEL_AI_CHAT_FOR_N8N_URL . 'assets/js/sessions-script.js',
             array('jquery'),
-            BOOCHAT_CONNECT_VERSION,
+            BOOPIXEL_AI_CHAT_FOR_N8N_VERSION,
             true
         );
         
-        wp_localize_script('boochat-connect-sessions', 'boochatConnectSessions', array(
-            'exportJsonText' => esc_html__('Export JSON', 'boochat-connect'),
-            'exportCsvText' => esc_html__('Export CSV', 'boochat-connect'),
+        wp_localize_script('boopixel-ai-chat-for-n8n-sessions', 'boopixelAiChatForN8nSessions', array(
+            'exportJsonText' => esc_html__('Export JSON', 'boopixel-ai-chat-for-n8n'),
+            'exportCsvText' => esc_html__('Export CSV', 'boopixel-ai-chat-for-n8n'),
             'ajax_url' => $ajax_url,
             'nonce' => $nonce,
-            'loadingText' => boochat_connect_translate('loading_sessions', 'Loading sessions...'),
-            'errorLoadingText' => boochat_connect_translate('error_loading_sessions', 'Error loading sessions: '),
-            'noSessionsText' => boochat_connect_translate('no_sessions_found', 'No sessions found.')
+            'loadingText' => boopixel_ai_chat_for_n8n_translate('loading_sessions', 'Loading sessions...'),
+            'errorLoadingText' => boopixel_ai_chat_for_n8n_translate('error_loading_sessions', 'Error loading sessions: '),
+            'noSessionsText' => boopixel_ai_chat_for_n8n_translate('no_sessions_found', 'No sessions found.')
         ));
         
-        include BOOCHAT_CONNECT_DIR . 'includes/views/admin-sessions.php';
+        include BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'includes/views/admin-sessions.php';
     }
     
     /**
@@ -634,13 +620,14 @@ class BooChat_Connect_Admin {
      * Redirect to PRO upgrade page
      */
     public function redirect_to_pro_page() {
-        $redirect_url = admin_url('admin.php?page=boochat-connect-pro');
-        // Use JavaScript as fallback in case PHP redirect doesn't work
-        ?>
-        <script type="text/javascript">
-            window.location.href = '<?php echo esc_js($redirect_url); ?>';
-        </script>
-        <?php
+        $redirect_url = admin_url('admin.php?page=boopixel-ai-chat-for-n8n-pro');
+        
+        // Enqueue redirect script using wp_add_inline_script
+        wp_enqueue_script('jquery');
+        $redirect_script = "window.location.href = '" . esc_js($redirect_url) . "';";
+        wp_add_inline_script('jquery', $redirect_script);
+        
+        // Use PHP redirect as primary method
         wp_safe_redirect($redirect_url);
         exit;
     }
@@ -649,13 +636,7 @@ class BooChat_Connect_Admin {
      * Render statistics page
      */
     public function render_statistics_page() {
-        // Check if user has PRO license
-        if (!$this->license->is_pro()) {
-            // Redirect to PRO upgrade page
-            wp_safe_redirect(admin_url('admin.php?page=boochat-connect-pro'));
-            exit;
-        }
-        
+        // Statistics page is available to all users
         $this->statistics->render_page();
     }
     
@@ -685,7 +666,7 @@ class BooChat_Connect_Admin {
      * Handle license activation
      */
     public function handle_activate_license() {
-        if (!$this->verify_request('boochat_connect_activate_license', 'license_nonce')) {
+        if (!$this->verify_request('boopixel_ai_chat_for_n8n_activate_license', 'license_nonce')) {
             return;
         }
         
@@ -696,12 +677,12 @@ class BooChat_Connect_Admin {
         
         if ($result['success']) {
             wp_safe_redirect(add_query_arg(array(
-                'page' => 'boochat-connect-pro',
+                'page' => 'boopixel-ai-chat-for-n8n-pro',
                 'activation' => 'success'
             ), admin_url('admin.php')));
         } else {
             wp_safe_redirect(add_query_arg(array(
-                'page' => 'boochat-connect-pro',
+                'page' => 'boopixel-ai-chat-for-n8n-pro',
                 'activation' => 'error',
                 'message' => urlencode($result['message'])
             ), admin_url('admin.php')));
@@ -713,14 +694,14 @@ class BooChat_Connect_Admin {
      * Handle license deactivation
      */
     public function handle_deactivate_license() {
-        if (!$this->verify_request('boochat_connect_deactivate_license', 'deactivate_nonce')) {
+        if (!$this->verify_request('boopixel_ai_chat_for_n8n_deactivate_license', 'deactivate_nonce')) {
             return;
         }
         
         $result = $this->license->deactivate_license();
         
         wp_safe_redirect(add_query_arg(array(
-            'page' => 'boochat-connect-pro',
+            'page' => 'boopixel-ai-chat-for-n8n-pro',
             'deactivation' => $result['success'] ? 'success' : 'error'
         ), admin_url('admin.php')));
         exit;
@@ -731,13 +712,13 @@ class BooChat_Connect_Admin {
      */
     public function ajax_create_stripe_session() {
         // Verify nonce
-        if (!isset($_POST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'boochat-connect-stripe')) {
-            wp_send_json_error(array('message' => boochat_connect_translate('security_check_failed', 'Security check failed.')));
+        if (!isset($_POST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'boopixel-ai-chat-for-n8n-stripe')) {
+            wp_send_json_error(array('message' => boopixel_ai_chat_for_n8n_translate('security_check_failed', 'Security check failed.')));
             return;
         }
         
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => boochat_connect_translate('no_permission', 'No permission.')));
+            wp_send_json_error(array('message' => boopixel_ai_chat_for_n8n_translate('no_permission', 'No permission.')));
             return;
         }
         
@@ -750,7 +731,7 @@ class BooChat_Connect_Admin {
             ));
         } else {
             wp_send_json_error(array(
-                'message' => isset($result['message']) ? $result['message'] : boochat_connect_translate('failed_checkout_session', 'Failed to create checkout session.')
+                'message' => isset($result['message']) ? $result['message'] : boopixel_ai_chat_for_n8n_translate('failed_checkout_session', 'Failed to create checkout session.')
             ));
         }
     }
@@ -759,7 +740,7 @@ class BooChat_Connect_Admin {
      * Handle checkout request (legacy POST form)
      */
     public function handle_stripe_checkout() {
-        if (!$this->verify_request('boochat_connect_stripe_checkout', 'stripe_nonce')) {
+        if (!$this->verify_request('boopixel_ai_chat_for_n8n_stripe_checkout', 'stripe_nonce')) {
             return;
         }
         
@@ -771,7 +752,7 @@ class BooChat_Connect_Admin {
             exit;
         } else {
             wp_safe_redirect(add_query_arg(array(
-                'page' => 'boochat-connect-pro',
+                'page' => 'boopixel-ai-chat-for-n8n-pro',
                 'payment' => 'error',
                 'message' => isset($result['message']) ? urlencode($result['message']) : ''
             ), admin_url('admin.php')));
@@ -784,7 +765,7 @@ class BooChat_Connect_Admin {
      */
     public function handle_stripe_return() {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Payment callback verification
-        if (!isset($_GET['page']) || sanitize_text_field(wp_unslash($_GET['page'])) !== 'boochat-connect-pro') {
+        if (!isset($_GET['page']) || sanitize_text_field(wp_unslash($_GET['page'])) !== 'boopixel-ai-chat-for-n8n-pro') {
             return;
         }
         
@@ -805,7 +786,7 @@ class BooChat_Connect_Admin {
         
         if ($result['success']) {
             wp_safe_redirect(add_query_arg(array(
-                'page' => 'boochat-connect-pro',
+                'page' => 'boopixel-ai-chat-for-n8n-pro',
                 'payment' => 'success',
                 'license_activated' => '1'
             ), admin_url('admin.php')));
@@ -815,14 +796,14 @@ class BooChat_Connect_Admin {
             
             if ($needs_api_key) {
                 wp_safe_redirect(add_query_arg(array(
-                    'page' => 'boochat-connect-pro',
+                    'page' => 'boopixel-ai-chat-for-n8n-pro',
                     'payment' => 'success',
                     'license_received' => '1',
                     'needs_api_key' => '1'
                 ), admin_url('admin.php')));
             } else {
                 wp_safe_redirect(add_query_arg(array(
-                    'page' => 'boochat-connect-pro',
+                    'page' => 'boopixel-ai-chat-for-n8n-pro',
                     'payment' => 'error',
                     'message' => isset($result['message']) ? urlencode($result['message']) : ''
                 ), admin_url('admin.php')));
@@ -838,7 +819,7 @@ class BooChat_Connect_Admin {
      * @return array Modified action links.
      */
     public function add_plugin_action_links($links) {
-        $settings_link = '<a href="' . esc_url(admin_url('admin.php?page=boochat-connect-settings')) . '">' . esc_html__('Settings', 'boochat-connect') . '</a>';
+        $settings_link = '<a href="' . esc_url(admin_url('admin.php?page=boopixel-ai-chat-for-n8n-settings')) . '">' . esc_html__('Settings', 'boopixel-ai-chat-for-n8n') . '</a>';
         array_unshift($links, $settings_link);
         return $links;
     }
