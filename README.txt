@@ -2,7 +2,7 @@
 Contributors: boopixel
 Tags: chatbot, ai, n8n, automation, customer service
 Requires at least: 5.0
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.2
 Stable tag: 1.0.0
 License: GPLv2 or later
@@ -151,6 +151,7 @@ Each user gets a unique session ID that persists throughout their conversation. 
 == Support ==
 
 For support, please visit: https://boopixel.com/support
+Email: email@boopixel.com
 
 == Credits ==
 

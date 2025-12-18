@@ -13,7 +13,7 @@
  * Text Domain: boopixel-ai-chat-for-n8n
  * Domain Path: /languages
  * Requires at least: 5.0
- * Tested up to: 6.8
+ * Tested up to: 6.9
  * Requires PHP: 7.2
  */
 
