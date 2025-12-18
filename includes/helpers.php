@@ -139,8 +139,9 @@ if (!function_exists('boopixel_ai_chat_for_n8n_get_translated_string')) {
                 return esc_html__('Error sending message. Please try again.', 'boopixel-ai-chat-for-n8n');
             case 'API URL not configured. Configure in Help Plugin > Settings.':
                 return esc_html__('API URL not configured. Configure in Help Plugin > Settings.', 'boopixel-ai-chat-for-n8n');
-            case 'HTTP %d: %s':
-                return esc_html__('HTTP %d: %s', 'boopixel-ai-chat-for-n8n');
+            case 'HTTP %1$d: %2$s':
+                /* translators: %1$d: HTTP status code, %2$s: Error message */
+                return esc_html__('HTTP %1$d: %2$s', 'boopixel-ai-chat-for-n8n');
             case 'Empty message.':
                 return esc_html__('Empty message.', 'boopixel-ai-chat-for-n8n');
             case 'Error connecting to the service. Please try again.':
@@ -286,9 +287,10 @@ if (!function_exists('boopixel_ai_chat_for_n8n_get_translated_string')) {
             case 'Refresh':
                 return esc_html__('Refresh', 'boopixel-ai-chat-for-n8n');
             default:
-                // Fallback: use the msgid directly if not in switch
-                // This handles any keys not explicitly listed above
-                return esc_html__($msgid, 'boopixel-ai-chat-for-n8n');
+                // Fallback: return the msgid as-is if not in switch
+                // Note: This should not happen if all translation keys are properly mapped
+                // Using the msgid directly without translation to avoid variable in gettext function
+                return esc_html($msgid);
         }
     }
 }
@@ -339,7 +341,7 @@ if (!function_exists('boopixel_ai_chat_for_n8n_translate')) {
             'waiting_response' => 'Waiting for response...',
             'error_send_message' => 'Error sending message. Please try again.',
             'api_not_configured_error' => 'API URL not configured. Configure in Help Plugin > Settings.',
-            'http_error_message' => 'HTTP %d: %s',
+            'http_error_message' => 'HTTP %1$d: %2$s',
             'empty_message' => 'Empty message.',
             'api_connection_error' => 'Error connecting to the service. Please try again.',
             'server_response_error' => 'Error processing server response.',

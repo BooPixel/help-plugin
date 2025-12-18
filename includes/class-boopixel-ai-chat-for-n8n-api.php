@@ -65,7 +65,7 @@ class BooPixel_AI_Chat_For_N8n_API {
         $body = wp_remote_retrieve_body($response);
         
         if ($response_code !== 200) {
-            return new WP_Error('http_error', sprintf(boopixel_ai_chat_for_n8n_translate('http_error_message', 'HTTP %d: %s'), $response_code, $body));
+            return new WP_Error('http_error', sprintf(boopixel_ai_chat_for_n8n_translate('http_error_message', 'HTTP %1$d: %2$s'), $response_code, $body));
         }
         
         return array(
