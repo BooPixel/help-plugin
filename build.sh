@@ -73,6 +73,11 @@ zip -r "$ZIP_NAME" . \
     -x "*.md" \
     -x "*.bak*" \
     -x "*backup*" \
+    -x "tests/*" \
+    -x "phpunit.xml" \
+    -x "composer.json" \
+    -x "package.json" \
+    -x "node_modules/*" \
     > /dev/null 2>&1
 
 echo "Build complete: $ZIP_NAME (version $NEW_VERSION)"
