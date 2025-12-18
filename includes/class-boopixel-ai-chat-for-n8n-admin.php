@@ -471,21 +471,12 @@ class BooPixel_AI_Chat_For_N8n_Admin {
         $target_locale = $this->get_target_locale();
         $current_locale = get_locale();
         
-        // If locale changed, reload text domain
+        // If locale changed, switch locale
+        // Note: WordPress.org automatically loads translations since WordPress 4.6
+        // No need to manually call load_plugin_textdomain() or unload_textdomain()
         if ($target_locale !== $current_locale && function_exists('switch_to_locale')) {
             switch_to_locale($target_locale);
-            // Reload text domain with new locale
-            unload_textdomain('boopixel-ai-chat-for-n8n');
-            // Note: load_plugin_textdomain() not needed for WordPress.org plugins since 4.6
-            // WordPress automatically loads translations, but we reload for locale switching
-            // Only reload if supporting WordPress < 4.6
-            if (version_compare(get_bloginfo('version'), '4.6', '<')) {
-                load_plugin_textdomain(
-                    'boopixel-ai-chat-for-n8n',
-                    false,
-                    dirname(plugin_basename(BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'boopixel-ai-chat-for-n8n.php')) . '/languages'
-                );
-            }
+            // WordPress will automatically reload translations for the new locale
         }
     }
     
