@@ -3,9 +3,15 @@
  * Bootstrap file for PHPUnit tests
  */
 
-// Prevent direct access
+// Prevent direct access (for test bootstrap, we define ABSPATH if not set)
 if (!defined('ABSPATH')) {
     define('ABSPATH', dirname(__DIR__) . '/');
+} else {
+    // If ABSPATH is already defined, this might be a direct access attempt
+    // Exit only if not in a test environment
+    if (!defined('WP_TESTS_FORCE_KNOWN_BUGS')) {
+        exit; // Exit if accessed directly outside test context
+    }
 }
 
 if (!defined('WP_CONTENT_DIR')) {
