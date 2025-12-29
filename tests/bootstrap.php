@@ -3,8 +3,9 @@
  * Bootstrap file for PHPUnit tests
  */
 
-// Prevent direct access (for test bootstrap, we define ABSPATH if not set)
+// Prevent direct access
 if (!defined('ABSPATH')) {
+    // For test bootstrap, we define ABSPATH if not set
     define('ABSPATH', dirname(__DIR__) . '/');
 } else {
     // If ABSPATH is already defined, this might be a direct access attempt
