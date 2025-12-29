@@ -4,10 +4,12 @@ This directory contains translation files following WordPress I18n standards.
 
 ## Files
 
-- `boochat-connect.pot` - Template file (Portable Object Template)
+- `boochat-connect.pot` - Template file (Portable Object Template) (Note: filename still uses old text domain, but content uses `boopixel-ai-chat-for-n8n`)
 - `boochat-connect-en_US.po` - English translations
 - `boochat-connect-pt_BR.po` - Portuguese (Brazil) translations
 - `boochat-connect-es_ES.po` - Spanish translations
+
+Note: Translation file names still use the old text domain (`boochat-connect`) for backward compatibility, but the actual text domain used in the code is `boopixel-ai-chat-for-n8n`.
 
 ## Compiling .mo files
 
@@ -18,6 +20,8 @@ msgfmt -o boochat-connect-en_US.mo boochat-connect-en_US.po
 msgfmt -o boochat-connect-pt_BR.mo boochat-connect-pt_BR.po
 msgfmt -o boochat-connect-es_ES.mo boochat-connect-es_ES.po
 ```
+
+Note: The compiled `.mo` files will be automatically loaded by WordPress.org based on the text domain `boopixel-ai-chat-for-n8n` used in the plugin code.
 
 Or compile all at once:
 
@@ -30,9 +34,9 @@ done
 ## WordPress I18n Standards
 
 This plugin now follows WordPress I18n standards:
-- Uses `load_plugin_textdomain()` to load translations
+- WordPress.org automatically loads translations (no need for `load_plugin_textdomain()` since WP 4.6)
 - Uses `esc_html__()`, `__()`, `_e()`, etc. for translations
-- Text Domain: `boochat-connect`
+- Text Domain: `boopixel-ai-chat-for-n8n`
 - Translation files follow WordPress naming conventions
 
 ## Updating Translations
