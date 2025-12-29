@@ -90,7 +90,7 @@ class BooPixel_AI_Chat_For_N8n_Test extends TestCase {
             function plugin_dir_path($file) { return dirname($file) . '/'; }
         }
         if (!function_exists('plugin_dir_url')) {
-            function plugin_dir_url($file) { return 'http://example.com/wp-content/plugins/boochat-connect/'; }
+            function plugin_dir_url($file) { return 'http://example.com/wp-content/plugins/boopixel-ai-chat-for-n8n/'; }
         }
         if (!function_exists('current_time')) {
             function current_time($type, $gmt = 0) { return gmdate('Y-m-d H:i:s'); }
@@ -308,7 +308,8 @@ class BooPixel_AI_Chat_For_N8n_Test extends TestCase {
         if (!defined('DB_NAME')) define('DB_NAME', 'test_db');
         if (!defined('HOUR_IN_SECONDS')) define('HOUR_IN_SECONDS', 3600);
         if (!defined('YEAR_IN_SECONDS')) define('YEAR_IN_SECONDS', 31536000);
-        if (!defined('BOOCHAT_CONNECT_VERSION')) define('BOOCHAT_CONNECT_VERSION', '1.0.0');
+        if (!defined('BOOPIXEL_AI_CHAT_FOR_N8N_VERSION')) define('BOOPIXEL_AI_CHAT_FOR_N8N_VERSION', '1.0.0');
+        if (!defined('BOOPIXEL_AI_CHAT_FOR_N8N_DIR')) define('BOOPIXEL_AI_CHAT_FOR_N8N_DIR', dirname(__DIR__) . '/');
     }
     
     /**
@@ -320,25 +321,25 @@ class BooPixel_AI_Chat_For_N8n_Test extends TestCase {
         
         $this->assertSame($instance1, $instance2);
         $this->assertInstanceOf('BooPixel_AI_Chat_For_N8n', $instance1);
-        $this->assertTrue(defined('BOOCHAT_CONNECT_VERSION'));
+        $this->assertTrue(defined('BOOPIXEL_AI_CHAT_FOR_N8N_VERSION'));
     }
     
     /**
      * Test helper functions
      */
     public function test_helper_functions() {
-        $this->assertTrue(function_exists('boochat_connect_get_version'));
-        $this->assertTrue(function_exists('boochat_connect_get_language_from_locale'));
-        $this->assertTrue(function_exists('boochat_connect_translate'));
-        $this->assertTrue(function_exists('boochat_connect_log_api_request'));
+        $this->assertTrue(function_exists('boopixel_ai_chat_for_n8n_get_version'));
+        $this->assertTrue(function_exists('boopixel_ai_chat_for_n8n_get_language_from_locale'));
+        $this->assertTrue(function_exists('boopixel_ai_chat_for_n8n_translate'));
+        $this->assertTrue(function_exists('boopixel_ai_chat_for_n8n_log_api_request'));
         
-        $this->assertEquals('pt', boochat_connect_get_language_from_locale('pt_BR'));
-        $this->assertEquals('es', boochat_connect_get_language_from_locale('es_ES'));
-        $this->assertEquals('en', boochat_connect_get_language_from_locale('en_US'));
-        $this->assertEquals('en', boochat_connect_get_language_from_locale('fr_FR'));
+        $this->assertEquals('pt', boopixel_ai_chat_for_n8n_get_language_from_locale('pt_BR'));
+        $this->assertEquals('es', boopixel_ai_chat_for_n8n_get_language_from_locale('es_ES'));
+        $this->assertEquals('en', boopixel_ai_chat_for_n8n_get_language_from_locale('en_US'));
+        $this->assertEquals('en', boopixel_ai_chat_for_n8n_get_language_from_locale('fr_FR'));
         
-        $this->assertEquals('Support', boochat_connect_translate('chat_name_default'));
-        $this->assertEquals('Default Value', boochat_connect_translate('non_existent_key', 'Default Value'));
+        $this->assertEquals('Support', boopixel_ai_chat_for_n8n_translate('chat_name_default'));
+        $this->assertEquals('Default Value', boopixel_ai_chat_for_n8n_translate('non_existent_key', 'Default Value'));
     }
     
     /**
@@ -355,14 +356,14 @@ class BooPixel_AI_Chat_For_N8n_Test extends TestCase {
         
         // Test error when URL is empty
         global $mock_options;
-        $mock_options = array('boochat_connect_api_url' => '');
+        $mock_options = array('boopixel_ai_chat_for_n8n_api_url' => '');
         $result = $api->send_message('test_session', 'test message');
         $this->assertInstanceOf('BooPixel_AI_Chat_For_N8n_Test_WP_Error', $result);
         $this->assertEquals('no_api_url', $result->get_error_code());
         unset($mock_options);
         
         // Test success
-        $mock_options = array('boochat_connect_api_url' => 'https://api.example.com/webhook');
+        $mock_options = array('boopixel_ai_chat_for_n8n_api_url' => 'https://api.example.com/webhook');
         $result = $api->send_message('test_session', 'test message');
         $this->assertIsArray($result);
         $this->assertArrayHasKey('body', $result);
@@ -370,7 +371,7 @@ class BooPixel_AI_Chat_For_N8n_Test extends TestCase {
         unset($mock_options);
         
         // Test HTTP error
-        $mock_options = array('boochat_connect_api_url' => 'https://api.example.com/webhook');
+        $mock_options = array('boopixel_ai_chat_for_n8n_api_url' => 'https://api.example.com/webhook');
         global $wp_remote_post_override;
         $wp_remote_post_override = array(
             'body' => 'Error message',
@@ -465,11 +466,11 @@ class BooPixel_AI_Chat_For_N8n_Test extends TestCase {
         );
         
         // Should execute without errors
-        boochat_connect_log_api_request($endpoint, $url);
-        boochat_connect_log_api_request($endpoint, $url, $request_body);
-        boochat_connect_log_api_request($endpoint, $url, array(), $headers);
-        boochat_connect_log_api_request($endpoint, $url, array(), array(), new BooPixel_AI_Chat_For_N8n_Test_WP_Error('test', 'error'));
-        boochat_connect_log_api_request($endpoint, $url, array(), array(), $response);
+        boopixel_ai_chat_for_n8n_log_api_request($endpoint, $url);
+        boopixel_ai_chat_for_n8n_log_api_request($endpoint, $url, $request_body);
+        boopixel_ai_chat_for_n8n_log_api_request($endpoint, $url, array(), $headers);
+        boopixel_ai_chat_for_n8n_log_api_request($endpoint, $url, array(), array(), new BooPixel_AI_Chat_For_N8n_Test_WP_Error('test', 'error'));
+        boopixel_ai_chat_for_n8n_log_api_request($endpoint, $url, array(), array(), $response);
         
         $this->assertTrue(true);
     }
@@ -478,8 +479,8 @@ class BooPixel_AI_Chat_For_N8n_Test extends TestCase {
      * Test essential files exist
      */
     public function test_essential_files_exist() {
-        $this->assertFileExists(BOOCHAT_CONNECT_DIR . 'includes/views/admin-main.php');
-        $this->assertFileExists(BOOCHAT_CONNECT_DIR . 'includes/views/frontend-chat.php');
-        $this->assertFileExists(BOOCHAT_CONNECT_DIR . 'assets/css/chat-style.css');
+        $this->assertFileExists(BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'includes/views/admin-main.php');
+        $this->assertFileExists(BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'includes/views/frontend-chat.php');
+        $this->assertFileExists(BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'assets/css/chat-style.css');
     }
 }
