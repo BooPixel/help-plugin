@@ -232,7 +232,7 @@ class BooPixel_AI_Chat_For_N8n_Admin {
                 'chart-js',
                 BOOPIXEL_AI_CHAT_FOR_N8N_URL . 'assets/js/chart.umd.min.js',
                 array(),
-                '4.4.0',
+                '4.4.3',
                 false
             );
             
