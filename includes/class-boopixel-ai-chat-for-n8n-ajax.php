@@ -30,13 +30,6 @@ class BooPixel_AI_Chat_For_N8n_Ajax {
     private $api;
     
     /**
-     * License instance
-     *
-     * @var BooPixel_AI_Chat_For_N8n_License
-     */
-    private $license;
-    
-    /**
      * Constructor
      *
      * @param BooPixel_AI_Chat_For_N8n_Database $database Database instance.
@@ -45,7 +38,6 @@ class BooPixel_AI_Chat_For_N8n_Ajax {
     public function __construct($database, $api) {
         $this->database = $database;
         $this->api = $api;
-        $this->license = new BooPixel_AI_Chat_For_N8n_License();
         
         // Register AJAX hooks
         add_action('wp_ajax_boopixel_ai_chat_for_n8n_send_message', array($this, 'send_message'));

@@ -35,7 +35,6 @@ require_once BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'includes/class-boopixel-ai-chat-for
 require_once BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'includes/class-boopixel-ai-chat-for-n8n-api.php';
 require_once BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'includes/class-boopixel-ai-chat-for-n8n-settings.php';
 require_once BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'includes/class-boopixel-ai-chat-for-n8n-statistics.php';
-require_once BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'includes/class-boopixel-ai-chat-for-n8n-license.php';
 require_once BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'includes/class-boopixel-ai-chat-for-n8n-ajax.php';
 require_once BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'includes/class-boopixel-ai-chat-for-n8n-admin.php';
 require_once BOOPIXEL_AI_CHAT_FOR_N8N_DIR . 'includes/class-boopixel-ai-chat-for-n8n-frontend.php';
@@ -129,19 +128,6 @@ class BooPixel_AI_Chat_For_N8n {
         flush_rewrite_rules();
     }
     
-    /**
-     * Verify license periodically
-     */
-    public function verify_license_periodically() {
-        $license = new BooPixel_AI_Chat_For_N8n_License();
-        
-        // Verify license every 24 hours
-        $last_check = get_option('boopixel_ai_chat_for_n8n_license_last_check', 0);
-        if (time() - $last_check > 86400) {
-            $license->verify_license();
-            update_option('boopixel_ai_chat_for_n8n_license_last_check', time());
-        }
-    }
     
     /**
      * Plugin uninstall hook - Remove all plugin data
@@ -164,15 +150,7 @@ class BooPixel_AI_Chat_For_N8n {
             'boopixel_ai_chat_for_n8n_text_color',
             'boopixel_ai_chat_for_n8n_font_family',
             'boopixel_ai_chat_for_n8n_font_size',
-            'boopixel_ai_chat_for_n8n_api_url',
-            'boopixel_ai_chat_for_n8n_license_key',
-            'boopixel_ai_chat_for_n8n_license_status',
-            'boopixel_ai_chat_for_n8n_license_expires',
-            'boopixel_ai_chat_for_n8n_license_last_check',
-            'boopixel_ai_chat_for_n8n_stripe_secret_key',
-            'boopixel_ai_chat_for_n8n_stripe_test_mode',
-            'boopixel_ai_chat_for_n8n_pro_price',
-            'boopixel_ai_chat_for_n8n_pro_currency'
+            'boopixel_ai_chat_for_n8n_api_url'
         );
         
         foreach ($options as $option) {
@@ -193,9 +171,6 @@ class BooPixel_AI_Chat_For_N8n {
      * Constructor
      */
     private function __construct() {
-        // Schedule license verification
-        add_action('wp_loaded', array($this, 'verify_license_periodically'));
-        
         // Initialize core components
         $this->database = new BooPixel_AI_Chat_For_N8n_Database();
         $this->api = new BooPixel_AI_Chat_For_N8n_API();
