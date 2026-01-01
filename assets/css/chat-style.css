@@ -23,6 +23,7 @@
     gap: 10px;
     position: relative;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-height: 50px;
 }
 
 .boochat-connect-popup-content:hover {
@@ -49,21 +50,38 @@
     background: rgba(255, 255, 255, 0.2);
     border: none;
     color: #fff;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, transform 0.2s ease;
     margin-left: 10px;
+    padding: 0;
+    flex-shrink: 0;
+    position: relative;
 }
 
 .boochat-connect-popup-close:hover {
     background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.boochat-connect-popup-close:active {
+    transform: scale(0.95);
+}
+
+.boochat-connect-popup-close::before {
+    content: '×';
+    display: block;
+    font-weight: bold;
+    line-height: 1;
 }
 
 .boochat-connect-popup.hidden {
@@ -139,6 +157,8 @@
     color: #fff;
     width: 28px;
     height: 28px;
+    min-width: 28px;
+    min-height: 28px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 20px;
@@ -146,11 +166,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, transform 0.2s ease;
+    padding: 0;
+    flex-shrink: 0;
+    position: relative;
 }
 
 .boochat-connect-chat-close:hover {
     background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.boochat-connect-chat-close:active {
+    transform: scale(0.95);
+}
+
+.boochat-connect-chat-close::before {
+    content: '×';
+    display: block;
+    font-weight: bold;
+    line-height: 1;
 }
 
 .boochat-connect-chat-body {
@@ -195,10 +230,39 @@
     align-self: flex-start;
 }
 
+.boochat-connect-chat-message {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
 .boochat-connect-chat-message p {
     margin: 0;
     font-size: 14px;
     line-height: 1.5;
+}
+
+.boochat-connect-chat-message a {
+    color: #667eea;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.boochat-connect-chat-message a:hover {
+    color: #764ba2;
+    text-decoration: none;
+}
+
+.boochat-connect-chat-message-admin a {
+    color: #667eea;
+}
+
+.boochat-connect-chat-message-user a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.boochat-connect-chat-message-user a:hover {
+    color: #e9ecef;
 }
 
 .boochat-connect-chat-footer {
