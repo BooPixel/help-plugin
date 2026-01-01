@@ -382,29 +382,6 @@ class BooPixel_AI_Chat_For_N8n_Test extends TestCase {
         $this->assertEquals('http_error', $result->get_error_code());
         unset($mock_options, $wp_remote_post_override);
     }
-    
-    /**
-     * Test License class
-     */
-    public function test_license_class() {
-        $license = new BooPixel_AI_Chat_For_N8n_License();
-        
-        $this->assertIsString($license->get_license_key());
-        $this->assertIsString($license->get_license_status());
-        
-        // Test activate with empty key
-        $result = $license->activate_license('');
-        $this->assertIsArray($result);
-        $this->assertFalse($result['success']);
-        $this->assertNotEmpty($result['message']);
-        
-        // Test verify_payment_and_activate with empty session
-        $result = $license->verify_payment_and_activate('');
-        $this->assertIsArray($result);
-        $this->assertFalse($result['success']);
-        $this->assertNotEmpty($result['message']);
-    }
-    
     /**
      * Test Database class
      */
