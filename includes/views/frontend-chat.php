@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
             <span class="boochat-connect-popup-icon">💬</span>
             <span class="boochat-connect-popup-text"><?php echo esc_html(boopixel_ai_chat_for_n8n_translate('need_help')); ?></span>
         </div>
-        <button class="boochat-connect-popup-close" aria-label="<?php echo esc_attr(boopixel_ai_chat_for_n8n_translate('close')); ?>">&times;</button>
+        <button type="button" class="boochat-connect-popup-close" aria-label="<?php echo esc_attr(boopixel_ai_chat_for_n8n_translate('close')); ?>"></button>
     </div>
 </div>
 
@@ -31,7 +31,7 @@ if (!defined('ABSPATH')) {
             <?php endif; ?>
             <span><?php echo esc_html($settings['chat_name']); ?></span>
         </div>
-        <button class="boochat-connect-chat-close" aria-label="<?php echo esc_attr(boopixel_ai_chat_for_n8n_translate('close_chat')); ?>">&times;</button>
+        <button type="button" class="boochat-connect-chat-close" aria-label="<?php echo esc_attr(boopixel_ai_chat_for_n8n_translate('close_chat')); ?>"></button>
     </div>
     <div class="boochat-connect-chat-body">
         <div class="boochat-connect-chat-messages" id="boochat-connect-chat-messages">
