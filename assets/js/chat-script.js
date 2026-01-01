@@ -263,33 +263,169 @@
             const messageClass = 'boochat-connect-chat-message-' + type;
             const idAttr = id ? ' id="' + escapeHtml(id) + '"' : '';
             const formattedText = formatMessage(text);
-            const messageHTML = '<div class="boochat-connect-chat-message ' + messageClass + '"' + idAttr + '><p>' + formattedText + '</p></div>';
+            
+            // Check if formatted text contains HTML tags
+            const hasHtmlTags = /<[^>]+>/g.test(formattedText);
+            
+            // If HTML is present, don't wrap in <p> tag
+            const contentWrapper = hasHtmlTags ? formattedText : '<p>' + formattedText + '</p>';
+            const messageHTML = '<div class="boochat-connect-chat-message ' + messageClass + '"' + idAttr + '>' + contentWrapper + '</div>';
+            
             $chatMessages.append(messageHTML);
             scrollToBottom();
         }
         
         /**
-         * Format message (convert \n to <br>, preserve markdown-like formatting)
+         * Format message (convert \n to <br>, preserve markdown-like formatting, allow safe HTML)
          */
         function formatMessage(text) {
             if (!text) return '';
             
-            // Escape HTML first
-            let formatted = escapeHtml(text);
+            // First, sanitize HTML to allow only safe tags
+            let formatted = sanitizeHtml(text);
             
-            // Convert \n to <br>
+            // Convert \n to <br> (but not if already in HTML)
             formatted = formatted.replace(/\n/g, '<br>');
             
-            // Convert **bold** to <strong>
-            formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Convert **bold** to <strong> (only if not already HTML)
+            formatted = formatted.replace(/\*\*(.*?)\*\*/g, function(match, content) {
+                // Only convert if not already inside HTML tags
+                if (!/<[^>]*>/.test(match)) {
+                    return '<strong>' + content + '</strong>';
+                }
+                return match;
+            });
             
-            // Convert *italic* to <em>
-            formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            // Convert *italic* to <em> (only if not already HTML and not **)
+            formatted = formatted.replace(/(?<!\*)\*(?!\*)([^*]+?)\*(?!\*)/g, function(match, content) {
+                // Only convert if not already inside HTML tags
+                if (!/<[^>]*>/.test(match)) {
+                    return '<em>' + content + '</em>';
+                }
+                return match;
+            });
             
             // Convert bullet points (* item) to list items
             formatted = formatted.replace(/^\* (.+?)$/gm, '<span class="boochat-connect-bullet">• $1</span>');
             
             return formatted;
+        }
+        
+        /**
+         * Sanitize HTML to allow only safe tags and attributes
+         * Allows: a, strong, em, b, i, u, br, p, span, div, ul, ol, li, h1-h6
+         * Removes: script, iframe, object, embed, form, input, button, style, link
+         * Removes dangerous attributes: onclick, onerror, onload, etc.
+         */
+        function sanitizeHtml(text) {
+            if (!text) return '';
+            
+            // Check if text contains HTML tags
+            const htmlTagRegex = /<[^>]+>/g;
+            const hasHtmlTags = htmlTagRegex.test(text);
+            
+            if (!hasHtmlTags) {
+                // No HTML tags, just escape and return
+                return escapeHtml(text);
+            }
+            
+            // Create a temporary div to parse HTML
+            const temp = document.createElement('div');
+            
+            // Set innerHTML to parse the HTML
+            temp.innerHTML = text;
+            
+            // List of allowed tags
+            const allowedTags = ['a', 'strong', 'em', 'b', 'i', 'u', 'br', 'p', 'span', 'div', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre'];
+            
+            // List of allowed attributes per tag
+            const allowedAttributes = {
+                'a': ['href', 'target', 'rel', 'title'],
+                'span': ['class'],
+                'div': ['class'],
+                'p': ['class'],
+                'h1': ['class'],
+                'h2': ['class'],
+                'h3': ['class'],
+                'h4': ['class'],
+                'h5': ['class'],
+                'h6': ['class']
+            };
+            
+            // Remove dangerous tags and attributes using TreeWalker
+            const walker = document.createTreeWalker(
+                temp,
+                NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+            
+            const nodesToRemove = [];
+            let node;
+            
+            while ((node = walker.nextNode())) {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    const tagName = node.tagName.toLowerCase();
+                    
+                    // Remove disallowed tags
+                    if (allowedTags.indexOf(tagName) === -1) {
+                        nodesToRemove.push(node);
+                        continue;
+                    }
+                    
+                    // Remove dangerous attributes
+                    const attrsToRemove = [];
+                    for (let i = node.attributes.length - 1; i >= 0; i--) {
+                        const attr = node.attributes[i];
+                        const attrName = attr.name.toLowerCase();
+                        
+                        // Remove event handlers and dangerous attributes
+                        if (attrName.startsWith('on') || 
+                            attrName === 'style' || 
+                            attrName === 'javascript') {
+                            attrsToRemove.push(attr.name);
+                        } else if (allowedAttributes[tagName] && allowedAttributes[tagName].indexOf(attrName) === -1) {
+                            // Remove attributes not in allowed list
+                            attrsToRemove.push(attr.name);
+                        }
+                        
+                        // Sanitize href attributes
+                        if (attrName === 'href' && tagName === 'a') {
+                            const href = attr.value.toLowerCase().trim();
+                            if (href.startsWith('javascript:') || 
+                                href.startsWith('data:') ||
+                                href.startsWith('vbscript:')) {
+                                attrsToRemove.push(attr.name);
+                            }
+                        }
+                    }
+                    
+                    attrsToRemove.forEach(attrName => {
+                        node.removeAttribute(attrName);
+                    });
+                    
+                    // Ensure target="_blank" links have rel="noopener noreferrer"
+                    if (tagName === 'a' && node.getAttribute('target') === '_blank') {
+                        if (!node.getAttribute('rel')) {
+                            node.setAttribute('rel', 'noopener noreferrer');
+                        }
+                    }
+                }
+            }
+            
+            // Remove disallowed nodes
+            nodesToRemove.forEach(nodeToRemove => {
+                const parent = nodeToRemove.parentNode;
+                if (parent) {
+                    // Move children to parent before removing
+                    while (nodeToRemove.firstChild) {
+                        parent.insertBefore(nodeToRemove.firstChild, nodeToRemove);
+                    }
+                    parent.removeChild(nodeToRemove);
+                }
+            });
+            
+            return temp.innerHTML;
         }
         
         /**
@@ -301,7 +437,7 @@
         }
         
         /**
-         * Escape HTML to prevent XSS
+         * Escape HTML to prevent XSS (used for non-HTML content)
          */
         function escapeHtml(text) {
             const map = {
