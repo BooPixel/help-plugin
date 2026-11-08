@@ -1,0 +1,83 @@
+site_name: BooPixel AI Chat for n8n - Documentation
+site_description: Complete guide for uploading and managing the plugin on WordPress.org
+site_author: BooPixel
+site_url: https://boopixel.com
+
+# Repository
+repo_name: boopixel/help-plugin
+repo_url: https://github.com/boopixel/help-plugin
+edit_uri: edit/main/docs/
+
+# Theme
+theme:
+  name: material
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.annotate
+
+# Plugins
+plugins:
+  - search
+  - git-revision-date-localized:
+      enable_creation_date: true
+
+# Navigation
+nav:
+  - Home: index.md
+  - SVN Guide:
+    - Overview: guia-svn/index.md
+    - Quick Commands: guia-svn/comandos-rapidos.md
+    - Configure Credentials: guia-svn/configurar-credenciais.md
+    - How to Use Credentials: guia-svn/como-usar-credenciais.md
+    - View Files: guia-svn/visualizar-arquivos.md
+  - Scripts:
+    - Upload to SVN: scripts/upload-svn.md
+    - Prepare SVN: scripts/preparar-svn.md
+  - Resources:
+    - Useful Links: recursos/links-uteis.md
+    - FAQ: recursos/faq.md
+
+# Extras
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+# Copyright
+copyright: Copyright &copy; 2025 BooPixel
+

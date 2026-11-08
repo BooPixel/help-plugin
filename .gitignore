@@ -3,3 +3,13 @@
 __MACOSX/
 .pro*.mo
 messages.mo
+
+# MkDocs
+site/
+.mkdocs_cache/
+
+# macOS
+.DS_Store
+
+# SVN working copy (WordPress.org)
+boopixel-svn/
